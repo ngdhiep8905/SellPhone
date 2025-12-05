@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý Người dùng – SellPhone Admin</title>
+
+    <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+
+<div class="admin-container">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="sidebar-header">
+            <h2>📱 SellPhone</h2>
+        </div>
+
+        <div class="sidebar-menu">
+            <a href="admin.html" class="menu-item">
+                <span class="icon">📊</span><span class="text">Dashboard</span>
+            </a>
+
+            <a href="products.html" class="menu-item">
+                <span class="icon">📦</span><span class="text">Sản phẩm</span>
+            </a>
+
+            <a href="brands.html" class="menu-item">
+                <span class="icon">🏷️</span><span class="text">Thương hiệu</span>
+            </a>
+
+            <a href="orders.html" class="menu-item">
+                <span class="icon">🧾</span><span class="text">Đơn hàng</span>
+            </a>
+
+            <a href="users.html" class="menu-item active">
+                <span class="icon">👤</span><span class="text">Người dùng</span>
+            </a>
+            <!-- KHOẢNG CÁCH TRƯỚC LOGOUT -->
+            <div class="sidebar-separator"></div>
+
+            <!-- NÚT LOGOUT -->
+            <a href="#" class="menu-item logout-item" onclick="logout()">
+                <span class="icon">🚪</span>
+                <span class="text">Đăng xuất</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <header class="topbar">
+            <h1>Quản lý Người dùng</h1>
+        </header>
+
+        <!-- TABLE -->
+        <div class="table-container">
+            <table id="userTable">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tên người dùng</th>
+                    <th>Email</th>
+                    <th>Vai trò</th>
+                    <th>Trạng thái</th>
+                    <th>Hành động</th>
+                </tr>
+                </thead>
+
+                <tbody></tbody>
+            </table>
+        </div>
+
+    </main>
+</div>
+
+<!-- MODAL CHI TIẾT USER -->
+<div id="userModal" class="modal">
+    <div class="modal-content">
+
+        <h2>Thông tin người dùng</h2>
+
+        <p><b>ID:</b> <span id="modalUserId"></span></p>
+        <p><b>Tên:</b> <span id="modalUserName"></span></p>
+        <p><b>Email:</b> <span id="modalUserEmail"></span></p>
+        <p><b>Vai trò:</b> <span id="modalUserRole"></span></p>
+        <p><b>Trạng thái:</b> <span id="modalUserStatus"></span></p>
+
+        <button class="btn" onclick="toggleUserStatus()">Khóa / Mở khóa</button>
+        <button class="btn" style="background:#d63031" onclick="closeModal()">Đóng</button>
+    </div>
+</div>
+
+<script src="js/users.js"></script>
+</body>
+</html>

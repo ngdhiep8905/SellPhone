@@ -13,33 +13,41 @@ import java.util.List;
 @Table(name = "`Users`")
 @Data
 public class Users {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "userId")
-    private Long userId;
 
-    @NotBlank(message = "Username is required")
-    @Size(min = 3, max = 100, message = "Username must be between 3 and 100 characters")
-    @Column(name = "userName", unique = true, nullable = false, length = 100)
+    @Id
+    @Column(name = "userId", length = 36)
+    private String userId;
+
+    @PrePersist
+    public void generateId() {
+        if (this.userId == null) {
+            this.userId = UUID.randomUUID().toString();
+        }
+    }
+
+    @NotBlank
+    @Column(unique = true, nullable = false, length = 100)
     private String userName;
 
-    @NotBlank(message = "Password is required")
-    @Size(min = 6, message = "Password must be at least 6 characters")
-    @Column(name = "password", nullable = false, length = 255)
+    @NotBlank
+    @Column(nullable = false)
     private String password;
 
-    @Email(message = "Email should be valid")
-    @Size(max = 100, message = "Email must not exceed 100 characters")
-    @Column(name = "email", length = 100)
+    @Email
+    @Column(length = 100)
     private String email;
 
-    @Size(max = 255, message = "Address must not exceed 255 characters")
-    @Column(name = "address", length = 255)
+    @Column(length = 255)
     private String address;
 
-    @Size(max = 20, message = "Phone must not exceed 20 characters")
-    @Column(name = "phone", length = 20)
+    @Column(length = 20)
     private String phone;
+
+    @Column(length = 150)
+    private String fullName;
+
+    @Column(length = 20)
+    private String status = "ACTIVE";
 
     @ManyToOne
     @JoinColumn(name = "roleId")
@@ -52,6 +60,6 @@ public class Users {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Orders> orders;
-
-
 }
+
+

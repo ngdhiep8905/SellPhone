@@ -7,24 +7,34 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.util.List;
+import java.util.UUID;
 
 @Entity
-@Table(name="Payment")
+@Table(name = "payment")
 @Data
 public class Payment {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "paymentId")
-    private Long paymentId;
+    @Column(name = "payment_id", length = 36)
+    private String paymentId;
+
+    @PrePersist
+    public void generateId() {
+        if (paymentId == null) {
+            paymentId = UUID.randomUUID().toString();
+        }
+    }
 
     @NotBlank(message = "Payment method is required")
     @Size(max = 50, message = "Payment method must not exceed 50 characters")
-    @Column(name = "paymentMethod", length = 50)
+    @Column(name = "payment_method", length = 50)
     private String paymentMethod;
+
+    @Size(max = 50)
+    @Column(name = "payment_status", length = 50)
+    private String paymentStatus = "PENDING";  // default
 
     @OneToMany(mappedBy = "payment")
     @JsonIgnore
     private List<Orders> orders;
-
-
 }

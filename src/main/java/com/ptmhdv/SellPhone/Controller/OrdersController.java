@@ -14,7 +14,7 @@ public class OrdersController {
 
     private final OrdersService ordersService;
 
-    // POST /api/orders/checkout?... (y như FE)
+    // POST /api/orders/checkout?...
     @PostMapping("/checkout")
     public OrdersDTO checkout(@RequestParam Long userId,
                               @RequestParam String receiverName,

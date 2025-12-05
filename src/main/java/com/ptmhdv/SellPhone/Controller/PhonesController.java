@@ -14,8 +14,6 @@ public class PhonesController {
 
     private final PhonesService phonesService;
 
-    // FE hiện tại gọi GET /api/phones (không truyền gì),
-    // nhưng mình vẫn hỗ trợ filter brandId, keyword cho sau này.
     @GetMapping
     public List<PhonesDTO> getPhones(
             @RequestParam(required = false) Long brandId,

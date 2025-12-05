@@ -6,26 +6,32 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.util.List;
+import java.util.UUID;
 
 @Entity
-@Table(name="Brands")
+@Table(name = "brands")
 @Data
 public class Brands {
-    @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @Column(name="brandId")
-    private Long brandId;
 
-    @NotBlank(message = "brandName is required")
-    @Column(name = "brandName", nullable = false, length = 50)
+    @Id
+    @Column(name = "brand_id", length = 36)
+    private String brandId;
+
+    @PrePersist
+    public void generateId() {
+        if (brandId == null) {
+            brandId = UUID.randomUUID().toString();
+        }
+    }
+
+    @NotBlank(message = "Brand name is required")
+    @Column(name = "brand_name", nullable = false, length = 100)
     private String brandName;
 
-    @Column(name="brandDescription", columnDefinition = "TEXT")
+    @Column(name = "brand_description", columnDefinition = "TEXT")
     private String brandDescription;
 
-    @OneToMany(mappedBy = "brand")
+    @OneToMany(mappedBy = "brand", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Phones> phones;
-
-
 }

@@ -5,68 +5,67 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Table(name="Orders")
+@Table(name = "orders")
 @Data
 public class Orders {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "orderId")
-    private Long orderId;
+    @Column(name = "order_id", length = 36)
+    private String orderId;
 
-    @Column(name = "bookDate")
-    private LocalDateTime bookDate;
+    @PrePersist
+    public void generateId() {
+        if (orderId == null) {
+            orderId = java.util.UUID.randomUUID().toString();
+        }
+        if (bookDate == null) {
+            bookDate = LocalDate.now();
+        }
+    }
 
-    @Column(name = "recipientName", length = 100)
+    @Column(name = "book_date")
+    private LocalDate bookDate;
+
+    // Thông tin người nhận
+    @Column(name = "recipient_name", length = 100)
     private String recipientName;
 
-    @Column(name = "recipientPhone", length = 20)
+    @Column(name = "recipient_phone", length = 20)
     private String recipientPhone;
 
-    @Column(name = "shippingAddress", length = 500)
+    @Column(name = "shipping_address", length = 500)
     private String shippingAddress;
 
+    // Tổng tiền của đơn
     @NotNull(message = "totalPrice is required")
     @DecimalMin(value = "0.0", inclusive = false, message = "Total Price must be greater than 0")
-    @Digits(integer = 10, fraction = 2, message = "Total Price must have at most 10 integer digits and 2 decimal places")
-    @Column(name = "totalPrice", precision = 12, scale = 2)
+    @Digits(integer = 12, fraction = 2)
+    @Column(name = "total_amount", precision = 12, scale = 2)
     private BigDecimal totalPrice;
 
-    @Column(length = 20)
-    private String status = "ACTIVE";
+    // Order Status: PROCESSING / COMPLETED / CANCELLED / PENDING
+    @Column(name = "order_status", length = 20)
+    private String status = "PENDING";
 
-
+    // User đặt đơn
     @ManyToOne
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "user_id")
     private Users user;
 
+    // Phương thức thanh toán
     @ManyToOne
-    @JoinColumn(name = "couponId")
-    private Coupon coupon;
-
-    @ManyToOne
-    @JoinColumn(name = "paymentId")
+    @JoinColumn(name = "payment_id")
     private Payment payment;
 
+    // Chi tiết đơn hàng
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrdersPhones> orderPhones;
 
-
-
-    public void setCreatedAt(LocalDateTime now) {
-    }
-
-    public void setReceiverName(String receiverName) {
-    }
-
-    public void setReceiverAddress(String receiverAddress) {
-    }
-
-    public void setReceiverPhone(String receiverPhone) {
-    }
 }
