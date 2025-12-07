@@ -1,0 +1,27 @@
+package com.ptmhdv.SellPhone.Repository;
+
+import com.ptmhdv.SellPhone.Entity.OrdersPhones;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
+
+public interface OrdersPhonesRepository extends JpaRepository<OrdersPhones, String> {
+
+    // Dashboard: top 5 sản phẩm bán chạy
+    @Query("""
+        SELECT op.phone.phoneName, SUM(op.quantity) 
+        FROM OrdersPhones op 
+        GROUP BY op.phone.phoneId 
+        ORDER BY SUM(op.quantity) DESC
+    """)
+    List<Object[]> getTopProducts();
+
+    // Dashboard: doanh thu theo thương hiệu
+    @Query("""
+        SELECT op.phone.brand.brandName, SUM(op.price * op.quantity)
+        FROM OrdersPhones op
+        GROUP BY op.phone.brand.brandId
+    """)
+    List<Object[]> getRevenueByBrand();
+}
