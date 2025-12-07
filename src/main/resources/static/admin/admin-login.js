@@ -1,3 +1,4 @@
+const API_BASE_URL = "";
 function login() {
     const email = emailInput.value.trim();
     const pass = password.value.trim();

@@ -1,5 +1,6 @@
 package com.ptmhdv.sellphone.order.entity;
 
+import com.ptmhdv.sellphone.cart.entity.Coupon;
 import com.ptmhdv.sellphone.payment.entity.Payment;
 import com.ptmhdv.sellphone.user.entity.Users;
 import jakarta.persistence.*;
@@ -73,5 +74,7 @@ public class Orders {
     // Chi tiết đơn hàng
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrdersPhones> orderPhones;
-
+    @ManyToOne
+    @JoinColumn(name = "coupon_id")
+    private Coupon coupon;
 }

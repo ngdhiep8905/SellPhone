@@ -1,5 +1,4 @@
-const API = "http://localhost:8080/api"; // sửa URL backend nếu cần
-
+const API_BASE_URL = "";
 function loadPhones() {
     document.getElementById("title").innerText = "Quản lý Sản phẩm";
 

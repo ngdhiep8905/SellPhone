@@ -44,8 +44,11 @@ public class OrdersPhones {
     @NotNull(message = "Price is required")
     @DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than 0")
     @Digits(integer = 12, fraction = 2)
-    @Column(name = "price", precision = 12, scale = 2, nullable = false)
-    private BigDecimal Quantityxprice;
+    @Column(name = "unit_price", precision = 12, scale = 2, nullable = false)
+    private BigDecimal price;
+
+    @Column(name = "total_price", precision = 12, scale = 2, nullable = false)
+    private BigDecimal quantityXprice;
 
 
 }

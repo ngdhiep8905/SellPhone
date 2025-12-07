@@ -13,7 +13,7 @@ public class CartMapper {
         d.setId(e.getCartItemId());
         d.setCartId(e.getCart().getCartId());
         d.setPhoneId(e.getPhone().getPhoneId());
-        d.setQuantity(e.getQuantityPrice());
+        d.setQuantity(e.getQuantity());
         return d;
     }
 
