@@ -1,8 +1,11 @@
 package com.ptmhdv.sellphone.dashboard.service;
 
+import com.ptmhdv.sellphone.catalog.repository.PhonesRepository;
+import com.ptmhdv.sellphone.dashboard.DTO.DashboardDTO;
 import com.ptmhdv.sellphone.order.entity.Orders;
 import com.ptmhdv.sellphone.order.repository.OrdersPhonesRepository;
 import com.ptmhdv.sellphone.order.repository.OrdersRepository;
+import com.ptmhdv.sellphone.user.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +13,11 @@ import java.util.List;
 
 @Service
 public class DashboardService {
+    @Autowired
+    private UsersRepository userRepo;
+
+    @Autowired
+    private PhonesRepository phoneRepo;
 
     @Autowired
     private OrdersRepository ordersRepo;
@@ -33,5 +41,15 @@ public class DashboardService {
 
     public List<Object[]> getRevenueByBrand() {
         return orderDetailRepo.getRevenueByBrand();
+    }
+
+    public DashboardDTO getSummary(){
+        long totalProducts = phoneRepo.count();
+        long totalOrders = ordersRepo.count();
+        long totalUsers = userRepo.count();
+
+        long revenue = ordersRepo.getMonthRevenue();
+        long monthRevenue = (revenue != null) ? revenue : 0;
+        return new DashboardDTO(totalProducts,totalOrders,totalUsers,monthRevenue);
     }
 }

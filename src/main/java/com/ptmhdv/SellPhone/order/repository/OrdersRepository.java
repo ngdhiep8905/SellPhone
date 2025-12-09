@@ -19,4 +19,7 @@ public interface OrdersRepository extends JpaRepository<Orders, String> {
         AND (:year IS NULL OR YEAR(o.bookDate) = :year)
     """)
     List<Orders> filterOrders(Integer month, Integer year);
+
+    @Query("SELECT SUM(o.totalPrice) FROM Order o WHERE MONTH(o.createdAt) = MONTH(CURRENT_DATE) AND YEAR(o.createdAt) = YEAR(CURRENT_DATE)")
+    Long getMonthRevenue();
 }

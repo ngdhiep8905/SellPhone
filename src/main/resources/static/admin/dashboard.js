@@ -1,4 +1,5 @@
-const API = "http://localhost:8080/api";
+const API = "";
+
 
 /* ========== TAB LOGIC ========== */
 function showTab(tab) {
@@ -30,6 +31,9 @@ function loadSummary() {
         document.getElementById("totalUsers").innerHTML = data.totalUsers;
         document.getElementById("monthRevenue").innerHTML = data.monthRevenue.toLocaleString() + " đ";
     });
+    .catch(err => {
+            console.error("Lỗi load summary:", err);
+        });
 }
 
 function loadOverviewChart() {
