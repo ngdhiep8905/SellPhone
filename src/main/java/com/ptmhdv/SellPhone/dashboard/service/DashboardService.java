@@ -48,7 +48,7 @@ public class DashboardService {
         long totalOrders = ordersRepo.count();
         long totalUsers = userRepo.count();
 
-        long revenue = ordersRepo.getMonthRevenue();
+        Long revenue = ordersRepo.getMonthRevenue();
         long monthRevenue = (revenue != null) ? revenue : 0;
         return new DashboardDTO(totalProducts,totalOrders,totalUsers,monthRevenue);
     }
