@@ -4,6 +4,7 @@ import com.ptmhdv.sellphone.order.entity.Orders;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface OrdersRepository extends JpaRepository<Orders, String> {
@@ -20,6 +21,14 @@ public interface OrdersRepository extends JpaRepository<Orders, String> {
     """)
     List<Orders> filterOrders(Integer month, Integer year);
 
-    @Query("SELECT SUM(o.totalPrice) FROM Order o WHERE MONTH(o.createdAt) = MONTH(CURRENT_DATE) AND YEAR(o.createdAt) = YEAR(CURRENT_DATE)")
-    Long getMonthRevenue();
+
+    @Query("""
+    SELECT COALESCE(SUM(o.totalPrice), 0)
+    FROM Orders o
+    WHERE MONTH(o.bookDate) = MONTH(CURRENT_DATE)
+      AND YEAR(o.bookDate) = YEAR(CURRENT_DATE)
+""")
+    BigDecimal getMonthRevenue();
+
+
 }

@@ -9,6 +9,7 @@ import com.ptmhdv.sellphone.user.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -43,13 +44,16 @@ public class DashboardService {
         return orderDetailRepo.getRevenueByBrand();
     }
 
-    public DashboardDTO getSummary(){
+    public DashboardDTO getSummary() {
+
         long totalProducts = phoneRepo.count();
         long totalOrders = ordersRepo.count();
         long totalUsers = userRepo.count();
 
-        Long revenue = ordersRepo.getMonthRevenue();
-        long monthRevenue = (revenue != null) ? revenue : 0;
-        return new DashboardDTO(totalProducts,totalOrders,totalUsers,monthRevenue);
+        BigDecimal revenue = ordersRepo.getMonthRevenue();
+        long monthRevenue = revenue == null ? 0 : revenue.longValue();
+
+        return new DashboardDTO(totalProducts, totalOrders, totalUsers, monthRevenue);
     }
+
 }

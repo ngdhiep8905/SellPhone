@@ -20,9 +20,14 @@ public class Brands {
     @PrePersist
     public void generateId() {
         if (brandId == null) {
-            brandId = UUID.randomUUID().toString();
+            brandId = generateCustomId();
         }
     }
+
+    private String generateCustomId() {
+        return String.format("%06d", (int)(Math.random() * 999999));
+    }
+
 
     @NotBlank(message = "Brand name is required")
     @Column(name = "brand_name", nullable = false, length = 100)

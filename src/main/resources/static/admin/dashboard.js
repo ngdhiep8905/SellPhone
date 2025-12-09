@@ -1,4 +1,4 @@
-const API = "";
+const API = "/api";
 
 
 /* ========== TAB LOGIC ========== */
@@ -24,17 +24,19 @@ window.onload = function () {
 /* ====== OVERVIEW ====== */
 function loadSummary() {
     fetch(`${API}/dashboard/summary`)
-    .then(res => res.json())
-    .then(data => {
-        document.getElementById("totalProducts").innerHTML = data.totalProducts;
-        document.getElementById("totalOrders").innerHTML = data.totalOrders;
-        document.getElementById("totalUsers").innerHTML = data.totalUsers;
-        document.getElementById("monthRevenue").innerHTML = data.monthRevenue.toLocaleString() + " đ";
-    });
-    .catch(err => {
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("totalProducts").innerHTML = data.totalProducts;
+            document.getElementById("totalOrders").innerHTML = data.totalOrders;
+            document.getElementById("totalUsers").innerHTML = data.totalUsers;
+            document.getElementById("monthRevenue").innerHTML =
+                data.monthRevenue.toLocaleString() + " đ";
+        })
+        .catch(err => {
             console.error("Lỗi load summary:", err);
         });
 }
+
 
 function loadOverviewChart() {
     fetch(`${API}/dashboard/revenue-monthly`)

@@ -17,15 +17,19 @@ import java.util.UUID;
 public class Phones {
 
     @Id
-    @Column(name = "phone_id", length = 36)
+    @Column(name = "phone_id", length = 6)
     private String phoneId;
 
     @PrePersist
     public void generateId() {
         if (phoneId == null) {
-            phoneId = UUID.randomUUID().toString();
+            phoneId = generateCustomId();
         }
     }
+    private String generateCustomId() {
+        return String.format("%06d", (int)(Math.random() * 999999));
+    }
+
 
     @NotBlank(message = "Phone name is required")
     @Size(min = 3, max = 100, message = "Phone name must be between 3 and 100 characters")
