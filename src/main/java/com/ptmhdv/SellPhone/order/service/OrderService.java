@@ -26,8 +26,8 @@ import java.util.List;
 public class OrderService {
 
     private final OrdersRepository ordersRepo;
-    private final PhonesRepository phonesRepo; // Nếu cần trừ kho
-    private final CouponService couponService; // Nếu xử lý coupon
+    private final PhonesRepository phonesRepo;
+    private final CouponService couponService;
     private final PaymentRepository paymentRepo;
     private final UsersRepository usersRepo;
 
@@ -40,75 +40,67 @@ public class OrderService {
             String paymentId
     ) {
 
-        Orders order = new Orders();
+        // ====== 1) LẤY USER ======
+        Users user = usersRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Gán thông tin người nhận
+        List<CartItem> cartItems = user.getCartItems();
+        if (cartItems.isEmpty()) {
+            throw new RuntimeException("Giỏ hàng trống! Không thể thanh toán.");
+        }
+
+        // ====== 2) KHỞI TẠO ORDER ======
+        Orders order = new Orders();
+        order.setUser(user);
         order.setRecipientName(receiverName);
         order.setRecipientPhone(receiverPhone);
         order.setShippingAddress(receiverAddress);
 
-        // Set User
-        Users user = usersRepo.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        order.setUser(user);
-
-        // Set Payment
         Payment payment = paymentRepo.findById(paymentId)
                 .orElseThrow(() -> new RuntimeException("Payment method not found"));
         order.setPayment(payment);
 
-        // Lấy giỏ hàng của user
-        List<CartItem> cartItems = user.getCartItems();
+        List<OrdersPhones> orderPhonesList = new ArrayList<>();
+        BigDecimal totalOrderAmount = BigDecimal.ZERO;
 
-        if (cartItems.isEmpty()) {
-            throw new RuntimeException("Giỏ hàng trống, không thể checkout.");
-        }
-
-        // Tạo danh sách order items
-        List<OrdersPhones> orderPhones = new ArrayList<>();
-        BigDecimal total = BigDecimal.ZERO;
-
+        // ====== 3) TÍNH TIỀN & TẠO ORDER DETAILS ======
         for (CartItem cart : cartItems) {
 
-            OrdersPhones item = new OrdersPhones();
+            BigDecimal price = cart.getPhone().getPrice(); // giá 1 sp
+            int qty = cart.getQuantity();
 
-            item.setOrder(order);
-            item.setPhone(cart.getPhone());
-            item.setQuantity(cart.getQuantity());
-            item.setPrice(cart.getPhone().getPrice());
+            BigDecimal lineTotal = price.multiply(BigDecimal.valueOf(qty));
 
-            BigDecimal itemTotal =
-                    cart.getPhone().getPrice()
-                            .multiply(BigDecimal.valueOf(cart.getQuantity()));
+            // Cộng tổng đơn
+            totalOrderAmount = totalOrderAmount.add(lineTotal);
 
-            total = total.add(itemTotal);
+            // Tạo record order_details
+            OrdersPhones detail = new OrdersPhones();
+            detail.setOrder(order);
+            detail.setPhone(cart.getPhone());
+            detail.setQuantity(qty);
+            detail.setPrice(price);
+            detail.setQuantityXprice(lineTotal);  // map vào cột total_price của SQL
 
-            orderPhones.add(item);
-
-            // Nếu muốn trừ kho:
-            // Phones phone = cart.getPhone();
-            // phone.setStock(phone.getStock() - cart.getQuantity());
-            // phonesRepo.save(phone);
+            orderPhonesList.add(detail);
         }
 
-        // Xử lý coupon nếu có
-        if (couponCode != null && !couponCode.isEmpty()) {
-            BigDecimal discount = couponService.applyCoupon(couponCode, total);
-            total = total.subtract(discount);
+        // ====== 4) XỬ LÝ COUPON ======
+        if (couponCode != null && !couponCode.isBlank()) {
+            BigDecimal discount = couponService.applyCoupon(couponCode, totalOrderAmount);
+            totalOrderAmount = totalOrderAmount.subtract(discount);
         }
 
-        order.setTotalPrice(total);
-        order.setOrderPhones(orderPhones);
+        // ====== 5) LƯU ORDER ======
+        order.setTotalPrice(totalOrderAmount);
+        order.setOrderPhones(orderPhonesList);
         order.setStatus("PENDING");
 
-        // Lưu đơn hàng + order details
-        Orders saved = ordersRepo.save(order);
+        Orders savedOrder = ordersRepo.save(order);
 
-        // Xóa giỏ hàng sau khi checkout
-        user.getCartItems().clear();
+        // ====== 6) XÓA GIỎ HÀNG ======
+        cartItems.clear();
 
-        return saved;
+        return savedOrder;
     }
 }
-
-
