@@ -11,7 +11,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class DashboardService {
@@ -52,10 +55,23 @@ public class DashboardService {
         long totalOrders = ordersRepo.sumOrdersOfMonth();
         long totalUsers = userRepo.count();
 
-        BigDecimal revenue = ordersRepo.getMonthRevenue();
+        BigDecimal revenue = ordersRepo.getCurrentMonthRevenue();
         long monthRevenue = revenue == null ? 0 : revenue.longValue();
 
         return new DashboardDTO(totalProducts, totalOrders, totalUsers, monthRevenue);
+    }
+    public List<Map<String, Object>> filterRevenue(Integer month, Integer year, String brandId) {
+        List<Object[]> data = ordersRepo.filterRevenue(month, year, brandId);
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (Object[] row : data) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("date", row[0]);            // LocalDate
+            map.put("total", row[1]);           // BigDecimal
+            result.add(map);
+        }
+
+        return result;
     }
 
 

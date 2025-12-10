@@ -52,22 +52,15 @@ public class DashBoardController {
     // GET /api/dashboard/revenue?month=...&year=...
     // ============================
     @GetMapping("/revenue")
-    public ResponseEntity<List<Map<String, Object>>> filterRevenue(
+    public ResponseEntity<List<Map<String, Object>>> getRevenue(
             @RequestParam(required = false) Integer month,
-            @RequestParam(required = false) Integer year
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) String brandId
     ) {
-        List<Orders> list = dashboardService.filterRevenue(month, year);
-        List<Map<String, Object>> result = new ArrayList<>();
-
-        for (Orders o : list) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("date", o.getBookDate());
-            map.put("total", o.getTotalPrice());
-            result.add(map);
-        }
-
+        List<Map<String, Object>> result = dashboardService.filterRevenue(month, year, brandId);
         return ResponseEntity.ok(result);
     }
+
 
     // ============================
     // 4) TOP 5 SẢN PHẨM BÁN CHẠY
@@ -110,4 +103,5 @@ public class DashBoardController {
 
         return ResponseEntity.ok(result);
     }
+
 }

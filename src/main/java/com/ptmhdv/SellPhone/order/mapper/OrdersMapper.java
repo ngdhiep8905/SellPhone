@@ -15,7 +15,7 @@ public class OrdersMapper {
         d.setPhoneId(e.getPhone().getPhoneId());
         d.setQuantity(e.getQuantity());
         d.setPrice(e.getPrice());
-        d.setPrice(e.getQuantityXprice());
+        d.setPrice(e.getTotalPrice());
         return d;
     }
 

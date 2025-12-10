@@ -19,11 +19,13 @@ public interface OrdersPhonesRepository extends JpaRepository<OrdersPhones, Stri
 
     // Dashboard: doanh thu theo thương hiệu
     @Query("""
-        SELECT op.phone.brand.brandName, SUM(op.price * op.quantity)
-        FROM OrdersPhones op
-        GROUP BY op.phone.brand.brandId
-    """)
+    SELECT op.phone.brand.brandName, SUM(op.quantity * op.price)
+    FROM OrdersPhones op
+    GROUP BY op.phone.brand.brandId, op.phone.brand.brandName
+    ORDER BY SUM(op.quantity * op.price) DESC
+""")
     List<Object[]> getRevenueByBrand();
+
     @Query("""
     SELECT p.phoneName, SUM(op.quantity)
     FROM OrdersPhones op

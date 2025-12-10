@@ -80,7 +80,7 @@ public class OrderService {
             detail.setPhone(cart.getPhone());
             detail.setQuantity(qty);
             detail.setPrice(price);
-            detail.setQuantityXprice(lineTotal);  // map vào cột total_price của SQL
+            detail.setTotalPrice(lineTotal);  // map vào cột total_price của SQL
 
             orderPhonesList.add(detail);
         }
