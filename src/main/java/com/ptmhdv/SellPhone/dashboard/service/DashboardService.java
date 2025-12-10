@@ -7,6 +7,7 @@ import com.ptmhdv.sellphone.order.repository.OrdersPhonesRepository;
 import com.ptmhdv.sellphone.order.repository.OrdersRepository;
 import com.ptmhdv.sellphone.user.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -26,19 +27,20 @@ public class DashboardService {
     @Autowired
     private OrdersPhonesRepository orderDetailRepo;
 
-    // LV1
-    public Double getRevenueOfMonth(int month) {
-        return ordersRepo.sumRevenueOfMonth(month);
-    }
+
 
     // LV2 combo chart
-    public List<Orders> filterOrders(Integer month, Integer year) {
+    public List<Orders> filterRevenue(Integer month, Integer year) {
         return ordersRepo.filterOrders(month, year);
+    }
+    public List<Object[]> getRevenueMonthly(){
+        return ordersRepo.getRevenueMonthly();
     }
 
     public List<Object[]> getTopProducts() {
-        return orderDetailRepo.getTopProducts();
+        return orderDetailRepo.getTopProducts(PageRequest.of(0, 5));
     }
+
 
     public List<Object[]> getRevenueByBrand() {
         return orderDetailRepo.getRevenueByBrand();
@@ -47,7 +49,7 @@ public class DashboardService {
     public DashboardDTO getSummary() {
 
         long totalProducts = phoneRepo.count();
-        long totalOrders = ordersRepo.count();
+        long totalOrders = ordersRepo.sumOrdersOfMonth();
         long totalUsers = userRepo.count();
 
         BigDecimal revenue = ordersRepo.getMonthRevenue();
@@ -55,5 +57,6 @@ public class DashboardService {
 
         return new DashboardDTO(totalProducts, totalOrders, totalUsers, monthRevenue);
     }
+
 
 }

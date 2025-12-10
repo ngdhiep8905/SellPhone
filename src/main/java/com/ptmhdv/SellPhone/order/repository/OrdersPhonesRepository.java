@@ -24,4 +24,13 @@ public interface OrdersPhonesRepository extends JpaRepository<OrdersPhones, Stri
         GROUP BY op.phone.brand.brandId
     """)
     List<Object[]> getRevenueByBrand();
+    @Query("""
+    SELECT p.phoneName, SUM(op.quantity)
+    FROM OrdersPhones op
+    JOIN op.phone p
+    GROUP BY p.phoneId
+    ORDER BY SUM(op.quantity) DESC
+    """)
+    List<Object[]> getTopProducts(org.springframework.data.domain.Pageable pageable);
+
 }
