@@ -1,23 +1,12 @@
-package com.ptmhdv.sellphone.payment.service;
+package com.ptmhdv.SellPhone.payment.service;
 
-import com.ptmhdv.sellphone.payment.entity.Payment;
-import com.ptmhdv.sellphone.payment.repository.PaymentRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.ptmhdv.SellPhone.payment.dto.PaymentDTO;
+import com.ptmhdv.SellPhone.payment.entity.Payment;
 
-import java.util.List;
+public interface PaymentService {
+    Payment processOrderPayment(String orderId, PaymentDTO dto);
 
-@Service
-public class PaymentService {
+    Payment getPaymentByOrder(String orderId);
 
-    @Autowired
-    private PaymentRepository paymentRepo;
-
-    public List<Payment> getAll() {
-        return paymentRepo.findAll();
-    }
-
-    public Payment getById(String id) {
-        return paymentRepo.findById(id).orElse(null);
-    }
+    Payment updatePaymentStatus(String paymentId, String status);
 }

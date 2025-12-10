@@ -1,31 +1,18 @@
-package com.ptmhdv.sellphone.catalog.service;
+package com.ptmhdv.SellPhone.catalog.service;
 
-import com.ptmhdv.sellphone.catalog.entity.Brands;
-import com.ptmhdv.sellphone.catalog.repository.BrandsRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.ptmhdv.SellPhone.catalog.entity.Brands;
 
 import java.util.List;
+import java.util.Optional;
 
-@Service
-public class BrandService {
+public interface BrandService {
+    Brands createBrand(Brands brand);
 
-    @Autowired
-    private BrandsRepository brandsRepo;
+    Brands updateBrand(String id, Brands brand);
 
-    public List<Brands> getAll() {
-        return brandsRepo.findAll();
-    }
+    void deleteBrand(String id);
 
-    public Brands getById(String id) {
-        return brandsRepo.findById(id).orElse(null);
-    }
+    Optional<Brands> getBrandById(String id);
 
-    public Brands save(Brands brand) {
-        return brandsRepo.save(brand);
-    }
-
-    public void delete(String id) {
-        brandsRepo.deleteById(id);
-    }
+    List<Brands> getAllBrands();
 }

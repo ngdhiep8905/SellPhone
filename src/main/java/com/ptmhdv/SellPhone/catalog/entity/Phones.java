@@ -1,4 +1,4 @@
-package com.ptmhdv.sellphone.catalog.entity;
+package com.ptmhdv.SellPhone.catalog.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ptmhdv.sellphone.cart.entity.CartItem;
@@ -17,19 +17,15 @@ import java.util.UUID;
 public class Phones {
 
     @Id
-    @Column(name = "phone_id", length = 6)
+    @Column(name = "phone_id", length = 36)
     private String phoneId;
 
     @PrePersist
     public void generateId() {
         if (phoneId == null) {
-            phoneId = generateCustomId();
+            phoneId = UUID.randomUUID().toString();
         }
     }
-    private String generateCustomId() {
-        return String.format("%06d", (int)(Math.random() * 999999));
-    }
-
 
     @NotBlank(message = "Phone name is required")
     @Size(min = 3, max = 100, message = "Phone name must be between 3 and 100 characters")

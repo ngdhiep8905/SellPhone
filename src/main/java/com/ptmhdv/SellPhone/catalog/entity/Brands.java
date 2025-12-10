@@ -1,4 +1,4 @@
-package com.ptmhdv.sellphone.catalog.entity;
+package com.ptmhdv.SellPhone.catalog.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -20,14 +20,9 @@ public class Brands {
     @PrePersist
     public void generateId() {
         if (brandId == null) {
-            brandId = generateCustomId();
+            brandId = UUID.randomUUID().toString();
         }
     }
-
-    private String generateCustomId() {
-        return String.format("%06d", (int)(Math.random() * 999999));
-    }
-
 
     @NotBlank(message = "Brand name is required")
     @Column(name = "brand_name", nullable = false, length = 100)

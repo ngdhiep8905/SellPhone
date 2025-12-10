@@ -1,22 +1,26 @@
-package com.ptmhdv.sellphone.catalog.mapper;
+package com.ptmhdv.SellPhone.catalog.mapper;
 
-import com.ptmhdv.sellphone.catalog.entity.Brands;
-import com.ptmhdv.sellphone.catalog.dto.BrandsDTO;
+import com.ptmhdv.SellPhone.catalog.entity.Brands;
+import com.ptmhdv.SellPhone.catalog.dto.BrandsDTO;
 
 public class BrandsMapper {
-    public static BrandsDTO toDTO(Brands e) {
-        BrandsDTO d = new BrandsDTO();
-        d.setId(e.getBrandId());
-        d.setBrandName(e.getBrandName());
-        d.setDescription(e.getBrandDescription());
-        return d;
+    public Brands toEntity(BrandsDTO dto) {
+        Brands brand = new Brands();
+        brand.setBrandName(dto.getBrandName());
+        brand.setBrandDescription(dto.getDescription());
+        return brand;
     }
 
-    public static Brands toEntity(BrandsDTO d) {
-        Brands e = new Brands();
-        e.setBrandId(d.getId());
-        e.setBrandName(d.getBrandName());
-        e.setBrandDescription(d.getDescription());
-        return e;
+    public void updateEntity(Brands brand, BrandsDTO dto) {
+        brand.setBrandName(dto.getBrandName());
+        brand.setBrandDescription(dto.getDescription());
+    }
+
+    public BrandsDTO toDTO(Brands brand) {
+        BrandsDTO dto = new BrandsDTO();
+        dto.setId(brand.getBrandId());
+        dto.setBrandName(brand.getBrandName());
+        dto.setDescription(brand.getBrandDescription());
+        return dto;
     }
 }

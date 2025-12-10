@@ -3,6 +3,7 @@ package com.ptmhdv.sellphone.order.service;
 
 import com.ptmhdv.sellphone.cart.entity.CartItem;
 import com.ptmhdv.sellphone.cart.service.CouponService;
+import com.ptmhdv.sellphone.common.exception.ResourceNotFoundException;
 import com.ptmhdv.sellphone.order.entity.Orders;
 import com.ptmhdv.sellphone.order.entity.OrdersPhones;
 import com.ptmhdv.sellphone.order.repository.OrdersRepository;
@@ -16,6 +17,7 @@ import com.ptmhdv.sellphone.order.dto.OrdersPhonesDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -23,11 +25,12 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class OrderService {
 
     private final OrdersRepository ordersRepo;
-    private final PhonesRepository phonesRepo;
-    private final CouponService couponService;
+    private final PhonesRepository phonesRepo; // Nếu cần trừ kho
+    private final CouponService couponService; // Nếu xử lý coupon
     private final PaymentRepository paymentRepo;
     private final UsersRepository usersRepo;
 
@@ -40,67 +43,91 @@ public class OrderService {
             String paymentId
     ) {
 
-        // ====== 1) LẤY USER ======
-        Users user = usersRepo.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        List<CartItem> cartItems = user.getCartItems();
-        if (cartItems.isEmpty()) {
-            throw new RuntimeException("Giỏ hàng trống! Không thể thanh toán.");
-        }
-
-        // ====== 2) KHỞI TẠO ORDER ======
         Orders order = new Orders();
-        order.setUser(user);
+
+        // Gán thông tin người nhận
         order.setRecipientName(receiverName);
         order.setRecipientPhone(receiverPhone);
         order.setShippingAddress(receiverAddress);
 
+        // Set User
+        Users user = usersRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        order.setUser(user);
+
+        // Set Payment
         Payment payment = paymentRepo.findById(paymentId)
                 .orElseThrow(() -> new RuntimeException("Payment method not found"));
         order.setPayment(payment);
 
-        List<OrdersPhones> orderPhonesList = new ArrayList<>();
-        BigDecimal totalOrderAmount = BigDecimal.ZERO;
+        // Lấy giỏ hàng của user
+        List<CartItem> cartItems = user.getCartItems();
 
-        // ====== 3) TÍNH TIỀN & TẠO ORDER DETAILS ======
+        if (cartItems.isEmpty()) {
+            throw new RuntimeException("Giỏ hàng trống, không thể checkout.");
+        }
+
+        // Tạo danh sách order items
+        List<OrdersPhones> orderPhones = new ArrayList<>();
+        BigDecimal total = BigDecimal.ZERO;
+
         for (CartItem cart : cartItems) {
 
-            BigDecimal price = cart.getPhone().getPrice(); // giá 1 sp
-            int qty = cart.getQuantity();
+            OrdersPhones item = new OrdersPhones();
 
-            BigDecimal lineTotal = price.multiply(BigDecimal.valueOf(qty));
+            item.setOrder(order);
+            item.setPhone(cart.getPhone());
+            item.setQuantity(cart.getQuantity());
+            item.setPrice(cart.getPhone().getPrice());
 
-            // Cộng tổng đơn
-            totalOrderAmount = totalOrderAmount.add(lineTotal);
+            BigDecimal itemTotal =
+                    cart.getPhone().getPrice()
+                            .multiply(BigDecimal.valueOf(cart.getQuantity()));
 
-            // Tạo record order_details
-            OrdersPhones detail = new OrdersPhones();
-            detail.setOrder(order);
-            detail.setPhone(cart.getPhone());
-            detail.setQuantity(qty);
-            detail.setPrice(price);
-            detail.setQuantityXprice(lineTotal);  // map vào cột total_price của SQL
+            total = total.add(itemTotal);
 
-            orderPhonesList.add(detail);
+            orderPhones.add(item);
+
+            // Nếu muốn trừ kho:
+            // Phones phone = cart.getPhone();
+            // phone.setStock(phone.getStock() - cart.getQuantity());
+            // phonesRepo.save(phone);
         }
 
-        // ====== 4) XỬ LÝ COUPON ======
-        if (couponCode != null && !couponCode.isBlank()) {
-            BigDecimal discount = couponService.applyCoupon(couponCode, totalOrderAmount);
-            totalOrderAmount = totalOrderAmount.subtract(discount);
+        // Xử lý coupon nếu có
+        if (couponCode != null && !couponCode.isEmpty()) {
+            BigDecimal discount = couponService.applyCoupon(couponCode, total);
+            total = total.subtract(discount);
         }
 
-        // ====== 5) LƯU ORDER ======
-        order.setTotalPrice(totalOrderAmount);
-        order.setOrderPhones(orderPhonesList);
+        order.setTotalPrice(total);
+        order.setOrderPhones(orderPhones);
         order.setStatus("PENDING");
 
-        Orders savedOrder = ordersRepo.save(order);
+        // Lưu đơn hàng + order details
+        Orders saved = ordersRepo.save(order);
 
-        // ====== 6) XÓA GIỎ HÀNG ======
-        cartItems.clear();
+        // Xóa giỏ hàng sau khi checkout
+        user.getCartItems().clear();
 
-        return savedOrder;
+        return saved;
+    }
+    public  Orders getOrderById(String orderId){
+        return ordersRepo.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException(orderId));
+    }
+    public Orders updateOrderStatus(String orderId, String status) {
+
+
+        Orders order = ordersRepo.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException(orderId));
+
+        order.setStatus(status);
+
+        Orders updatedOrder = ordersRepo.save(order);
+
+        return updatedOrder;
     }
 }
+
+

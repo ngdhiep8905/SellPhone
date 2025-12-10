@@ -1,4 +1,4 @@
-package com.ptmhdv.sellphone.payment.entity;
+package com.ptmhdv.SellPhone.payment.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ptmhdv.sellphone.order.entity.Orders;
@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,7 +34,12 @@ public class Payment {
 
     @Size(max = 50)
     @Column(name = "payment_status", length = 50)
-    private String paymentStatus = "PENDING";  // default
+    private String paymentStatus = "PENDING";
+    @Column(name = "paidAt")
+    private LocalDateTime paidAt;// default
+    @Size(max = 100, message = "Transaction ID must not exceed 100 characters")
+    @Column(name = "transactionId", length = 100)
+    private String transactionId;
 
     @OneToMany(mappedBy = "payment")
     @JsonIgnore

@@ -1,36 +1,22 @@
-package com.ptmhdv.sellphone.catalog.service;
+package com.ptmhdv.SellPhone.catalog.service;
 
-import com.ptmhdv.sellphone.catalog.entity.Phones;
-import com.ptmhdv.sellphone.catalog.repository.PhonesRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.ptmhdv.SellPhone.catalog.dto.PhonesDTO;
+import com.ptmhdv.SellPhone.catalog.entity.Phones;
 
 import java.util.List;
 
-@Service
-public class PhoneService {
+public interface PhoneService {
+    List<Phones> getAllPhones();
 
-    @Autowired
-    private PhonesRepository phoneRepo;
+    List<Phones> getAllPhonesSorted(String sortBy, String sortOrder);
 
-    public List<Phones> getAll() {
-        return phoneRepo.findAll();
-    }
+    Phones getPhoneById(String id);
 
-    public Phones getById(String id) {
-        return phoneRepo.findById(id).orElse(null);
-    }
+    List<Phones> searchPhones(String keyword);
 
-    public Phones save(Phones phone) {
-        return phoneRepo.save(phone);
-    }
+    Phones createPhone(PhonesDTO dto);
 
-    public void delete(String id) {
-        phoneRepo.deleteById(id);
-    }
+    Phones updatePhone(String PhoneId, PhonesDTO dto);
 
-    public List<Phones> search(String keyword) {
-        return phoneRepo.findByPhoneNameContainingIgnoreCase(keyword);
-    }
+    void deletePhone(String PhoneId);
 }
-
