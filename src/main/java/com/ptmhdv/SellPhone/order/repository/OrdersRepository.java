@@ -10,8 +10,6 @@ import java.util.List;
 
 public interface OrdersRepository extends JpaRepository<Orders, String> {
 
-    @Query("SELECT SUM(o.totalPrice) FROM Orders o WHERE MONTH(o.bookDate) = ?1")
-    Double sumRevenueOfMonth(int month);
     @Query("SELECT COUNT(o) FROM Orders o " +
             "WHERE FUNCTION('YEAR', o.bookDate) = FUNCTION('YEAR', CURRENT_DATE) " +
             "AND FUNCTION('MONTH', o.bookDate) = FUNCTION('MONTH', CURRENT_DATE)")
