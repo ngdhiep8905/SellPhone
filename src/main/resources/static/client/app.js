@@ -154,9 +154,45 @@ async function apiLogin(email, password) {
     `${API_BASE_URL}/api/users/login?${params.toString()}`,
     { method: "POST" }
   );
-  if (!res.ok) throw new Error("Login failed");
-  return res.json();
+
+  if (!res.ok) {
+    // Đọc thêm message từ backend nếu có
+    let msg = "Login failed";
+    try {
+      const err = await res.json();
+      if (err && err.message) msg = err.message;
+    } catch {
+      // body không phải JSON thì bỏ qua
+    }
+    throw new Error(msg);
+  }
+
+  return res.json(); // 200 OK + body là JSON Users → không còn lỗi JSON nữa
 }
+
+async function apiRegister(payload) {
+  const res = await fetch(`${API_BASE_URL}/api/users/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    let msg = "Register failed";
+    try {
+      const err = await res.json();
+      if (err && err.message) msg = err.message;
+    } catch {
+      // ignore
+    }
+    throw new Error(msg);
+  }
+
+  return res.json(); // trả về Users
+}
+
+
+
 
 // chỉ gọi 1 lần, lấy toàn bộ danh sách phone
 async function apiFetchPhones() {
@@ -630,6 +666,82 @@ function initLoginPage() {
   }
 }
 
+// ============ PAGE INIT: REGISTER ============
+function initRegisterPage() {
+  const usernameInput = $("#reg-username");
+  const fullNameInput = $("#reg-fullname");
+  const emailInput = $("#reg-email");
+  const phoneInput = $("#reg-phone");
+  const addrInput = $("#reg-address");
+  const pwdInput = $("#reg-password");
+  const submitBtn = $("#reg-submit");
+  const cancelBtn = $("#reg-cancel");
+  const errorEl = $("#reg-error");
+  const successEl = $("#reg-success");
+
+  if (!usernameInput || !emailInput || !pwdInput || !submitBtn) return;
+
+  async function handleRegister() {
+    const userName = usernameInput.value.trim();
+    const fullName = fullNameInput.value.trim();
+    const email = emailInput.value.trim();
+    const phone = phoneInput.value.trim();
+    const address = addrInput.value.trim();
+    const password = pwdInput.value.trim();
+
+    errorEl.classList.add("sp-hidden");
+    successEl.classList.add("sp-hidden");
+
+    if (!userName || !email || !password) {
+      errorEl.textContent =
+        "Vui lòng nhập ít nhất Tên đăng nhập, Email và Mật khẩu.";
+      errorEl.classList.remove("sp-hidden");
+      return;
+    }
+
+    try {
+      const user = await apiRegister({
+        userName,
+        fullName,
+        email,
+        phone,
+        address,
+        password,
+      });
+
+      // Tự động đăng nhập sau khi đăng ký
+      AppState.currentUser = user;
+      saveUser();
+      updateHeaderUI();
+      showToast("Đăng ký thành công. Đã đăng nhập.");
+
+      successEl.textContent = "Đăng ký thành công!";
+      successEl.classList.remove("sp-hidden");
+
+      // chuyển sang trang products
+      window.location.href = "products.html";
+    } catch (err) {
+      console.error(err);
+      errorEl.textContent =
+        err.message === "EMAIL_EXISTS"
+          ? "Email đã tồn tại. Vui lòng dùng email khác."
+          : "Đăng ký thất bại. Vui lòng thử lại.";
+      errorEl.classList.remove("sp-hidden");
+    }
+  }
+
+  submitBtn.onclick = handleRegister;
+  pwdInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") handleRegister();
+  });
+  if (cancelBtn) {
+    cancelBtn.onclick = () => {
+      window.location.href = "login.html";
+    };
+  }
+}
+
+
 // ============ PAGE INIT: PRODUCTS ============
 function initProductsPage() {
   const searchInput = $("#search-input");
@@ -847,6 +959,9 @@ document.addEventListener("DOMContentLoaded", () => {
   switch (page) {
     case "login":
       initLoginPage();
+      break;
+    case "register":
+      initRegisterPage();
       break;
     case "products":
       initProductsPage();
