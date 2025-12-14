@@ -1,7 +1,7 @@
 package com.ptmhdv.SellPhone.payment.mapper;
 
-import com.ptmhdv.sellphone.payment.entity.Payment;
-import com.ptmhdv.sellphone.payment.dto.PaymentDTO;
+import com.ptmhdv.SellPhone.payment.entity.Payment;
+import com.ptmhdv.SellPhone.payment.dto.PaymentDTO;
 
 public class PaymentMapper {
     public static PaymentDTO toDTO(Payment e) {
