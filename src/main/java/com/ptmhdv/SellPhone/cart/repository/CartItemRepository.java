@@ -1,6 +1,6 @@
-package com.ptmhdv.sellphone.cart.repository;
+package com.ptmhdv.SellPhone.cart.repository;
 
-import com.ptmhdv.sellphone.cart.entity.CartItem;
+import com.ptmhdv.SellPhone.cart.entity.CartItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 

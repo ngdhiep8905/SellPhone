@@ -1,7 +1,7 @@
-package com.ptmhdv.sellphone.payment.entity;
+package com.ptmhdv.SellPhone.payment.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ptmhdv.sellphone.order.entity.Orders;
+import com.ptmhdv.SellPhone.order.entity.Orders;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

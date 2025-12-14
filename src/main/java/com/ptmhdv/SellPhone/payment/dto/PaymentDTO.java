@@ -1,4 +1,4 @@
-package com.ptmhdv.sellphone.payment.dto;
+package com.ptmhdv.SellPhone.payment.dto;
 
 import lombok.Data;
 

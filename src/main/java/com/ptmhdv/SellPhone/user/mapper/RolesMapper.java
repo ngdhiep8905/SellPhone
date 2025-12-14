@@ -1,7 +1,7 @@
-package com.ptmhdv.sellphone.user.mapper;
+package com.ptmhdv.SellPhone.user.mapper;
 
-import com.ptmhdv.sellphone.user.entity.Roles;
-import com.ptmhdv.sellphone.user.dto.RolesDTO;
+import com.ptmhdv.SellPhone.user.entity.Roles;
+import com.ptmhdv.SellPhone.user.dto.RolesDTO;
 
 public class RolesMapper {
     public static RolesDTO toDTO(Roles e) {

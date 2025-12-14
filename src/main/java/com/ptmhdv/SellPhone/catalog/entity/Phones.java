@@ -1,8 +1,8 @@
-package com.ptmhdv.sellphone.catalog.entity;
+package com.ptmhdv.SellPhone.catalog.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ptmhdv.sellphone.cart.entity.CartItem;
-import com.ptmhdv.sellphone.order.entity.OrdersPhones;
+import com.ptmhdv.SellPhone.cart.entity.CartItem;
+import com.ptmhdv.SellPhone.order.entity.OrdersPhones;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;

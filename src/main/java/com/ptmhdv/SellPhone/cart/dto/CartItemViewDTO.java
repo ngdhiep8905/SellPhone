@@ -1,6 +1,6 @@
-package com.ptmhdv.sellphone.cart.dto;
+package com.ptmhdv.SellPhone.cart.dto;
 
-import com.ptmhdv.sellphone.catalog.dto.PhonesDTO;
+import com.ptmhdv.SellPhone.catalog.dto.PhonesDTO;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

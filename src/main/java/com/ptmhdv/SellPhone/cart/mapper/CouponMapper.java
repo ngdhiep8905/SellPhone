@@ -1,7 +1,7 @@
-package com.ptmhdv.sellphone.cart.mapper;
+package com.ptmhdv.SellPhone.cart.mapper;
 
-import com.ptmhdv.sellphone.cart.entity.Coupon;
-import com.ptmhdv.sellphone.cart.dto.CouponDTO;
+import com.ptmhdv.SellPhone.cart.entity.Coupon;
+import com.ptmhdv.SellPhone.cart.dto.CouponDTO;
 
 public class CouponMapper {
     public static CouponDTO toDTO(Coupon e) {

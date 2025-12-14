@@ -1,9 +1,9 @@
-package com.ptmhdv.sellphone.order.controller;
+package com.ptmhdv.SellPhone.order.controller;
 
-import com.ptmhdv.sellphone.order.entity.Orders;
-import com.ptmhdv.sellphone.order.mapper.OrdersMapper;
-import com.ptmhdv.sellphone.order.service.OrderService;
-import com.ptmhdv.sellphone.order.dto.OrdersDTO;
+import com.ptmhdv.SellPhone.order.entity.Orders;
+import com.ptmhdv.SellPhone.order.mapper.OrdersMapper;
+import com.ptmhdv.SellPhone.order.service.OrderService;
+import com.ptmhdv.SellPhone.order.dto.OrdersDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

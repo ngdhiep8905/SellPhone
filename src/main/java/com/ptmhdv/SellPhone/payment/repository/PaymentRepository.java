@@ -1,6 +1,6 @@
-package com.ptmhdv.sellphone.payment.repository;
+package com.ptmhdv.SellPhone.payment.repository;
 
-import com.ptmhdv.sellphone.payment.entity.Payment;
+import com.ptmhdv.SellPhone.payment.entity.Payment;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PaymentRepository extends JpaRepository<Payment, String> {

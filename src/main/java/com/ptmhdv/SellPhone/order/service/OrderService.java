@@ -1,18 +1,18 @@
-package com.ptmhdv.sellphone.order.service;
+package com.ptmhdv.SellPhone.order.service;
 
 
-import com.ptmhdv.sellphone.cart.entity.CartItem;
-import com.ptmhdv.sellphone.cart.service.CouponService;
-import com.ptmhdv.sellphone.order.entity.Orders;
-import com.ptmhdv.sellphone.order.entity.OrdersPhones;
-import com.ptmhdv.sellphone.order.repository.OrdersRepository;
-import com.ptmhdv.sellphone.payment.entity.Payment;
-import com.ptmhdv.sellphone.payment.repository.PaymentRepository;
-import com.ptmhdv.sellphone.catalog.repository.PhonesRepository;
-import com.ptmhdv.sellphone.user.entity.Users;
-import com.ptmhdv.sellphone.user.repository.UsersRepository;
-import com.ptmhdv.sellphone.order.dto.OrdersDTO;
-import com.ptmhdv.sellphone.order.dto.OrdersPhonesDTO;
+import com.ptmhdv.SellPhone.cart.entity.CartItem;
+import com.ptmhdv.SellPhone.cart.service.CouponService;
+import com.ptmhdv.SellPhone.order.entity.Orders;
+import com.ptmhdv.SellPhone.order.entity.OrdersPhones;
+import com.ptmhdv.SellPhone.order.repository.OrdersRepository;
+import com.ptmhdv.SellPhone.payment.entity.Payment;
+import com.ptmhdv.SellPhone.payment.repository.PaymentRepository;
+import com.ptmhdv.SellPhone.catalog.repository.PhonesRepository;
+import com.ptmhdv.SellPhone.user.entity.Users;
+import com.ptmhdv.SellPhone.user.repository.UsersRepository;
+import com.ptmhdv.SellPhone.order.dto.OrdersDTO;
+import com.ptmhdv.SellPhone.order.dto.OrdersPhonesDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

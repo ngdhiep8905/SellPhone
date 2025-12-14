@@ -1,6 +1,6 @@
-package com.ptmhdv.sellphone.cart.entity;
+package com.ptmhdv.SellPhone.cart.entity;
 
-import com.ptmhdv.sellphone.user.entity.Users;
+import com.ptmhdv.SellPhone.user.entity.Users;
 import jakarta.persistence.*;
 import lombok.Data;
 

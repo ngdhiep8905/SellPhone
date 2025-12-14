@@ -1,14 +1,14 @@
-package com.ptmhdv.sellphone.cart.service;
+package com.ptmhdv.SellPhone.cart.service;
 
-import com.ptmhdv.sellphone.cart.entity.Cart;
-import com.ptmhdv.sellphone.cart.entity.CartItem;
-import com.ptmhdv.sellphone.catalog.entity.Phones;
-import com.ptmhdv.sellphone.common.exception.ResourceNotFoundException;
-import com.ptmhdv.sellphone.user.entity.Users;
-import com.ptmhdv.sellphone.user.repository.UsersRepository;
-import com.ptmhdv.sellphone.catalog.repository.PhonesRepository;
-import com.ptmhdv.sellphone.cart.repository.CartItemRepository;
-import com.ptmhdv.sellphone.cart.repository.CartRepository;
+import com.ptmhdv.SellPhone.cart.entity.Cart;
+import com.ptmhdv.SellPhone.cart.entity.CartItem;
+import com.ptmhdv.SellPhone.catalog.entity.Phones;
+import com.ptmhdv.SellPhone.common.exception.ResourceNotFoundException;
+import com.ptmhdv.SellPhone.user.entity.Users;
+import com.ptmhdv.SellPhone.user.repository.UsersRepository;
+import com.ptmhdv.SellPhone.catalog.repository.PhonesRepository;
+import com.ptmhdv.SellPhone.cart.repository.CartItemRepository;
+import com.ptmhdv.SellPhone.cart.repository.CartRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

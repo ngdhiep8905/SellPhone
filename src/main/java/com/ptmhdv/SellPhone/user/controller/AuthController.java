@@ -1,7 +1,7 @@
-package com.ptmhdv.sellphone.user.controller;
+package com.ptmhdv.SellPhone.user.controller;
 
-import com.ptmhdv.sellphone.user.entity.Users;
-import com.ptmhdv.sellphone.user.service.AuthService;
+import com.ptmhdv.SellPhone.user.entity.Users;
+import com.ptmhdv.SellPhone.user.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

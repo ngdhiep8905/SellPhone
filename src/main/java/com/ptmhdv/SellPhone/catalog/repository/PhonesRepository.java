@@ -1,6 +1,6 @@
-package com.ptmhdv.sellphone.catalog.repository;
+package com.ptmhdv.SellPhone.catalog.repository;
 
-import com.ptmhdv.sellphone.catalog.entity.Phones;
+import com.ptmhdv.SellPhone.catalog.entity.Phones;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

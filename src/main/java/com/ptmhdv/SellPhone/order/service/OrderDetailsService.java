@@ -1,6 +1,6 @@
-package com.ptmhdv.sellphone.order.service;
+package com.ptmhdv.SellPhone.order.service;
 
-import com.ptmhdv.sellphone.order.repository.OrdersPhonesRepository;
+import com.ptmhdv.SellPhone.order.repository.OrdersPhonesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

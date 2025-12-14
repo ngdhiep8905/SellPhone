@@ -1,7 +1,7 @@
-package com.ptmhdv.sellphone.catalog.controller;
+package com.ptmhdv.SellPhone.catalog.controller;
 
-import com.ptmhdv.sellphone.catalog.entity.Brands;
-import com.ptmhdv.sellphone.catalog.service.BrandService;
+import com.ptmhdv.SellPhone.catalog.entity.Brands;
+import com.ptmhdv.SellPhone.catalog.service.BrandService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

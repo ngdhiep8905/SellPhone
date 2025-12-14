@@ -1,4 +1,4 @@
-package com.ptmhdv.sellphone.user.entity;
+package com.ptmhdv.SellPhone.user.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

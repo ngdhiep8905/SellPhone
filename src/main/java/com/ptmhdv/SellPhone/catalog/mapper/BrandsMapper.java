@@ -1,7 +1,7 @@
-package com.ptmhdv.sellphone.catalog.mapper;
+package com.ptmhdv.SellPhone.catalog.mapper;
 
-import com.ptmhdv.sellphone.catalog.entity.Brands;
-import com.ptmhdv.sellphone.catalog.dto.BrandsDTO;
+import com.ptmhdv.SellPhone.catalog.entity.Brands;
+import com.ptmhdv.SellPhone.catalog.dto.BrandsDTO;
 
 public class BrandsMapper {
     public static BrandsDTO toDTO(Brands e) {

@@ -1,7 +1,7 @@
-package com.ptmhdv.sellphone.cart.mapper;
+package com.ptmhdv.SellPhone.cart.mapper;
 
-import com.ptmhdv.sellphone.cart.entity.CartItem;
-import com.ptmhdv.sellphone.cart.dto.CartItemDTO;
+import com.ptmhdv.SellPhone.cart.entity.CartItem;
+import com.ptmhdv.SellPhone.cart.dto.CartItemDTO;
 
 public class CartItemMapper {
     public static CartItemDTO toDTO(CartItem e) {

@@ -1,6 +1,5 @@
-package com.ptmhdv.sellphone.cart.entity;
-
-import com.ptmhdv.sellphone.catalog.entity.Phones;
+package com.ptmhdv.SellPhone.cart.entity;
+import com.ptmhdv.SellPhone.catalog.entity.Phones;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;

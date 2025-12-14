@@ -1,7 +1,7 @@
-package com.ptmhdv.sellphone.payment.service;
+package com.ptmhdv.SellPhone.payment.service;
 
-import com.ptmhdv.sellphone.payment.entity.Payment;
-import com.ptmhdv.sellphone.payment.repository.PaymentRepository;
+import com.ptmhdv.SellPhone.payment.entity.Payment;
+import com.ptmhdv.SellPhone.payment.repository.PaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

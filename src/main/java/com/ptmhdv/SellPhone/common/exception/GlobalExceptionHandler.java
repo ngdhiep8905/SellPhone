@@ -1,4 +1,4 @@
-package com.ptmhdv.sellphone.common.exception;
+package com.ptmhdv.SellPhone.common.exception;
 
 public class GlobalExceptionHandler {
 }

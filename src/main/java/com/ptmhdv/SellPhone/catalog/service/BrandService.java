@@ -1,7 +1,7 @@
-package com.ptmhdv.sellphone.catalog.service;
+package com.ptmhdv.SellPhone.catalog.service;
 
-import com.ptmhdv.sellphone.catalog.entity.Brands;
-import com.ptmhdv.sellphone.catalog.repository.BrandsRepository;
+import com.ptmhdv.SellPhone.catalog.entity.Brands;
+import com.ptmhdv.SellPhone.catalog.repository.BrandsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

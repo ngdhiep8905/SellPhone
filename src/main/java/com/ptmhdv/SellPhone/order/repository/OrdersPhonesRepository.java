@@ -1,6 +1,6 @@
-package com.ptmhdv.sellphone.order.repository;
+package com.ptmhdv.SellPhone.order.repository;
 
-import com.ptmhdv.sellphone.order.entity.OrdersPhones;
+import com.ptmhdv.SellPhone.order.entity.OrdersPhones;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

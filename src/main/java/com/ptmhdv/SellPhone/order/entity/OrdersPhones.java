@@ -1,7 +1,7 @@
-package com.ptmhdv.sellphone.order.entity;
+package com.ptmhdv.SellPhone.order.entity;
 
-import com.ptmhdv.sellphone.catalog.entity.Brands;
-import com.ptmhdv.sellphone.catalog.entity.Phones;
+import com.ptmhdv.SellPhone.catalog.entity.Brands;
+import com.ptmhdv.SellPhone.catalog.entity.Phones;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;

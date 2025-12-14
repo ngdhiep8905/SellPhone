@@ -1,7 +1,7 @@
-package com.ptmhdv.sellphone.payment.controller;
+package com.ptmhdv.SellPhone.payment.controller;
 
-import com.ptmhdv.sellphone.payment.entity.Payment;
-import com.ptmhdv.sellphone.payment.service.PaymentService;
+import com.ptmhdv.SellPhone.payment.entity.Payment;
+import com.ptmhdv.SellPhone.payment.service.PaymentService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

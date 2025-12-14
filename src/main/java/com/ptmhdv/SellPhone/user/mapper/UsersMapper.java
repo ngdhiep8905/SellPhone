@@ -1,7 +1,7 @@
-package com.ptmhdv.sellphone.user.mapper;
+package com.ptmhdv.SellPhone.user.mapper;
 
-import com.ptmhdv.sellphone.user.entity.Users;
-import com.ptmhdv.sellphone.user.dto.UsersDTO;
+import com.ptmhdv.SellPhone.user.entity.Users;
+import com.ptmhdv.SellPhone.user.dto.UsersDTO;
 
 public class UsersMapper {
     public static UsersDTO toDTO(Users e) {

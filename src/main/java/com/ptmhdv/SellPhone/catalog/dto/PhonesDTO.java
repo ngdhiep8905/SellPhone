@@ -1,4 +1,4 @@
-package com.ptmhdv.sellphone.catalog.dto;
+package com.ptmhdv.SellPhone.catalog.dto;
 
 import lombok.Data;
 import java.math.BigDecimal;

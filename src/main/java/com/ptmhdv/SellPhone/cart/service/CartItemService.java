@@ -1,7 +1,7 @@
-package com.ptmhdv.sellphone.cart.service;
+package com.ptmhdv.SellPhone.cart.service;
 
-import com.ptmhdv.sellphone.cart.entity.CartItem;
-import com.ptmhdv.sellphone.cart.repository.CartItemRepository;
+import com.ptmhdv.SellPhone.cart.entity.CartItem;
+import com.ptmhdv.SellPhone.cart.repository.CartItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

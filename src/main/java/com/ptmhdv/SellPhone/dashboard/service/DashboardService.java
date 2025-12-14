@@ -1,11 +1,11 @@
-package com.ptmhdv.sellphone.dashboard.service;
+package com.ptmhdv.SellPhone.dashboard.service;
 
-import com.ptmhdv.sellphone.catalog.repository.PhonesRepository;
-import com.ptmhdv.sellphone.dashboard.DTO.DashboardDTO;
-import com.ptmhdv.sellphone.order.entity.Orders;
-import com.ptmhdv.sellphone.order.repository.OrdersPhonesRepository;
-import com.ptmhdv.sellphone.order.repository.OrdersRepository;
-import com.ptmhdv.sellphone.user.repository.UsersRepository;
+import com.ptmhdv.SellPhone.catalog.repository.PhonesRepository;
+import com.ptmhdv.SellPhone.dashboard.DTO.DashboardDTO;
+import com.ptmhdv.SellPhone.order.entity.Orders;
+import com.ptmhdv.SellPhone.order.repository.OrdersPhonesRepository;
+import com.ptmhdv.SellPhone.order.repository.OrdersRepository;
+import com.ptmhdv.SellPhone.user.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;

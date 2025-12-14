@@ -1,8 +1,8 @@
-package com.ptmhdv.sellphone.order.entity;
+package com.ptmhdv.SellPhone.order.entity;
 
-import com.ptmhdv.sellphone.cart.entity.Coupon;
-import com.ptmhdv.sellphone.payment.entity.Payment;
-import com.ptmhdv.sellphone.user.entity.Users;
+import com.ptmhdv.SellPhone.cart.entity.Coupon;
+import com.ptmhdv.SellPhone.payment.entity.Payment;
+import com.ptmhdv.SellPhone.user.entity.Users;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;

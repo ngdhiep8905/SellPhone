@@ -1,6 +1,6 @@
-package com.ptmhdv.sellphone.user.repository;
+package com.ptmhdv.SellPhone.user.repository;
 
-import com.ptmhdv.sellphone.user.entity.Users;
+import com.ptmhdv.SellPhone.user.entity.Users;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

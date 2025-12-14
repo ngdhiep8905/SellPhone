@@ -1,7 +1,7 @@
-package com.ptmhdv.sellphone.user.service;
+package com.ptmhdv.SellPhone.user.service;
 
-import com.ptmhdv.sellphone.user.entity.Roles;
-import com.ptmhdv.sellphone.user.repository.RolesRepository;
+import com.ptmhdv.SellPhone.user.entity.Roles;
+import com.ptmhdv.SellPhone.user.repository.RolesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

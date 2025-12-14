@@ -1,4 +1,4 @@
-package com.ptmhdv.sellphone.common.exception;
+package com.ptmhdv.SellPhone.common.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

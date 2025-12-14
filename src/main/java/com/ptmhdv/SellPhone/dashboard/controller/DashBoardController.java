@@ -1,8 +1,8 @@
-package com.ptmhdv.sellphone.dashboard.controller;
+package com.ptmhdv.SellPhone.dashboard.controller;
 
-import com.ptmhdv.sellphone.dashboard.DTO.DashboardDTO;
-import com.ptmhdv.sellphone.dashboard.service.DashboardService;
-import com.ptmhdv.sellphone.order.entity.Orders;
+import com.ptmhdv.SellPhone.dashboard.DTO.DashboardDTO;
+import com.ptmhdv.SellPhone.dashboard.service.DashboardService;
+import com.ptmhdv.SellPhone.order.entity.Orders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package com.ptmhdv.sellphone.dashboard.DTO;
+package com.ptmhdv.SellPhone.dashboard.DTO;
 
 
 import lombok.Getter;

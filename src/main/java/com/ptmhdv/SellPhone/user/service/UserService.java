@@ -1,7 +1,7 @@
-package com.ptmhdv.sellphone.user.service;
+package com.ptmhdv.SellPhone.user.service;
 
-import com.ptmhdv.sellphone.user.entity.Users;
-import com.ptmhdv.sellphone.user.repository.UsersRepository;
+import com.ptmhdv.SellPhone.user.entity.Users;
+import com.ptmhdv.SellPhone.user.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
