@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý Đơn hàng – SellPhone Admin</title>
+
+    <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+
+<div class="admin-container">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="sidebar-header">
+            <h2>📱 SellPhone</h2>
+        </div>
+
+        <div class="sidebar-menu">
+            <a href="admin.html" class="menu-item">
+                <span class="icon">📊</span><span class="text">Dashboard</span>
+            </a>
+
+            <a href="products.html" class="menu-item">
+                <span class="icon">📦</span><span class="text">Sản phẩm</span>
+            </a>
+
+            <a href="brands.html" class="menu-item">
+                <span class="icon">🏷️</span><span class="text">Thương hiệu</span>
+            </a>
+
+            <a href="orders.html" class="menu-item active">
+                <span class="icon">🧾</span><span class="text">Đơn hàng</span>
+            </a>
+
+            <a href="users.html" class="menu-item">
+                <span class="icon">👤</span><span class="text">Người dùng</span>
+            </a>
+            <!-- KHOẢNG CÁCH TRƯỚC LOGOUT -->
+            <div class="sidebar-separator"></div>
+
+            <!-- NÚT LOGOUT -->
+            <a href="#" class="menu-item logout-item" onclick="logout()">
+                <span class="icon">🚪</span>
+                <span class="text">Đăng xuất</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <header class="topbar">
+            <h1>Quản lý Đơn hàng</h1>
+        </header>
+
+        <!-- FILTER STATUS -->
+        <div class="cards" style="grid-template-columns: repeat(4, 1fr); margin-bottom:25px;">
+            <div class="card status-filter" onclick="filterStatus('PENDING')">Chờ xử lý</div>
+            <div class="card status-filter" onclick="filterStatus('PROCESSING')">Đang xử lý</div>
+            <div class="card status-filter" onclick="filterStatus('COMPLETED')">Hoàn thành</div>
+            <div class="card status-filter" onclick="filterStatus('CANCELLED')">Đã hủy</div>
+        </div>
+
+        <!-- ORDER TABLE -->
+        <div class="table-container">
+            <table id="orderTable">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Khách hàng</th>
+                    <th>Ngày đặt</th>
+                    <th>Tổng tiền</th>
+                    <th>Trạng thái</th>
+                    <th>Hành động</th>
+                </tr>
+                </thead>
+
+                <tbody></tbody>
+            </table>
+        </div>
+
+    </main>
+</div>
+
+<!-- MODAL CHI TIẾT ĐƠN -->
+<div id="orderModal" class="modal">
+    <div class="modal-content">
+        <h2>Chi tiết đơn hàng</h2>
+
+        <p><b>Mã đơn:</b> <span id="orderId"></span></p>
+        <p><b>Khách hàng:</b> <span id="orderUser"></span></p>
+        <p><b>Ngày đặt:</b> <span id="orderDate"></span></p>
+        <p><b>Tổng tiền:</b> <span id="orderTotal"></span></p>
+
+        <h3>Sản phẩm</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>Tên</th>
+                <th>SL</th>
+                <th>Giá</th>
+            </tr>
+            </thead>
+            <tbody id="orderItems"></tbody>
+        </table>
+
+        <label>Cập nhật trạng thái</label>
+        <select id="orderStatus">
+            <option value="PENDING">Chờ xử lý</option>
+            <option value="PROCESSING">Đang xử lý</option>
+            <option value="COMPLETED">Hoàn thành</option>
+            <option value="CANCELLED">Đã hủy</option>
+        </select>
+
+        <button class="btn" onclick="updateStatus()">Cập nhật</button>
+        <button class="btn" style="background:#d63031" onclick="closeModal()">Đóng</button>
+    </div>
+</div>
+
+<script src="orders.js"></script>
+</body>
+</html>

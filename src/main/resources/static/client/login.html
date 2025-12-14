@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Đăng nhập - SellPhone Black Friday</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="login">
+  <header class="sp-header">
+    <div class="sp-header__left">
+      <div class="sp-logo">
+        <span class="sp-logo__icon">📱</span>
+        <div class="sp-logo__text">
+          <span class="sp-logo__brand">SellPhone</span>
+          <span class="sp-logo__tagline">Đăng nhập để săn deal</span>
+        </div>
+      </div>
+      <nav class="sp-nav">
+        <a href="index.html" class="sp-nav__item">Trang chủ</a>
+        <a href="products.html" class="sp-nav__item">Sản phẩm</a>
+      </nav>
+    </div>
+
+    <div class="sp-header__right">
+      <div class="sp-header__icons">
+        <a href="cart.html" class="sp-header-icon" title="Giỏ hàng">
+          <span class="sp-header-icon__badge" id="cart-header-count">0</span>
+          🛒
+        </a>
+        <a href="account.html" class="sp-header-icon" title="Tài khoản của tôi">
+          👤
+        </a>
+      </div>
+
+      <div class="sp-user">
+        <div class="sp-user__info">
+          <span id="user-label" class="sp-user__label">Chưa đăng nhập</span>
+        </div>
+        <div class="sp-user__actions">
+          <button id="login-header-btn" class="sp-btn sp-btn--outline sp-btn--sm">
+            Đăng nhập
+          </button>
+          <button
+            id="logout-header-btn"
+            class="sp-btn sp-btn--outline sp-btn--sm sp-hidden"
+          >
+            Đăng xuất
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="sp-layout" style="grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.2fr);">
+    <section class="sp-panel sp-panel--main">
+      <div class="sp-panel__header">
+        <div>
+          <h2 class="sp-panel__title">Đăng nhập tài khoản</h2>
+          <p class="sp-panel__subtitle">
+            Đăng nhập để lưu giỏ hàng, đặt đơn và theo dõi lịch sử mua hàng.
+          </p>
+        </div>
+      </div>
+
+      <div style="margin-top: 10px; max-width: 420px; font-size: 13px;">
+        <label class="sp-field">
+          <span>Email</span>
+          <input id="login-email" type="email" placeholder="vd: khachhang@gmail.com" />
+        </label>
+        <label class="sp-field">
+          <span>Mật khẩu</span>
+          <input id="login-password" type="password" placeholder="••••••" />
+        </label>
+
+        <div
+          id="login-error"
+          class="sp-alert sp-alert--error sp-alert--compact sp-hidden"
+        ></div>
+
+        <div style="margin-top: 10px; display: flex; gap: 8px;">
+          <button id="login-submit" class="sp-btn sp-btn--primary">
+            Đăng nhập
+          </button>
+          <button id="login-cancel" class="sp-btn sp-btn--ghost">
+            Về trang chủ
+          </button>
+          <p style="margin-top: 8px; font-size: 12px;">
+            Chưa có tài khoản?
+            <a href="register.html">Đăng ký ngay</a>.
+          </p>
+
+        </div>
+
+        <p class="sp-text--muted" style="margin-top: 12px; font-size: 12px;">
+          Hệ thống sẽ gọi API
+          <code>POST /api/users/login?email=&amp;password=</code>.
+          Nếu thành công, thông tin tài khoản được lưu trong trình duyệt để dùng trên các trang
+          <b>Sản phẩm</b>, <b>Giỏ hàng</b>, <b>Tài khoản</b>.
+        </p>
+      </div>
+    </section>
+
+    <aside class="sp-panel sp-panel--side">
+      <div class="sp-panel__header">
+        <div>
+          <h2 class="sp-panel__title">Lợi ích khi đăng nhập</h2>
+          <p class="sp-panel__subtitle">
+            Một số tính năng chỉ dùng được sau khi đăng nhập.
+          </p>
+        </div>
+      </div>
+
+      <div style="margin-top: 10px; font-size: 13px;">
+        <ul style="margin-left: 18px; margin-bottom: 10px;">
+          <li>Lưu giỏ hàng theo từng tài khoản.</li>
+          <li>Đặt hàng nhanh, không phải nhập lại thông tin nhiều lần.</li>
+          <li>Theo dõi lịch sử mua hàng và tình trạng đơn.</li>
+        </ul>
+        <p class="sp-text--muted" style="font-size: 12px;">
+          Trong demo, tài khoản test được tạo sẵn ở database của backend.
+        </p>
+      </div>
+    </aside>
+  </main>
+
+  <div id="toast" class="sp-toast sp-hidden"></div>
+  <script src="app.js"></script>
+</body>
+</html>

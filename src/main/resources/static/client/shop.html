@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>SellPhone - Mua điện thoại online</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- HEADER -->
+  <header class="sp-header">
+    <div class="sp-header__left">
+      <div class="sp-logo">
+        <span class="sp-logo__icon">📱</span>
+        <div class="sp-logo__text">
+          <span class="sp-logo__brand">SellPhone</span>
+          <span class="sp-logo__tagline">Cửa hàng điện thoại trực tuyến</span>
+        </div>
+      </div>
+      <nav class="sp-nav">
+        <a href="index.html" class="sp-nav__item">Trang chủ</a>
+        <a href="shop.html" class="sp-nav__item sp-nav__item--active">Cửa hàng</a>
+        <a href="about.html" class="sp-nav__item">Về SellPhone</a>
+      </nav>
+    </div>
+
+    <div class="sp-header__right">
+      <div class="sp-search">
+        <input
+          id="search-input"
+          type="text"
+          placeholder="Tìm theo tên điện thoại (vd: iPhone 15, Galaxy S23...)"
+        />
+        <button id="clear-search-btn" class="sp-btn sp-btn--ghost">Xoá</button>
+      </div>
+
+      <div class="sp-user">
+        <div class="sp-user__info">
+          <span id="user-label" class="sp-user__label">Chưa đăng nhập</span>
+        </div>
+        <div class="sp-user__actions">
+          <button id="login-btn" class="sp-btn sp-btn--outline sp-btn--sm">
+            Đăng nhập
+          </button>
+          <button
+            id="logout-btn"
+            class="sp-btn sp-btn--outline sp-btn--sm sp-hidden"
+          >
+            Đăng xuất
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN LAYOUT -->
+  <main class="sp-layout">
+    <!-- LEFT: PRODUCTS -->
+    <section class="sp-panel sp-panel--main">
+      <div class="sp-panel__header">
+        <div>
+          <h2 class="sp-panel__title">Điện thoại nổi bật</h2>
+          <p class="sp-panel__subtitle">
+            Chọn ngay mẫu điện thoại phù hợp với nhu cầu và ngân sách của bạn.
+          </p>
+        </div>
+        <div class="sp-filters">
+          <select id="brand-filter" class="sp-select">
+            <option value="">Tất cả hãng</option>
+            <!-- brandId cần trùng DB -->
+            <option value="1">Apple</option>
+            <option value="2">Samsung</option>
+            <option value="3">Xiaomi</option>
+            <option value="4">Oppo</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="sp-panel__toolbar">
+        <span id="product-count" class="sp-text--muted"></span>
+        <span id="product-loading" class="sp-text--muted sp-hidden">
+          Đang tải sản phẩm...
+        </span>
+      </div>
+
+      <div id="product-error" class="sp-alert sp-alert--error sp-hidden"></div>
+
+      <div id="product-list" class="sp-products">
+        <!-- Render bằng JS -->
+      </div>
+
+      <div id="pagination" class="sp-pagination"></div>
+    </section>
+
+    <!-- RIGHT: CART -->
+    <aside class="sp-panel sp-panel--side">
+      <div class="sp-panel__header">
+        <div>
+          <h2 class="sp-panel__title">Giỏ hàng của bạn</h2>
+          <p class="sp-panel__subtitle">
+            Sản phẩm sẽ được lưu theo tài khoản sau khi bạn đăng nhập.
+          </p>
+        </div>
+        <span id="cart-count" class="sp-badge">0 sp</span>
+      </div>
+
+      <div id="cart-error" class="sp-alert sp-alert--error sp-hidden"></div>
+
+      <div id="cart-items" class="sp-cart">
+        <!-- Render bằng JS -->
+      </div>
+
+      <div class="sp-cart__summary">
+        <div class="sp-cart__row">
+          <span>Tạm tính</span>
+          <span id="cart-subtotal">0₫</span>
+        </div>
+        <div class="sp-cart__row">
+          <span>Phí vận chuyển (tạm tính)</span>
+          <span id="cart-shipping">0₫</span>
+        </div>
+        <div class="sp-cart__row sp-cart__row--total">
+          <span>Tổng cộng</span>
+          <span id="cart-total">0₫</span>
+        </div>
+      </div>
+
+      <button id="checkout-btn" class="sp-btn sp-btn--primary sp-btn--full">
+        Đặt hàng ngay
+      </button>
+
+      <p class="sp-text--muted sp-cart__hint">
+        Đơn hàng sẽ được xác nhận qua điện thoại trước khi giao. Vui lòng điền
+        đúng thông tin người nhận khi thanh toán.
+      </p>
+    </aside>
+  </main>
+
+  <!-- LOGIN MODAL -->
+  <div id="login-modal" class="sp-modal sp-hidden">
+    <div class="sp-modal__backdrop"></div>
+    <div class="sp-modal__dialog">
+      <div class="sp-modal__header">
+        <h3>Đăng nhập tài khoản</h3>
+        <button class="sp-modal__close" data-close-modal="login">×</button>
+      </div>
+      <div class="sp-modal__body">
+        <p class="sp-text--muted sp-mb-8">
+          Đăng nhập để lưu giỏ hàng và theo dõi đơn đặt hàng của bạn.
+        </p>
+        <label class="sp-field">
+          <span>Email</span>
+          <input
+            id="login-email"
+            type="email"
+            placeholder="vd: khachhang@gmail.com"
+          />
+        </label>
+        <label class="sp-field">
+          <span>Mật khẩu</span>
+          <input
+            id="login-password"
+            type="password"
+            placeholder="••••••"
+          />
+        </label>
+        <div
+          id="login-error"
+          class="sp-alert sp-alert--error sp-alert--compact sp-hidden"
+        ></div>
+      </div>
+      <div class="sp-modal__footer">
+        <button
+          id="login-cancel"
+          class="sp-btn sp-btn--ghost"
+          data-close-modal="login"
+        >
+          Huỷ
+        </button>
+        <button id="login-submit" class="sp-btn sp-btn--primary">
+          Đăng nhập
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRODUCT DETAIL MODAL -->
+  <div id="detail-modal" class="sp-modal sp-hidden">
+    <div class="sp-modal__backdrop"></div>
+    <div class="sp-modal__dialog">
+      <div class="sp-modal__header">
+        <h3 id="detail-name">Chi tiết sản phẩm</h3>
+        <button class="sp-modal__close" data-close-modal="detail">×</button>
+      </div>
+      <div class="sp-modal__body">
+        <p id="detail-price" class="sp-detail__price"></p>
+        <p id="detail-desc" class="sp-text--muted sp-mb-8"></p>
+        <dl class="sp-detail__meta">
+          <div>
+            <dt>Hãng</dt>
+            <dd id="detail-brand">N/A</dd>
+          </div>
+          <div>
+            <dt>Bộ nhớ</dt>
+            <dd id="detail-storage">N/A</dd>
+          </div>
+        </dl>
+      </div>
+      <div class="sp-modal__footer">
+        <button
+          id="detail-add"
+          class="sp-btn sp-btn--primary sp-btn--full"
+        >
+          Thêm vào giỏ
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECKOUT MODAL -->
+  <div id="checkout-modal" class="sp-modal sp-hidden">
+    <div class="sp-modal__backdrop"></div>
+    <div class="sp-modal__dialog">
+      <div class="sp-modal__header">
+        <h3>Thông tin người nhận</h3>
+        <button class="sp-modal__close" data-close-modal="checkout">×</button>
+      </div>
+      <div class="sp-modal__body">
+        <p class="sp-text--muted sp-mb-8">
+          Vui lòng nhập chính xác thông tin để chúng tôi giao hàng nhanh chóng cho bạn.
+        </p>
+        <label class="sp-field">
+          <span>Tên người nhận</span>
+          <input id="checkout-name" type="text" />
+        </label>
+        <label class="sp-field">
+          <span>Địa chỉ nhận hàng</span>
+          <textarea id="checkout-address" rows="3"></textarea>
+        </label>
+        <label class="sp-field">
+          <span>Số điện thoại</span>
+          <input id="checkout-phone" type="text" />
+        </label>
+        <label class="sp-field">
+          <span>Mã giảm giá (nếu có)</span>
+          <input id="checkout-coupon" type="text" placeholder="Nhập mã ưu đãi (tuỳ chọn)" />
+        </label>
+        <div
+          id="checkout-error"
+          class="sp-alert sp-alert--error sp-alert--compact sp-hidden"
+        ></div>
+      </div>
+      <div class="sp-modal__footer">
+        <button
+          class="sp-btn sp-btn--ghost"
+          data-close-modal="checkout"
+        >
+          Huỷ
+        </button>
+        <button id="checkout-confirm" class="sp-btn sp-btn--primary">
+          Xác nhận đặt hàng
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast" class="sp-toast sp-hidden"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tài khoản - SellPhone Black Friday</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="account">
+  <header class="sp-header">
+    <div class="sp-header__left">
+      <div class="sp-logo">
+        <span class="sp-logo__icon">📱</span>
+        <div class="sp-logo__text">
+          <span class="sp-logo__brand">SellPhone</span>
+          <span class="sp-logo__tagline">Thông tin tài khoản</span>
+        </div>
+      </div>
+      <nav class="sp-nav">
+        <a href="index.html" class="sp-nav__item">Trang chủ</a>
+        <a href="products.html" class="sp-nav__item">Sản phẩm</a>
+      </nav>
+    </div>
+
+    <div class="sp-header__right">
+      <div class="sp-header__icons">
+        <a href="cart.html" class="sp-header-icon" title="Giỏ hàng">
+          <span class="sp-header-icon__badge" id="cart-header-count">0</span>
+          🛒
+        </a>
+        <a href="account.html" class="sp-header-icon" title="Tài khoản của tôi">
+          👤
+        </a>
+      </div>
+
+      <div class="sp-user">
+        <div class="sp-user__info">
+          <span id="user-label" class="sp-user__label">Chưa đăng nhập</span>
+        </div>
+        <div class="sp-user__actions">
+          <button id="login-header-btn" class="sp-btn sp-btn--outline sp-btn--sm">
+            Đăng nhập
+          </button>
+          <button
+            id="logout-header-btn"
+            class="sp-btn sp-btn--outline sp-btn--sm sp-hidden"
+          >
+            Đăng xuất
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="sp-layout" style="grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.4fr);">
+    <section class="sp-panel sp-panel--main">
+      <div class="sp-panel__header">
+        <div>
+          <h2 class="sp-panel__title">Thông tin tài khoản</h2>
+          <p class="sp-panel__subtitle">
+            Hiển thị thông tin user sau khi đăng nhập thành công.
+          </p>
+        </div>
+      </div>
+
+      <div id="account-guest" style="margin-top: 10px; font-size: 13px;">
+        <p class="sp-text--muted">
+          Bạn chưa đăng nhập. Vui lòng
+          <a href="login.html">đăng nhập</a> để xem thông tin tài khoản.
+        </p>
+      </div>
+
+      <div id="account-user" style="margin-top: 10px; font-size: 13px;" class="sp-hidden">
+        <p><b>Họ tên:</b> <span id="account-name"></span></p>
+        <p><b>Email:</b> <span id="account-email"></span></p>
+        <p><b>Số điện thoại:</b> <span id="account-phone"></span></p>
+        <p><b>Địa chỉ:</b> <span id="account-address"></span></p>
+
+        <p class="sp-text--muted" style="margin-top: 12px; font-size: 12px;">
+          Dữ liệu trên được lấy từ đối tượng user trả về bởi API
+          <code>/api/users/login</code> và được lưu tạm ở frontend. Trong thực tế,
+          trang này có thể mở rộng thêm chức năng cập nhật thông tin, đổi mật khẩu...
+        </p>
+      </div>
+    </section>
+
+    <aside class="sp-panel sp-panel--side">
+      <div class="sp-panel__header">
+        <div>
+          <h2 class="sp-panel__title">Gợi ý cho báo cáo</h2>
+          <p class="sp-panel__subtitle">
+            Mô tả phần “Quản lý tài khoản người dùng”.
+          </p>
+        </div>
+      </div>
+
+      <div style="margin-top: 10px; font-size: 13px;">
+        <p>
+          Hệ thống hỗ trợ:
+        </p>
+        <ul style="margin-left: 18px; margin-bottom: 8px;">
+          <li>Đăng nhập bằng email & mật khẩu.</li>
+          <li>Gắn giỏ hàng và đơn hàng với từng user.</li>
+          <li>Hiển thị thông tin user trên trang Tài khoản.</li>
+        </ul>
+        <p class="sp-text--muted" style="font-size: 12px;">
+          Bạn có thể dùng nội dung này cho phần thuyết minh kiến trúc hệ thống
+          và mô-đun quản lý người dùng trong báo cáo môn học.
+        </p>
+      </div>
+    </aside>
+  </main>
+
+  <div id="toast" class="sp-toast sp-hidden"></div>
+  <script src="app.js"></script>
+</body>
+</html>

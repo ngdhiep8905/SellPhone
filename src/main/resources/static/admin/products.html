@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý sản phẩm – SellPhone Admin</title>
+
+    <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+
+<div class="admin-container">
+
+    <!-- SIDEBAR (đồng bộ) -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>📱 SellPhone</h2>
+        </div>
+
+        <div class="sidebar-menu">
+            <a href="admin.html" class="menu-item">
+                <span class="icon">📊</span><span class="text">Dashboard</span>
+            </a>
+
+            <a href="products.html" class="menu-item active">
+                <span class="icon">📦</span><span class="text">Sản phẩm</span>
+            </a>
+
+            <a href="brands.html" class="menu-item">
+                <span class="icon">🏷️</span><span class="text">Thương hiệu</span>
+            </a>
+
+            <a href="orders.html" class="menu-item">
+                <span class="icon">🧾</span><span class="text">Đơn hàng</span>
+            </a>
+
+            <a href="users.html" class="menu-item">
+                <span class="icon">👤</span><span class="text">Người dùng</span>
+            </a>
+            <!-- KHOẢNG CÁCH TRƯỚC LOGOUT -->
+            <div class="sidebar-separator"></div>
+
+            <!-- NÚT LOGOUT -->
+            <a href="#" class="menu-item logout-item" onclick="logout()">
+                <span class="icon">🚪</span>
+                <span class="text">Đăng xuất</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- HEADER -->
+        <header class="topbar">
+            <h1>Quản lý sản phẩm</h1>
+            <button class="btn" onclick="openAddModal()">+ Thêm sản phẩm</button>
+        </header>
+
+        <!-- TABLE -->
+        <div class="table-container">
+            <table id="productTable">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tên</th>
+                    <th>Giá</th>
+                    <th>Ảnh</th>
+                    <th>Thương hiệu</th>
+                    <th>Hành động</th>
+                </tr>
+                </thead>
+
+                <tbody></tbody>
+            </table>
+        </div>
+
+    </main>
+</div>
+
+<!-- MODAL THÊM/SỬA -->
+<div id="productModal" class="modal">
+    <div class="modal-content">
+        <h2 id="modalTitle">Thêm sản phẩm</h2>
+
+        <label>Tên sản phẩm</label>
+        <input type="text" id="phoneName">
+
+        <label>Giá</label>
+        <input type="number" id="price">
+
+        <label>Ảnh (URL)</label>
+        <input type="text" id="coverImageURL">
+
+        <label>Thương hiệu</label>
+        <select id="brandId"></select>
+
+        <button class="btn" onclick="saveProduct()">Lưu</button>
+        <button class="btn" style="background:#d63031" onclick="closeModal()">Hủy</button>
+    </div>
+</div>
+
+<script src="products.js"></script>
+</body>
+</html>

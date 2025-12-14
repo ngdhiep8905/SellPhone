@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Tổng Hợp - SellPhone Admin</title>
+    <link rel="stylesheet" href="admin.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<div class="admin-container">
+
+    <aside class="sidebar">
+
+        <div class="sidebar-header">
+            <h2>📱 SellPhone</h2>
+        </div>
+
+        <div class="sidebar-menu">
+
+            <a href="dashboard.html" class="menu-item active">
+                <span class="icon">📊</span>
+                <span class="text">Dashboard</span>
+            </a>
+
+            <a href="products.html" class="menu-item">
+                <span class="icon">📦</span>
+                <span class="text">Sản phẩm</span>
+            </a>
+
+            <a href="brands.html" class="menu-item">
+                <span class="icon">🏷️</span>
+                <span class="text">Thương hiệu</span>
+            </a>
+
+            <a href="orders.html" class="menu-item">
+                <span class="icon">🧾</span>
+                <span class="text">Đơn hàng</span>
+            </a>
+
+            <a href="users.html" class="menu-item">
+                <span class="icon">👤</span>
+                <span class="text">Người dùng</span>
+            </a>
+            <!-- KHOẢNG CÁCH TRƯỚC LOGOUT -->
+            <div class="sidebar-separator"></div>
+
+            <!-- NÚT LOGOUT -->
+            <a href="#" class="menu-item logout-item" onclick="logout()">
+                <span class="icon">🚪</span>
+                <span class="text">Đăng xuất</span>
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+        <header class="topbar">
+            <h1>Dashboard Tổng Hợp</h1>
+
+            <div class="tabs">
+                <button class="tab-btn active" onclick="showTab('overview')">Tổng Quan</button>
+                <button class="tab-btn" onclick="showTab('advanced')">Phân Tích Nâng Cao</button>
+            </div>
+        </header>
+
+        <!-- TAB 1: OVERVIEW -->
+        <section id="overview" class="tab-page active">
+
+            <div class="cards">
+                <div class="card">
+                    <h3>Tổng sản phẩm</h3>
+                    <p id="totalProducts">0</p>
+                </div>
+                <div class="card">
+                    <h3>Tổng đơn hàng trong tháng</h3>
+                    <p id="totalOrders">0</p>
+                </div>
+                <div class="card">
+                    <h3>Tổng người dùng</h3>
+                    <p id="totalUsers">0</p>
+                </div>
+                <div class="card">
+                    <h3>Doanh thu tháng</h3>
+                    <p id="monthRevenue">0 đ</p>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h2>Biểu đồ doanh thu theo tháng</h2>
+                <canvas id="revenueOverviewChart"></canvas>
+            </div>
+        </section>
+
+
+        <!-- TAB 2: ADVANCED -->
+        <section id="advanced" class="tab-page">
+
+            <!-- Filters -->
+            <div class="card filter-card">
+                <h2>Bộ lọc nâng cao</h2>
+                <div class="filters">
+                    <div class="filter-item">
+                        <label>Tháng</label>
+                        <select id="monthFilter"><option value="">Tất cả</option></select>
+                    </div>
+                    <div class="filter-item">
+                        <label>Năm</label>
+                        <select id="yearFilter"><option value="">Tất cả</option></select>
+                    </div>
+                    <div class="filter-item">
+                        <label>Thương hiệu</label>
+                        <select id="brandFilter"><option value="">Tất cả</option></select>
+                    </div>
+
+                    <button class="btn" onclick="applyFilters()">Lọc</button>
+                </div>
+            </div>
+
+            <div class="grid">
+                <div class="card">
+                    <h3>Combo Chart Doanh Thu</h3>
+                    <canvas id="comboRevenueChart"></canvas>
+                </div>
+
+                <div class="card">
+                    <h3>Top 5 sản phẩm bán chạy</h3>
+                    <canvas id="topProductChart"></canvas>
+                </div>
+
+                <div class="card">
+                    <h3>Doanh thu theo thương hiệu (Donut)</h3>
+                    <canvas id="brandDonutChart"></canvas>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+</div>
+
+<script src="dashboard.js"></script>
+</body>
+</html>

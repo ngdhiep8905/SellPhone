@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Giỏ hàng - SellPhone Black Friday</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="cart">
+  <header class="sp-header">
+    <div class="sp-header__left">
+      <div class="sp-logo">
+        <span class="sp-logo__icon">📱</span>
+        <div class="sp-logo__text">
+          <span class="sp-logo__brand">SellPhone</span>
+          <span class="sp-logo__tagline">Giỏ hàng của bạn</span>
+        </div>
+      </div>
+      <nav class="sp-nav">
+        <a href="index.html" class="sp-nav__item">Trang chủ</a>
+        <a href="products.html" class="sp-nav__item">Sản phẩm</a>
+      </nav>
+    </div>
+
+    <div class="sp-header__right">
+      <div class="sp-header__icons">
+        <a href="cart.html" class="sp-header-icon" title="Giỏ hàng">
+          <span class="sp-header-icon__badge" id="cart-header-count">0</span>
+          🛒
+        </a>
+        <a href="account.html" class="sp-header-icon" title="Tài khoản của tôi">
+          👤
+        </a>
+      </div>
+
+      <div class="sp-user">
+        <div class="sp-user__info">
+          <span id="user-label" class="sp-user__label">Chưa đăng nhập</span>
+        </div>
+        <div class="sp-user__actions">
+          <button id="login-header-btn" class="sp-btn sp-btn--outline sp-btn--sm">
+            Đăng nhập
+          </button>
+          <button
+            id="logout-header-btn"
+            class="sp-btn sp-btn--outline sp-btn--sm sp-hidden"
+          >
+            Đăng xuất
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="sp-layout" style="grid-template-columns: minmax(0, 1.7fr) minmax(0, 1.3fr);">
+    <section class="sp-panel sp-panel--main">
+      <div class="sp-panel__header">
+        <div>
+          <h2 class="sp-panel__title">Giỏ hàng</h2>
+          <p class="sp-panel__subtitle">
+            Kiểm tra lại sản phẩm trước khi thanh toán.
+          </p>
+        </div>
+      </div>
+
+      <div id="cart-error" class="sp-alert sp-alert--error sp-hidden"></div>
+
+      <div id="cart-items" class="sp-cart">
+        <!-- Render bằng JS -->
+      </div>
+
+      <p id="cart-empty" class="sp-text--muted" style="font-size: 13px;">
+        Giỏ hàng hiện đang trống. Hãy quay lại trang
+        <a href="products.html">Sản phẩm</a> để chọn điện thoại muốn mua.
+      </p>
+    </section>
+
+    <aside class="sp-panel sp-panel--side">
+      <div class="sp-panel__header">
+        <div>
+          <h2 class="sp-panel__title">Thanh toán</h2>
+          <p class="sp-panel__subtitle">
+            Thông tin dùng để giao hàng cho bạn.
+          </p>
+        </div>
+        <span id="cart-count" class="sp-badge">0 sp</span>
+      </div>
+
+      <div class="sp-cart__summary">
+        <div class="sp-cart__row">
+          <span>Tạm tính</span>
+          <span id="cart-subtotal">0₫</span>
+        </div>
+        <div class="sp-cart__row">
+          <span>Phí vận chuyển (tạm tính)</span>
+          <span id="cart-shipping">0₫</span>
+        </div>
+        <div class="sp-cart__row sp-cart__row--total">
+          <span>Tổng cộng</span>
+          <span id="cart-total">0₫</span>
+        </div>
+      </div>
+
+      <div style="margin-top: 12px; font-size: 13px;">
+        <label class="sp-field">
+          <span>Tên người nhận</span>
+          <input id="checkout-name" type="text" />
+        </label>
+        <label class="sp-field">
+          <span>Địa chỉ nhận hàng</span>
+          <textarea id="checkout-address" rows="3"></textarea>
+        </label>
+        <label class="sp-field">
+          <span>Số điện thoại</span>
+          <input id="checkout-phone" type="text" />
+        </label>
+        <label class="sp-field">
+          <span>Mã giảm giá (nếu có)</span>
+          <input id="checkout-coupon" type="text" placeholder="Nhập mã ưu đãi (tuỳ chọn)" />
+        </label>
+        <label class="sp-field">
+            <span>Phương thức thanh toán</span>
+            <select id="checkout-payment"></select>
+        </label>
+
+        <div
+          id="checkout-error"
+          class="sp-alert sp-alert--error sp-alert--compact sp-hidden"
+        ></div>
+        <div
+          id="checkout-success"
+          class="sp-alert sp-alert--compact sp-hidden"
+          style="background:#dcfce7;border:1px solid #16a34a;color:#166534;"
+        ></div>
+
+        <button id="checkout-submit" class="sp-btn sp-btn--primary sp-btn--full" style="margin-top: 8px;">
+          Xác nhận đặt hàng
+        </button>
+
+        <p class="sp-text--muted sp-cart__hint">
+          Sau khi đặt, hệ thống gọi API
+          <code>/api/orders/checkout</code> để tạo đơn hàng trong backend.
+        </p>
+      </div>
+    </aside>
+  </main>
+
+  <div id="toast" class="sp-toast sp-hidden"></div>
+  <script src="app.js"></script>
+</body>
+</html>
