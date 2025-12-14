@@ -2,7 +2,9 @@ package com.ptmhdv.SellPhone.user.service;
 
 import com.ptmhdv.SellPhone.user.entity.Users;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -10,33 +12,27 @@ import java.util.Optional;
 public class AuthService {
 
     @Autowired
-    private UserService userService; // Dùng UserService của bạn để tìm user
+    private UserService userService;
 
     public Users login(String email, String rawPassword) {
 
-        // 1. Tìm người dùng theo Email
         Optional<Users> userOpt = userService.getByEmail(email);
 
         if (userOpt.isEmpty()) {
-            return null; // Không tìm thấy email
+            // Trả về lỗi 401 nếu không tìm thấy email
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Sai email hoặc mật khẩu.");
         }
 
         Users user = userOpt.get();
 
-        // 2. So sánh Mật khẩu (So sánh chuỗi trực tiếp)
-        // **Đây là phần thay thế cho BCryptPasswordEncoder.matches()**
+        // 1. So sánh Mật khẩu (So sánh chuỗi trực tiếp)
         if (!user.getPassword().equals(rawPassword)) {
-            return null; // Sai mật khẩu
+            // Trả về lỗi 401 nếu mật khẩu không khớp
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Sai email hoặc mật khẩu.");
         }
 
-        // 3. Kiểm tra Vai trò (Admin Check)
-        // Giả định: Vai trò Admin có tên Role là "ADMIN"
-        // (Yêu cầu Entity Roles của bạn phải có trường và getter getRoleName())
-        if (user.getRole() != null && "ADMIN".equalsIgnoreCase(user.getRole().getRoleName())) {
-            return user; // Đăng nhập thành công và là Admin
-        }
-
-        // Người dùng hợp lệ nhưng không phải Admin
-        return null;
+        // [QUAN TRỌNG]: Nếu mật khẩu khớp, trả về User, bất kể vai trò là gì.
+        // Điều này cho phép KHÁCH HÀNG (role='USER') đăng nhập.
+        return user;
     }
 }

@@ -8,8 +8,10 @@ const AppState = {
 };
 
 const ProductsState = {
-  rawItems: [], // toàn bộ dữ liệu từ API
-  items: [], // danh sách sau khi áp dụng filter
+  // Biến này sẽ lưu trữ dữ liệu GỐC nhận được từ Server (Đã lọc theo Brand/Keyword)
+  rawItems: [],
+  // Biến này sẽ chứa danh sách hiển thị sau khi áp dụng lọc Giá/Sắp xếp (Client-side)
+  items: [],
   currentPage: 1,
   pageSize: 8,
   brandId: "",
@@ -104,8 +106,7 @@ function updateCartHeaderCount() {
 
   let totalQty = 0;
   CartState.cart.items.forEach((item) => {
-    const q =
-      item.quantityPrice != null ? item.quantityPrice : item.quantity || 0;
+    const q = item.quantity || 0;
     totalQty += q;
   });
 
@@ -121,9 +122,9 @@ function updateHeaderUI() {
   if (!label || !loginBtn || !logoutBtn) return;
 
   if (AppState.currentUser) {
-    label.textContent = `Xin chào, ${
-      AppState.currentUser.userName || AppState.currentUser.email
-    }`;
+    const displayName = AppState.currentUser.fullName || AppState.currentUser.email || "Người dùng";
+    label.textContent = `Xin chào, ${displayName}`;
+
     loginBtn.classList.add("sp-hidden");
     logoutBtn.classList.remove("sp-hidden");
   } else {
@@ -172,7 +173,6 @@ function renderPaymentOptions() {
   sel.innerHTML = "";
 
   (PaymentState.methods || []).forEach((p) => {
-    // Backend Payment thường có: paymentId, paymentMethod, paymentStatus
     const id = p.paymentId ?? p.id ?? p.payment_id;
     const name = p.paymentMethod ?? p.method ?? "Thanh toán";
 
@@ -186,23 +186,26 @@ function renderPaymentOptions() {
 async function apiLogin(email, password) {
   const params = new URLSearchParams({ email, password });
   const res = await fetch(
-    `${API_BASE_URL}/api/users/login?${params.toString()}`,
+    `${API_BASE_URL}/api/auth/login?${params.toString()}`,
     { method: "POST" }
   );
 
   if (!res.ok) {
-    // Đọc thêm message từ backend nếu có
     let msg = "Login failed";
     try {
       const err = await res.json();
       if (err && err.message) msg = err.message;
     } catch {
-      // body không phải JSON thì bỏ qua
+      if (res.status === 401 || res.status === 400) {
+        msg = "Sai email hoặc mật khẩu.";
+      } else {
+        msg = `Lỗi kết nối Server: HTTP ${res.status}`;
+      }
     }
     throw new Error(msg);
   }
 
-  return res.json(); // 200 OK + body là JSON Users → không còn lỗi JSON nữa
+  return res.json();
 }
 
 async function apiRegister(payload) {
@@ -227,21 +230,31 @@ async function apiRegister(payload) {
 }
 
 
-
-
-// chỉ gọi 1 lần, lấy toàn bộ danh sách phone
-async function apiFetchPhones() {
+// [HÀM LỌC SERVER-SIDE] Fetch Products với tham số lọc
+async function apiFetchProducts(keyword = "", brandId = "") {
   const loadingEl = $("#product-loading");
   const errorEl = $("#product-error");
+
   if (loadingEl) loadingEl.classList.remove("sp-hidden");
   if (errorEl) errorEl.classList.add("sp-hidden");
 
+  const params = new URLSearchParams();
+  if (keyword) params.append('keyword', keyword);
+  if (brandId) params.append('brandId', brandId);
+
+  const queryString = params.toString() ? `?${params.toString()}` : "";
+
   try {
-    const res = await fetch(`${API_BASE_URL}/api/phones`);
+    const res = await fetch(`${API_BASE_URL}/api/phones${queryString}`);
     if (!res.ok) throw new Error("HTTP " + res.status);
-    ProductsState.rawItems = (await res.json()) || [];
-    ProductsState.currentPage = 1;
-    applyProductFilters();
+
+    const fetchedItems = (await res.json()) || [];
+
+    // 1. Lưu trữ dữ liệu GỐC (đã lọc Server)
+    ProductsState.rawItems = fetchedItems;
+    // 2. Gọi hàm áp dụng lọc/sắp xếp Client-side trên dữ liệu mới này
+    applyClientFilters();
+
   } catch (err) {
     console.error(err);
     if (errorEl) {
@@ -253,6 +266,7 @@ async function apiFetchPhones() {
     if (loadingEl) loadingEl.classList.add("sp-hidden");
   }
 }
+
 
 async function apiAddToCart(phoneId, quantity = 1) {
   if (!requireLogin("products.html")) return;
@@ -290,7 +304,8 @@ async function apiFetchCart() {
   if (!AppState.currentUser) {
     CartState.cart = null;
     updateCartHeaderCount();
-    renderCartPage();
+    const page = document.body.dataset.page;
+    if (page === "cart") renderCartPage();
     return;
   }
   const errorEl = $("#cart-error");
@@ -303,7 +318,8 @@ async function apiFetchCart() {
     if (!res.ok) throw new Error("HTTP " + res.status);
     CartState.cart = await res.json();
     updateCartHeaderCount();
-    renderCartPage();
+    const page = document.body.dataset.page;
+    if (page === "cart") renderCartPage();
   } catch (err) {
     console.error(err);
     if (errorEl) {
@@ -394,40 +410,13 @@ async function apiCheckout(payload) {
 }
 
 
-// ============ PRODUCT FILTERING ============
-function applyProductFilters() {
+// [HÀM MỚI] Áp dụng các bộ lọc Client-side (Giá và Sắp xếp)
+function applyClientFilters() {
+
+  // Bắt đầu với danh sách đã lọc từ Server (rawItems)
   let list = [...(ProductsState.rawItems || [])];
 
-  // từ khoá
-  if (ProductsState.keyword) {
-    const kw = ProductsState.keyword.toLowerCase();
-    list = list.filter((p) => {
-      const name = (p.phoneName || "").toLowerCase();
-      const desc = (p.phoneDescription || "").toLowerCase();
-      return name.includes(kw) || desc.includes(kw);
-    });
-  }
-
-  // hãng (ưu tiên brandId)
-  if (ProductsState.brandId) {
-    list = list.filter((p) => {
-      if (p.brandId != null) {
-        return String(p.brandId) === ProductsState.brandId;
-      }
-      // fallback theo tên
-      if (!p.brandName) return false;
-      const map = {
-        1: "apple",
-        2: "samsung",
-        3: "xiaomi",
-        4: "oppo",
-      };
-      const target = map[ProductsState.brandId];
-      return p.brandName.toLowerCase().includes(target);
-    });
-  }
-
-  // lọc khoảng giá
+  // Lọc khoảng giá (Sử dụng ProductsState.priceFilter)
   if (ProductsState.priceFilter) {
     list = list.filter((p) => {
       const price = getPhonePrice(p);
@@ -446,7 +435,7 @@ function applyProductFilters() {
     });
   }
 
-  // sắp xếp
+  // Sắp xếp (Sử dụng ProductsState.sort)
   if (ProductsState.sort) {
     const sort = ProductsState.sort;
     list.sort((a, b) => {
@@ -463,9 +452,41 @@ function applyProductFilters() {
     });
   }
 
+  // Cập nhật danh sách hiển thị và gọi render
   ProductsState.items = list;
   ProductsState.currentPage = 1;
   renderProducts();
+}
+
+// [HÀM SỬA ĐỔI] Kích hoạt việc gọi API hoặc Client Filter
+function applyProductFilters() {
+
+  // Lấy trạng thái mới từ các input
+  const newKeyword = $("#search-input") ? $("#search-input").value.trim() : "";
+  const newBrandId = $("#brand-filter") ? $("#brand-filter").value : "";
+  const newPriceFilter = $("#price-filter") ? $("#price-filter").value : "";
+  const newSort = $("#sort-filter") ? $("#sort-filter").value : "";
+
+
+  // QUYẾT ĐỊNH: Có cần gọi API (Server Filter) không?
+  const serverFilterChanged =
+      ProductsState.keyword !== newKeyword || ProductsState.brandId !== newBrandId;
+
+  // Cập nhật trạng thái Global (trước khi quyết định gọi API)
+  ProductsState.keyword = newKeyword;
+  ProductsState.brandId = newBrandId;
+  ProductsState.priceFilter = newPriceFilter;
+  ProductsState.sort = newSort;
+
+
+  if (serverFilterChanged) {
+      // 1. GỌI API (Fetch data mới đã lọc theo Brand/Keyword)
+      apiFetchProducts(newKeyword, newBrandId);
+      return;
+  }
+
+  // 2. KHÔNG cần gọi API, chỉ cần áp dụng lọc/sắp xếp Client-side trên dữ liệu hiện có
+  applyClientFilters();
 }
 
 // ============ PRODUCTS RENDER ============
@@ -513,6 +534,8 @@ function renderProducts() {
 
     const desc = p.phoneDescription || "Chưa có mô tả.";
 
+    const phoneId = p.phoneId || p.id;
+
     card.innerHTML = `
       <div class="sp-product-card__image">
         ${imgHtml}
@@ -522,12 +545,12 @@ function renderProducts() {
       <div class="sp-product-card__desc">${desc}</div>
       <div class="sp-product-card__footer">
         <button class="sp-btn sp-btn--primary sp-btn--sm" data-action="add" data-id="${
-          p.id
+          phoneId
         }">
           Thêm vào giỏ
         </button>
         <button class="sp-btn sp-btn--outline sp-btn--sm" data-action="detail" data-id="${
-          p.id
+          phoneId
         }">
           Xem chi tiết
         </button>
@@ -566,7 +589,7 @@ function openDetailModal(phoneId) {
   const modal = $("#detail-modal");
   if (!modal) return;
 
-  const phone = ProductsState.items.find((p) => p.id === phoneId);
+  const phone = ProductsState.rawItems.find((p) => p.phoneId === phoneId || p.id === phoneId);
   if (!phone) return;
   AppState.currentDetailPhone = phone;
 
@@ -574,7 +597,8 @@ function openDetailModal(phoneId) {
   $("#detail-price").textContent = formatVND(getPhonePrice(phone));
   $("#detail-desc").textContent =
     phone.phoneDescription || "Chưa có mô tả chi tiết.";
-  $("#detail-brand").textContent = phone.brandName || "Không rõ";
+
+  $("#detail-brand").textContent = phone.brand?.brandName || "Không rõ";
   $("#detail-storage").textContent = phone.storage || "Không rõ";
 
   modal.classList.remove("sp-hidden");
@@ -620,8 +644,7 @@ function renderCartPage() {
 
   CartState.cart.items.forEach((item) => {
     const phone = item.phone || {};
-    const qty =
-      item.quantityPrice != null ? item.quantityPrice : item.quantity || 0;
+    const qty = item.quantity || 0;
     const price = getPhonePrice(phone);
     const lineTotal = qty * price;
 
@@ -664,6 +687,7 @@ function renderCartPage() {
 }
 
 // ============ PAGE INIT: LOGIN ============
+// ============ PAGE INIT: LOGIN ============
 function initLoginPage() {
   const emailInput = $("#login-email");
   const pwdInput = $("#login-password");
@@ -685,17 +709,27 @@ function initLoginPage() {
     }
     errorEl.classList.add("sp-hidden");
     try {
-      const user = await apiLogin(email, password);
-      AppState.currentUser = user;
-      saveUser();
-      updateHeaderUI();
-      showToast("Đăng nhập thành công.");
-      const target = redirect || "products.html";
-      window.location.href = target;
+        const user = await apiLogin(email, password);
+
+        // [ĐÃ SỬA] Thay thế logic kiểm tra Admin (sử dụng hàm JS hợp lệ)
+        if (user.role && user.role.roleName && user.role.roleName.toUpperCase() === "ADMIN") {
+            window.location.href = "admin.html";
+            return;
+        }
+
+        // Nếu không phải Admin, lưu user và chuyển hướng
+        AppState.currentUser = user;
+        saveUser();
+        updateHeaderUI();
+        showToast("Đăng nhập thành công.");
+        const target = redirect || "products.html";
+        window.location.href = target;
+
     } catch (err) {
       console.error(err);
+      // Hiển thị thông báo lỗi chi tiết từ catch
       errorEl.textContent =
-        "Đăng nhập thất bại. Kiểm tra lại email/mật khẩu hoặc backend.";
+        `Đăng nhập thất bại: ${err.message}. Vui lòng kiểm tra Email/Mật khẩu.`;
       errorEl.classList.remove("sp-hidden");
     }
   }
@@ -713,7 +747,6 @@ function initLoginPage() {
 
 // ============ PAGE INIT: REGISTER ============
 function initRegisterPage() {
-  const usernameInput = $("#reg-username");
   const fullNameInput = $("#reg-fullname");
   const emailInput = $("#reg-email");
   const phoneInput = $("#reg-phone");
@@ -726,10 +759,9 @@ function initRegisterPage() {
   const paymentSelect = $("#checkout-payment");
 
 
-  if (!usernameInput || !emailInput || !pwdInput || !submitBtn) return;
+  if (!emailInput || !pwdInput || !submitBtn) return;
 
   async function handleRegister() {
-    const userName = usernameInput.value.trim();
     const fullName = fullNameInput.value.trim();
     const email = emailInput.value.trim();
     const phone = phoneInput.value.trim();
@@ -739,16 +771,15 @@ function initRegisterPage() {
     errorEl.classList.add("sp-hidden");
     successEl.classList.add("sp-hidden");
 
-    if (!userName || !email || !password) {
+    if (!email || !password) {
       errorEl.textContent =
-        "Vui lòng nhập ít nhất Tên đăng nhập, Email và Mật khẩu.";
+        "Vui lòng nhập đầy đủ Email và Mật khẩu.";
       errorEl.classList.remove("sp-hidden");
       return;
     }
 
     try {
       const user = await apiRegister({
-        userName,
         fullName,
         email,
         phone,
@@ -756,7 +787,6 @@ function initRegisterPage() {
         password,
       });
 
-      // Tự động đăng nhập sau khi đăng ký
       AppState.currentUser = user;
       saveUser();
       updateHeaderUI();
@@ -765,7 +795,6 @@ function initRegisterPage() {
       successEl.textContent = "Đăng ký thành công!";
       successEl.classList.remove("sp-hidden");
 
-      // chuyển sang trang products
       window.location.href = "products.html";
     } catch (err) {
       console.error(err);
@@ -804,46 +833,27 @@ function initProductsPage() {
 
   if (!listEl) return;
 
-  if (searchInput) {
-    searchInput.addEventListener("input", (e) => {
-      ProductsState.keyword = e.target.value.trim();
-      applyProductFilters();
-    });
-  }
+  // Lắng nghe sự kiện input/change và gọi applyProductFilters để xử lý logic
+  const elementsToWatch = [searchInput, brandSelect, priceSelect, sortSelect];
+
+  elementsToWatch.forEach(el => {
+    if (el) {
+        el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', applyProductFilters);
+    }
+  });
+
 
   if (clearBtn) {
     clearBtn.onclick = () => {
-      searchInput.value = "";
-      ProductsState.keyword = "";
+      if (searchInput) searchInput.value = "";
       applyProductFilters();
     };
-  }
-
-  if (brandSelect) {
-    brandSelect.addEventListener("change", (e) => {
-      ProductsState.brandId = e.target.value || "";
-      applyProductFilters();
-    });
-  }
-
-  if (priceSelect) {
-    priceSelect.addEventListener("change", (e) => {
-      ProductsState.priceFilter = e.target.value || "";
-      applyProductFilters();
-    });
-  }
-
-  if (sortSelect) {
-    sortSelect.addEventListener("change", (e) => {
-      ProductsState.sort = e.target.value || "";
-      applyProductFilters();
-    });
   }
 
   listEl.addEventListener("click", (e) => {
     const btn = e.target.closest("button[data-action]");
     if (!btn) return;
-    const id = Number(btn.dataset.id);
+    const id = btn.dataset.id;
     const action = btn.dataset.action;
     if (action === "add") {
       apiAddToCart(id, 1);
@@ -859,13 +869,15 @@ function initProductsPage() {
   if (detailAddBtn) {
     detailAddBtn.onclick = () => {
       if (AppState.currentDetailPhone) {
-        apiAddToCart(AppState.currentDetailPhone.id, 1);
+        apiAddToCart(AppState.currentDetailPhone.phoneId, 1);
         closeDetailModal();
       }
     };
   }
 
-  apiFetchPhones();
+  // Gọi API lần đầu tiên (Không có tham số)
+  apiFetchProducts();
+
   if (AppState.currentUser) {
     apiFetchCart();
   } else {
@@ -884,6 +896,7 @@ function initCartPage() {
   const checkoutBtn = $("#checkout-submit");
   const errorEl = $("#checkout-error");
   const successEl = $("#checkout-success");
+  const paymentSelect = $("#checkout-payment");
 
   if (!itemsEl || !checkoutBtn) return;
     // Load payment methods cho dropdown
@@ -891,7 +904,6 @@ function initCartPage() {
     apiFetchPayments()
       .then(() => {
         renderPaymentOptions();
-        // auto-select option đầu nếu có
         if (paymentSelect.options.length > 0) paymentSelect.selectedIndex = 0;
       })
       .catch((err) => {
@@ -915,10 +927,7 @@ function initCartPage() {
       (i) => i.cartItemId === cartItemId
     );
     if (!current) return;
-    const qty =
-      current.quantityPrice != null
-        ? current.quantityPrice
-        : current.quantity || 0;
+    const qty = current.quantity || 0;
 
     if (action === "plus") {
       apiUpdateCartItem(cartItemId, qty + 1);
@@ -982,9 +991,13 @@ function initCartPage() {
 
       console.log("Order created:", order);
       successEl.textContent =
-        "Đặt hàng thành công. Cảm ơn bạn đã mua sắm tại SellPhone!";
+        "Đặt hàng thành công. Cảm ơn bạn đã mua sắm tại SellPhone! Mã đơn hàng: " + order.orderId;
       successEl.classList.remove("sp-hidden");
-      await apiFetchCart();
+
+      CartState.cart = null;
+      updateCartHeaderCount();
+      renderCartPage();
+
     } catch (err) {
       console.error(err);
       errorEl.textContent = `Thanh toán thất bại: ${err.message}`;
@@ -1012,7 +1025,7 @@ function initAccountPage() {
   guestEl.classList.add("sp-hidden");
   userEl.classList.remove("sp-hidden");
 
-  $("#account-name").textContent = AppState.currentUser.userName || "(chưa có)";
+  $("#account-name").textContent = AppState.currentUser.fullName || AppState.currentUser.email || "(chưa có)";
   $("#account-email").textContent = AppState.currentUser.email || "(chưa có)";
   $("#account-phone").textContent = AppState.currentUser.phone || "(chưa có)";
   $("#account-address").textContent =

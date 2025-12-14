@@ -1,6 +1,5 @@
 package com.ptmhdv.SellPhone.order.entity;
 
-import com.ptmhdv.SellPhone.cart.entity.Coupon;
 import com.ptmhdv.SellPhone.payment.entity.Payment;
 import com.ptmhdv.SellPhone.user.entity.Users;
 import jakarta.persistence.*;
@@ -8,9 +7,6 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -67,7 +63,5 @@ public class Orders {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrdersPhones> orderPhones;
 
-    @ManyToOne
-    @JoinColumn(name = "coupon_id")
-    private Coupon coupon;
+
 }

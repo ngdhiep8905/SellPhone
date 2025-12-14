@@ -18,24 +18,19 @@ import java.util.UUID;
 
 public class OrdersPhones {
 
-    @Id
-    @Column(name = "order_detail_id", length = 36)
-    private String orderDetailId;
-
-    @PrePersist
-    public void generateId() {
-        if (orderDetailId == null) {
-            orderDetailId = UUID.randomUUID().toString();
-        }
-    }
-
-    @ManyToOne
+    @EmbeddedId
+    private OrdersPhonesId id;
+    @MapsId("order") // Maps thuộc tính 'order' trong OrdersPhonesId
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
     private Orders order;
 
-    @ManyToOne
+    @MapsId("phone") // Maps thuộc tính 'phone' trong OrdersPhonesId
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "phone_id", nullable = false)
     private Phones phone;
+
+
 
 
     @NotNull(message = "Quantity is required")

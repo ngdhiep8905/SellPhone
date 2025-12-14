@@ -2,7 +2,6 @@ package com.ptmhdv.SellPhone.order.service;
 
 
 import com.ptmhdv.SellPhone.cart.entity.CartItem;
-import com.ptmhdv.SellPhone.cart.service.CouponService;
 import com.ptmhdv.SellPhone.order.entity.Orders;
 import com.ptmhdv.SellPhone.order.entity.OrdersPhones;
 import com.ptmhdv.SellPhone.order.repository.OrdersRepository;
@@ -11,10 +10,7 @@ import com.ptmhdv.SellPhone.payment.repository.PaymentRepository;
 import com.ptmhdv.SellPhone.catalog.repository.PhonesRepository;
 import com.ptmhdv.SellPhone.user.entity.Users;
 import com.ptmhdv.SellPhone.user.repository.UsersRepository;
-import com.ptmhdv.SellPhone.order.dto.OrdersDTO;
-import com.ptmhdv.SellPhone.order.dto.OrdersPhonesDTO;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -27,7 +23,6 @@ public class OrderService {
 
     private final OrdersRepository ordersRepo;
     private final PhonesRepository phonesRepo;
-    private final CouponService couponService;
     private final PaymentRepository paymentRepo;
     private final UsersRepository usersRepo;
 
@@ -85,11 +80,7 @@ public class OrderService {
             orderPhonesList.add(detail);
         }
 
-        // ====== 4) XỬ LÝ COUPON ======
-        if (couponCode != null && !couponCode.isBlank()) {
-            BigDecimal discount = couponService.applyCoupon(couponCode, totalOrderAmount);
-            totalOrderAmount = totalOrderAmount.subtract(discount);
-        }
+
 
         // ====== 5) LƯU ORDER ======
         order.setTotalPrice(totalOrderAmount);

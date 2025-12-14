@@ -1,4 +1,4 @@
-const API_BASE_URL = "";
+const API_BASE_URL = "/api";
 function loadPhones() {
     document.getElementById("title").innerText = "Quản lý Sản phẩm";
 

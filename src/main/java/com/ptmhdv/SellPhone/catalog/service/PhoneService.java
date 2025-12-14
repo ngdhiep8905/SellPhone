@@ -32,5 +32,16 @@ public class PhoneService {
     public List<Phones> search(String keyword) {
         return phoneRepo.findByPhoneNameContainingIgnoreCase(keyword);
     }
+    public List<Phones> searchByFilter(String keyword, String brandId) {
+        String finalKeyword = (keyword == null || keyword.trim().isEmpty()) ? null : keyword.trim();
+        String finalBrandId = (brandId == null || brandId.trim().isEmpty()) ? null : brandId.trim();
+
+        // Nếu cả hai đều null, trả về tất cả
+        if (finalKeyword == null && finalBrandId == null) {
+            return phoneRepo.findAll();
+        }
+
+        return phoneRepo.searchByFilter(finalKeyword, finalBrandId);
+    }
 }
 
