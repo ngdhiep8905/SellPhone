@@ -6,6 +6,10 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+
+
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -30,7 +34,9 @@ public class CartItem {
     // Mỗi Cart có nhiều CartItem
     @ManyToOne
     @JoinColumn(name = "cart_id")
+    @JsonIgnore
     private Cart cart;
+
 
     // Mỗi CartItem gắn với một Phone
     @ManyToOne

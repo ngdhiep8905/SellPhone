@@ -1,7 +1,7 @@
-package com.ptmhdv.SellPhone.user.controller;
+package com.ptmhdv.sellphone.user.controller;
 
-import com.ptmhdv.SellPhone.user.entity.Users;
-import com.ptmhdv.SellPhone.user.service.UserService;
+import com.ptmhdv.sellphone.user.entity.Users;
+import com.ptmhdv.sellphone.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -55,6 +55,37 @@ public class UserController {
         userService.updateStatus(id, status);
     }
 
+    // =============================
+    // AUTH RESPONSE DTO (trả gọn, không lộ password, không lặp JSON)
+    // =============================
+    public static class AuthResponse {
+        public String userId;
+        public String userName;
+        public String email;
+        public String phone;
+        public String address;
+        public String fullName;
+        public String status;
+        public String roleId;
+        public String roleName;
+    }
+
+    private AuthResponse toAuthResponse(Users u) {
+        AuthResponse r = new AuthResponse();
+        r.userId = u.getUserId();
+        r.userName = u.getUserName();
+        r.email = u.getEmail();
+        r.phone = u.getPhone();
+        r.address = u.getAddress();
+        r.fullName = u.getFullName();
+        r.status = u.getStatus();
+        if (u.getRole() != null) {
+            r.roleId = u.getRole().getRoleId();
+            r.roleName = u.getRole().getRoleName();
+        }
+        return r;
+    }
+
     // ====== LOGIN USER (CLIENT) ======
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestParam String email,
@@ -62,59 +93,14 @@ public class UserController {
 
         Users user = userService.getByEmail(email).orElse(null);
 
-        // Sai email hoặc mật khẩu
-        if (user == null || !user.getPassword().equals(password)) {
+        if (user == null || user.getPassword() == null || !user.getPassword().equals(password)) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "INVALID_CREDENTIALS"));
         }
 
-        // Ở DB status đang là int 1/0, nên tạm bỏ check ACTIVE
-        // Nếu muốn dùng, sửa entity + logic cho đúng kiểu
-
-        return ResponseEntity.ok(user);
-    }
-
-    // ====== REGISTER USER (CLIENT) ======
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest req) {
-
-        // validate đơn giản
-        if (req == null
-                || req.userName == null || req.userName.isBlank()
-                || req.password == null || req.password.isBlank()
-                || req.email == null || req.email.isBlank()) {
-
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", "MISSING_FIELDS"));
-        }
-
-        // kiểm tra email đã tồn tại chưa
-        if (userService.getByEmail(req.email).isPresent()) {
-            return ResponseEntity
-                    .status(HttpStatus.CONFLICT)
-                    .body(Map.of("message", "EMAIL_EXISTS"));
-        }
-
-        // tạo user mới
-        Users user = new Users();
-        user.setUserName(req.userName);
-        user.setPassword(req.password);   // hiện tại password để plain-text
-        user.setEmail(req.email);
-        user.setFullName(req.fullName);
-        user.setPhone(req.phone);
-        user.setAddress(req.address);
-        // userId: generate trong @PrePersist của entity
-        // status: default ACTIVE
-        // role: để null → user thường
-        user.setStatus("1");
-
-        Users saved = userService.save(user);
-
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(saved);
+        // Trả DTO gọn để tránh JSON nesting + đảm bảo có userId cho frontend
+        return ResponseEntity.ok(toAuthResponse(user));
     }
 
     // DTO đơn giản cho đăng ký
@@ -125,5 +111,43 @@ public class UserController {
         public String fullName;
         public String phone;
         public String address;
+    }
+
+    // ====== REGISTER USER (CLIENT) ======
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody RegisterRequest req) {
+
+        if (req == null
+                || req.userName == null || req.userName.isBlank()
+                || req.password == null || req.password.isBlank()
+                || req.email == null || req.email.isBlank()) {
+
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "MISSING_FIELDS"));
+        }
+
+        if (userService.getByEmail(req.email).isPresent()) {
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body(Map.of("message", "EMAIL_EXISTS"));
+        }
+
+        Users user = new Users();
+        user.setUserName(req.userName);
+        user.setPassword(req.password);   // demo: plain-text
+        user.setEmail(req.email);
+        user.setFullName(req.fullName);
+        user.setPhone(req.phone);
+        user.setAddress(req.address);
+
+        // status: bạn đang dùng "1" ở file hiện tại :contentReference[oaicite:4]{index=4}
+        user.setStatus("1");
+
+        Users saved = userService.save(user);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(toAuthResponse(saved));
     }
 }

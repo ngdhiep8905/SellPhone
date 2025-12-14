@@ -64,13 +64,15 @@ public class Users {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Orders> orders;
-
+    @JsonIgnore
     public List<CartItem> getCartItems() {
         if (this.cart == null) {
-            return List.of(); // Tránh NullPointerException
+            return List.of();
         }
         return this.cart.getCartItems();
     }
+
+
 
 }
 

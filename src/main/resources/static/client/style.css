@@ -793,3 +793,68 @@ body {
     flex: 1;
   }
 }
+
+/* Fix: ô nhập trang giỏ hàng bị nền đen khó nhìn */
+/* Fix: ô nhập bị nền đen khó nhìn (áp dụng mọi trang) */
+#checkout-address,
+#checkout-name,
+#checkout-phone,
+#checkout-coupon,
+textarea,
+input[type="text"],
+input[type="tel"],
+input[type="email"],
+input[type="password"] {
+  background: #fff !important;
+  color: #111 !important;
+  border: 1px solid rgba(0,0,0,0.15) !important;
+}
+
+
+#checkout-address::placeholder,
+#checkout-name::placeholder,
+#checkout-phone::placeholder,
+#checkout-coupon::placeholder,
+textarea::placeholder,
+input::placeholder {
+  color: rgba(0,0,0,0.45) !important;
+}
+/* Làm label (chữ phía trên ô nhập) đậm & rõ hơn */
+.checkout label,
+.checkout .field-label,
+.checkout .form-label,
+.checkout .input-label {
+  font-weight: 700 !important;
+  color: #111 !important;
+  letter-spacing: 0.2px;
+}
+
+/* Nếu label đang là <span> hoặc <p> phía trên input */
+.checkout .field > span,
+.checkout .field > p {
+  font-weight: 700 !important;
+  color: #111 !important;
+}
+
+/* Placeholder: đậm và rõ hơn */
+input::placeholder,
+textarea::placeholder {
+  color: rgba(0, 0, 0, 0.75) !important;
+  opacity: 1 !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+}
+
+/* Chữ bạn gõ vào cũng rõ */
+input, textarea {
+  color: #111 !important;
+  font-weight: 500;
+}
+/* Global: làm label trên ô nhập đậm ở mọi trang */
+.sp-field > span{
+  font-weight:800 !important;
+  color:#111827 !important;
+  font-size:14px !important;
+  letter-spacing:0.2px;
+  opacity:1 !important;
+}
