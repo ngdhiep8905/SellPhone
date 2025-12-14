@@ -1,4 +1,3 @@
-// Dùng cùng host/port với Spring Boot (server.port=8086)
 const API_BASE_URL = "";
 
 function login() {

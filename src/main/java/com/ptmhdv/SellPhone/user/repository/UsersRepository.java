@@ -16,9 +16,6 @@ public interface UsersRepository extends JpaRepository<Users, String> {
     // Login admin + get user by email
     Optional<Users> findByEmail(String email);
 
-
-    Optional<Users> findByUserName(String userName);
-
     Page<Users> findByFullNameContainingIgnoreCaseOrEmailContainingIgnoreCase(
             String name, String email, Pageable pageable
     );

@@ -49,11 +49,6 @@ public class UserController {
         userService.delete(id);
     }
 
-    // ====== UPDATE STATUS (ADMIN) ======
-    @PutMapping("/{id}/status")
-    public void updateStatus(@PathVariable String id, @RequestParam String status) {
-        userService.updateStatus(id, status);
-    }
 
     // ====== LOGIN USER (CLIENT) ======
     @PostMapping("/login")
@@ -99,7 +94,7 @@ public class UserController {
 
         // tạo user mới
         Users user = new Users();
-        user.setUserName(req.userName);
+        user.setFullName(req.userName);
         user.setPassword(req.password);   // hiện tại password để plain-text
         user.setEmail(req.email);
         user.setFullName(req.fullName);
@@ -108,7 +103,6 @@ public class UserController {
         // userId: generate trong @PrePersist của entity
         // status: default ACTIVE
         // role: để null → user thường
-        user.setStatus("1");
 
         Users saved = userService.save(user);
 

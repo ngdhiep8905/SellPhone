@@ -7,7 +7,6 @@ import com.ptmhdv.SellPhone.order.entity.Orders;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.util.List;
@@ -19,7 +18,7 @@ import java.util.UUID;
 public class Users {
 
     @Id
-    @Column(name = "userId", length = 36)
+    @Column(name = "user_id", length = 36) // Sửa để khớp với DB (user_id)
     private String userId;
 
     @PrePersist
@@ -28,10 +27,6 @@ public class Users {
             this.userId = UUID.randomUUID().toString();
         }
     }
-
-    @NotBlank
-    @Column(unique = true, nullable = false, length = 100)
-    private String userName;
 
     @NotBlank
     @Column(nullable = false)
@@ -47,14 +42,11 @@ public class Users {
     @Column(length = 20)
     private String phone;
 
-    @Column(length = 150)
+    @Column(name = "full_name", length = 150) // Sửa để khớp với DB (fullname)
     private String fullName;
 
-    @Column(length = 20)
-    private String status = "ACTIVE";
-
     @ManyToOne
-    @JoinColumn(name = "roleId")
+    @JoinColumn(name = "role_id") // Sửa để khớp với DB (role_id)
     private Roles role;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
@@ -67,11 +59,8 @@ public class Users {
 
     public List<CartItem> getCartItems() {
         if (this.cart == null) {
-            return List.of(); // Tránh NullPointerException
+            return List.of();
         }
         return this.cart.getCartItems();
     }
-
 }
-
-

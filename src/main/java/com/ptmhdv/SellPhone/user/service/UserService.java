@@ -34,11 +34,7 @@ public class UserService {
         usersRepo.deleteById(id);
     }
 
-    public void updateStatus(String id, String status) {
-        Users user = usersRepo.findById(id).orElseThrow();
-        user.setStatus(status);
-        usersRepo.save(user);
-    }
+
 
       public Optional<Users> getByEmail(String email) {
         return usersRepo.findByEmail(email);
