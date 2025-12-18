@@ -19,13 +19,14 @@ import java.util.UUID;
 public class OrdersPhones {
 
     @EmbeddedId
-    private OrdersPhonesId id;
-    @MapsId("order") // Maps thuộc tính 'order' trong OrdersPhonesId
+    private OrdersPhonesId id = new OrdersPhonesId(); // ✅ thêm dòng này
+
+    @MapsId("order")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
     private Orders order;
 
-    @MapsId("phone") // Maps thuộc tính 'phone' trong OrdersPhonesId
+    @MapsId("phone")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "phone_id", nullable = false)
     private Phones phone;

@@ -1,4 +1,5 @@
 package com.ptmhdv.SellPhone.cart.entity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.ptmhdv.SellPhone.catalog.entity.Phones;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -29,7 +30,8 @@ public class CartItem {
 
     // Mỗi Cart có nhiều CartItem
     @ManyToOne
-    @JoinColumn(name = "cart_id")
+    @JoinColumn(name="cart_id")
+    @JsonBackReference
     private Cart cart;
 
     // Mỗi CartItem gắn với một Phone

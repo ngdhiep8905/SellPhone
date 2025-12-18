@@ -13,22 +13,15 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "`Users`")
+@Table(name = "users")
 @Data
 public class Users {
 
     @Id
-    @Column(name = "user_id", length = 36) // Sửa để khớp với DB (user_id)
+    @Column(name = "user_id", length = 6)
     private String userId;
 
-    @PrePersist
-    public void generateId() {
-        if (this.userId == null) {
-            this.userId = UUID.randomUUID().toString();
-        }
-    }
-
-    @NotBlank
+    @JsonIgnore
     @Column(nullable = false)
     private String password;
 
@@ -42,11 +35,11 @@ public class Users {
     @Column(length = 20)
     private String phone;
 
-    @Column(name = "full_name", length = 150) // Sửa để khớp với DB (fullname)
+    @Column(name = "full_name", length = 150)
     private String fullName;
 
     @ManyToOne
-    @JoinColumn(name = "role_id") // Sửa để khớp với DB (role_id)
+    @JoinColumn(name = "role_id")
     private Roles role;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
@@ -56,11 +49,11 @@ public class Users {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Orders> orders;
-
+    @JsonIgnore
     public List<CartItem> getCartItems() {
         if (this.cart == null) {
             return List.of();
         }
-        return this.cart.getCartItems();
+        return this.cart.getItems();
     }
 }

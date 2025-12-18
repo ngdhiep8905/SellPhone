@@ -7,10 +7,11 @@ import lombok.Data;
 
 @Data
 public class CartItemViewDTO {
+
     private String cartItemId;
-    private Integer quantityPrice;
+    private int quantity;
     private PhonesDTO phone;
 
-    public void setQuantity(@NotNull(message = "Quantity is required") @Min(value = 1, message = "Quantity must be at least 1") int quantity) {
-    }
+
 }
+

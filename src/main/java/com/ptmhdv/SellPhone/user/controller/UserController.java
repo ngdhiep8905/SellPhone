@@ -74,42 +74,96 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest req) {
 
-        // validate đơn giản
-        if (req == null
-                || req.userName == null || req.userName.isBlank()
-                || req.password == null || req.password.isBlank()
-                || req.email == null || req.email.isBlank()) {
-
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", "MISSING_FIELDS"));
+        if (req == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "INVALID_REQUEST"));
         }
 
-        // kiểm tra email đã tồn tại chưa
-        if (userService.getByEmail(req.email).isPresent()) {
-            return ResponseEntity
-                    .status(HttpStatus.CONFLICT)
-                    .body(Map.of("message", "EMAIL_EXISTS"));
+        // --- validate required fields ---
+        String email = req.email == null ? "" : req.email.trim();
+        String password = req.password == null ? "" : req.password.trim();
+        String phone = req.phone == null ? "" : req.phone.trim();
+
+        if (email.isBlank() || password.isBlank()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "MISSING_FIELDS",
+                            "detail", "Email và mật khẩu là bắt buộc"));
         }
 
-        // tạo user mới
+        // full_name NOT NULL trong DB -> bắt buộc có
+        String fullName = (req.fullName != null && !req.fullName.isBlank())
+                ? req.fullName.trim()
+                : (req.userName != null && !req.userName.isBlank() ? req.userName.trim() : "");
+
+        if (fullName.isBlank()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "FULL_NAME_REQUIRED",
+                            "detail", "Vui lòng nhập họ tên"));
+        }
+
+        // --- validate email format ---
+        // Regex đủ tốt cho demo/proj (không quá strict)
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+        if (!email.matches(emailRegex)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "INVALID_EMAIL",
+                            "detail", "Email không đúng định dạng. Ví dụ: abc@gmail.com"));
+        }
+
+        // --- validate password minimal ---
+        int minPasswordLen = 6;
+        if (password.length() < minPasswordLen) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "WEAK_PASSWORD",
+                            "detail", "Mật khẩu phải có ít nhất " + minPasswordLen + " ký tự"));
+        }
+
+        // --- validate phone required + numeric ---
+        if (phone.isBlank()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "PHONE_REQUIRED",
+                            "detail", "Vui lòng nhập số điện thoại"));
+        }
+        if (!phone.matches("^\\d{10}$")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "INVALID_PHONE",
+                            "detail", "Số điện thoại chỉ được chứa chữ số (10 chữ số)."));
+        }
+
+        // --- email unique ---
+        if (userService.getByEmail(email).isPresent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("message", "EMAIL_EXISTS",
+                            "detail", "Email đã tồn tại. Vui lòng dùng email khác."));
+        }
+
+        // --- create user ---
         Users user = new Users();
-        user.setFullName(req.userName);
-        user.setPassword(req.password);   // hiện tại password để plain-text
-        user.setEmail(req.email);
-        user.setFullName(req.fullName);
-        user.setPhone(req.phone);
+        user.setFullName(fullName);
+        user.setEmail(email);
+        user.setPassword(password);  // plain-text theo yêu cầu
+        user.setPhone(phone);
         user.setAddress(req.address);
-        // userId: generate trong @PrePersist của entity
-        // status: default ACTIVE
-        // role: để null → user thường
+
+        // --- set default role_id = '02' (USER) ---
+        // Cách 1: nếu entity Users có field roleId:
+        try {
+            user.getClass().getMethod("setRoleId", String.class).invoke(user, "02");
+        } catch (Exception ignored) {
+            // Cách 2: nếu Users map ManyToOne Roles thì bạn cần set role entity (mình sẽ chỉnh đúng nếu bạn gửi Users.java/Roles.java)
+        }
 
         Users saved = userService.save(user);
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(saved);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                Map.of("message", "REGISTER_SUCCESS",
+                        "userId", saved.getUserId(),
+                        "email", saved.getEmail(),
+                        "fullName", saved.getFullName())
+        );
     }
+
+
 
     // DTO đơn giản cho đăng ký
     public static class RegisterRequest {

@@ -59,16 +59,26 @@ public class CartController {
 
     // ====== mapping từ Entity sang ViewDTO mà FE cần ======
     private CartViewDTO toView(Cart cart) {
+        if (cart == null) {
+            CartViewDTO empty = new CartViewDTO();
+            empty.setItems(List.of());
+            return empty;
+        }
+
         CartViewDTO dto = new CartViewDTO();
         dto.setCartId(cart.getCartId());
 
-        List<CartItemViewDTO> items = cart.getItems().stream()
+        List<CartItemViewDTO> items = cart.getItems() == null
+                ? List.of()
+                : cart.getItems().stream()
                 .map(this::toItemView)
                 .collect(Collectors.toList());
+
 
         dto.setItems(items);
         return dto;
     }
+
 
     private CartItemViewDTO toItemView(CartItem item) {
         CartItemViewDTO dto = new CartItemViewDTO();

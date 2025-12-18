@@ -18,18 +18,19 @@ import java.util.List;
 public class Orders {
 
     @Id
-    @Column(name = "order_id", length = 36)
+    @Column(name = "order_id", length = 13) // ví dụ: O + 12 số
     private String orderId;
 
     @PrePersist
     public void generateId() {
         if (orderId == null) {
-            orderId = java.util.UUID.randomUUID().toString();
+            // O + yyyyMMddHHmm (12 số)
+            java.time.format.DateTimeFormatter f = java.time.format.DateTimeFormatter.ofPattern("yyyyMMddHHmm");
+            orderId = "O" + java.time.LocalDateTime.now().format(f);
         }
-        if (bookDate == null) {
-            bookDate = LocalDate.now();
-        }
+        if (bookDate == null) bookDate = LocalDate.now();
     }
+
 
     @Column(name = "book_date")
     private LocalDate bookDate;

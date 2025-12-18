@@ -4,7 +4,12 @@
   <meta charset="UTF-8" />
   <title>Đăng ký tài khoản - SellPhone Black Friday</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css" />
+
 </head>
 <body data-page="register">
   <header class="sp-header">
@@ -42,11 +47,6 @@
       </div>
 
       <div style="margin-top: 10px; max-width: 420px; font-size: 13px;">
-        <label class="sp-field">
-          <span>Tên đăng nhập</span>
-          <input id="reg-username" type="text" placeholder="vd: nguyenvana" />
-        </label>
-
         <label class="sp-field">
           <span>Họ tên</span>
           <input id="reg-fullname" type="text" placeholder="vd: Nguyễn Văn A" />
@@ -123,6 +123,6 @@
   </main>
 
   <div id="toast" class="sp-toast sp-hidden"></div>
-  <script src="app.js"></script>
+  <script type="module" src="js/main.js"></script>
 </body>
 </html>

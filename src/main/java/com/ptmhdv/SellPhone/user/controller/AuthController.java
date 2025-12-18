@@ -1,5 +1,6 @@
 package com.ptmhdv.SellPhone.user.controller;
 
+import com.ptmhdv.SellPhone.user.dto.UserLoginResponse;
 import com.ptmhdv.SellPhone.user.entity.Users;
 import com.ptmhdv.SellPhone.user.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,21 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/login")
-    public Users login(@RequestParam String email, @RequestParam String password) {
-        return authService.login(email, password);
+    public UserLoginResponse login(@RequestParam String email, @RequestParam String password) {
+        Users u = authService.login(email, password);
+
+        UserLoginResponse.RoleDto roleDto = null;
+        if (u.getRole() != null) {
+            roleDto = new UserLoginResponse.RoleDto(u.getRole().getRoleId(), u.getRole().getRoleName());
+        }
+
+        return new UserLoginResponse(
+                u.getUserId(),
+                u.getEmail(),
+                u.getFullName(),
+                u.getPhone(),
+                u.getAddress(),
+                roleDto
+        );
     }
 }

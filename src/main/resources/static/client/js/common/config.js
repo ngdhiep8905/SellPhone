@@ -1,0 +1,1 @@
+export const API_BASE_URL = ""; // cùng host với Spring Boot

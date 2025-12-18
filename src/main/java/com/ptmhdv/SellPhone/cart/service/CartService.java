@@ -15,92 +15,86 @@ import org.springframework.stereotype.Service;
 @Service
 public class CartService {
 
-    @Autowired
-    private CartRepository cartRepo;
-    private UsersRepository usersRepo;
-    private PhonesRepository phonesRepo;
+    private final CartRepository cartRepo;
+    private final UsersRepository usersRepo;
+    private final PhonesRepository phonesRepo;
+    private final CartItemRepository cartItemRepo;
 
     @Autowired
-    private CartItemRepository cartItemRepo;
+    public CartService(
+            CartRepository cartRepo,
+            UsersRepository usersRepo,
+            PhonesRepository phonesRepo,
+            CartItemRepository cartItemRepo
+    ) {
+        this.cartRepo = cartRepo;
+        this.usersRepo = usersRepo;
+        this.phonesRepo = phonesRepo;
+        this.cartItemRepo = cartItemRepo;
+    }
 
     public Cart getCartByUser(String userId) {
         return cartRepo.findByUser_UserId(userId);
     }
 
-    public Cart createCart(Users user) {
-        Cart cart = new Cart(user);
-        return cartRepo.save(cart);
-    }
-
     public Cart addToCart(String userId, String phoneId, Integer quantity) {
 
-        // 1. Lấy user
         Users user = usersRepo.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        // 2. Lấy sản phẩm
         Phones phone = phonesRepo.findById(phoneId)
                 .orElseThrow(() -> new ResourceNotFoundException("Phone not found"));
 
-        // 3. Lấy cart của user (nếu chưa có thì tạo mới)
         Cart cart = cartRepo.findByUserUserId(userId)
-                .orElseGet(() -> {
-                    Cart c = new Cart();
-                    c.setUser(user);
-                    return cartRepo.save(c);
-                });
+                .orElse(null);
 
-        // 4. Kiểm tra xem trong cart đã có sản phẩm này chưa
-        CartItem item = cartItemRepo.findByCartCartIdAndPhonePhoneId(cart.getCartId(), phoneId)
+        if (cart == null) {
+            cart = new Cart();
+            cart.setUser(user);
+            cart = cartRepo.save(cart); // nếu fail → exception, không return null
+        }
+
+        CartItem item = cartItemRepo
+                .findByCartCartIdAndPhonePhoneId(cart.getCartId(), phoneId)
                 .orElse(null);
 
         if (item == null) {
-            // 5. Nếu chưa có → tạo mới CartItem
             item = new CartItem();
             item.setCart(cart);
             item.setPhone(phone);
             item.setQuantity(quantity);
         } else {
-            // 6. Nếu đã có → tăng số lượng
             item.setQuantity(item.getQuantity() + quantity);
         }
 
         cartItemRepo.save(item);
-
         return cart;
     }
 
     public Cart updateQuantity(String cartItemId, Integer quantity) {
-        CartItem item = cartItemRepo.findById(cartItemId).orElseThrow(() -> new ResourceNotFoundException("Cart item not found"));
+
+        CartItem item = cartItemRepo.findById(cartItemId)
+                .orElseThrow(() -> new ResourceNotFoundException("Cart item not found"));
 
         Cart cart = item.getCart();
-        // 2. Nếu quantity = 0 → xóa item khỏi giỏ
-        if (quantity == 0) {
+
+        if (quantity <= 0) {
             cartItemRepo.delete(item);
-            return cart; // giỏ sau khi xóa item
+            return cart;
         }
 
-        // 3. Cập nhật số lượng mới
         item.setQuantity(quantity);
         cartItemRepo.save(item);
-
         return cart;
     }
 
     public Cart removeItem(String cartItemId) {
 
-        // 1. Lấy cart item
         CartItem item = cartItemRepo.findById(cartItemId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart item not found"));
 
-        // 2. Lấy cart tương ứng
         Cart cart = item.getCart();
-
-        // 3. Xóa item khỏi repository
         cartItemRepo.delete(item);
-
-        // 4. Trả về cart sau khi xóa item
         return cart;
     }
-
 }

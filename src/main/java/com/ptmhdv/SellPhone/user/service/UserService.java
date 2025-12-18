@@ -25,8 +25,28 @@ public class UserService {
     public Optional<Users> getUserById(String id) {
         return usersRepo.findById(id);
     }
+    private String generateUserId() {
+        // Sinh id dạng 000001 .. 999999 giống data mẫu của bạn
+        for (int i = 0; i < 50; i++) {
+            int n = java.util.concurrent.ThreadLocalRandom.current().nextInt(1, 1_000_000);
+            String id = String.format("%06d", n);
 
+            if (!usersRepo.existsById(id)) {
+                return id;
+            }
+        }
+
+        // fallback rất hiếm
+        long t = System.currentTimeMillis() % 1_000_000;
+        return String.format("%06d", t);
+    }
     public Users save(Users user) {
+
+        // Nếu userId chưa có thì tự sinh (DB: users.user_id CHAR(6))
+        if (user.getUserId() == null || user.getUserId().isBlank()) {
+            user.setUserId(generateUserId());
+        }
+
         return usersRepo.save(user);
     }
 
