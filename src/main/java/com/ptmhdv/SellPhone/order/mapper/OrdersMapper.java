@@ -9,52 +9,48 @@ import java.util.stream.Collectors;
 
 public class OrdersMapper {
 
-    // [PHƯƠNG THỨC GIỮ NGUYÊN] Ánh xạ OrdersPhones sang DTO (Đã sửa lỗi Khóa tổng hợp)
-    public static OrdersPhonesDTO toOrdersPhonesDTO(OrdersPhones e) {
-        OrdersPhonesDTO d = new OrdersPhonesDTO();
+    public static OrdersDTO toDTO(Orders e) {
+        if (e == null) return null;
 
-        if (e.getId() != null) {
-            d.setOrderId(e.getId().getOrder());
-            d.setPhoneId(e.getId().getPhone());
-        } else {
-            d.setOrderId(e.getOrder().getOrderId());
-            d.setPhoneId(e.getPhone().getPhoneId());
+        OrdersDTO d = new OrdersDTO();
+        d.setId(e.getOrderId());
+        d.setUserId(e.getUser() != null ? e.getUser().getUserId() : null);
+        d.setStatus(e.getStatus());
+        d.setPaymentId(e.getPayment() != null ? e.getPayment().getPaymentId() : null);
+
+        // Thông tin giao hàng
+        d.setRecipientName(e.getRecipientName());
+        d.setRecipientPhone(e.getRecipientPhone());
+        d.setShippingAddress(e.getShippingAddress());
+        d.setTotalPrice(e.getTotalPrice()); // Khớp với Entity totalPrice
+
+        // Chuyển đổi danh sách chi tiết sản phẩm
+        if (e.getOrderPhones() != null) {
+            d.setOrderItems(e.getOrderPhones().stream()
+                    .map(OrdersMapper::toOrdersPhonesDTO)
+                    .collect(Collectors.toList()));
         }
-
-        d.setQuantity(e.getQuantity());
-        d.setPrice(e.getPrice());
-        // d.setTotalPrice(e.getTotalPrice()); // Giữ lại nếu DTO có trường này
 
         return d;
     }
 
-    // [PHƯƠNG THỨC ĐÃ SỬA] Bổ sung ánh xạ thông tin người nhận
-    public static OrdersDTO toDTO(Orders e) {
-        OrdersDTO d = new OrdersDTO();
-        d.setId(e.getOrderId());
+    public static OrdersPhonesDTO toOrdersPhonesDTO(OrdersPhones e) {
+        if (e == null) return null;
 
-        // Giả định Entity Orders có phương thức getUser() để lấy thông tin user
-        if (e.getUser() != null) {
-            d.setUserId(e.getUser().getUserId());
+        OrdersPhonesDTO d = new OrdersPhonesDTO();
+
+        // Xử lý lấy ID từ EmbeddedId OrdersPhonesId
+        if (e.getId() != null) {
+            d.setOrderId(e.getId().getOrder());
+            d.setPhoneId(e.getId().getPhone());
         }
 
-        d.setStatus(e.getStatus());
-        if (e.getPayment() != null)
-            d.setPaymentId(e.getPayment().getPaymentId());
-
-        // [BỔ SUNG QUAN TRỌNG]: Ánh xạ các trường thông tin giao hàng
-        // Giả định Entity Orders có các trường getRecipientName(), getRecipientPhone(), getShippingAddress()
-        d.setRecipientName(e.getRecipientName());
-        d.setRecipientPhone(e.getRecipientPhone());
-        d.setShippingAddress(e.getShippingAddress());
-        // [Cần thêm TotalPrice/TotalAmount vào DTO]
-        // d.setTotalPrice(e.getTotalAmount());
-
-        d.setOrderItems(
-                e.getOrderPhones().stream()
-                        .map(OrdersMapper::toOrdersPhonesDTO)
-                        .collect(Collectors.toList())
-        );
+        d.setQuantity(e.getQuantity());
+        d.setPrice(e.getPrice());
+        // Trả thêm phoneName nếu DTO có trường này giúp FE hiển thị dễ hơn
+        if (e.getPhone() != null) {
+            // d.setPhoneName(e.getPhone().getPhoneName());
+        }
 
         return d;
     }

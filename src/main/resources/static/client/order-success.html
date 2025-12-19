@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đặt hàng thành công - SellPhone</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .success-container {
+            max-width: 600px;
+            margin: 80px auto;
+            text-align: center;
+            padding: 40px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+        .success-icon {
+            font-size: 64px;
+            color: #22c55e;
+            margin-bottom: 20px;
+        }
+        .order-number {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e40af;
+            background: #eff6ff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            display: inline-block;
+            margin: 15px 0;
+        }
+        .next-steps {
+            text-align: left;
+            margin: 30px 0;
+            padding: 20px;
+            border-top: 1px solid #eee;
+        }
+        .next-steps h4 { margin-bottom: 10px; color: #333; }
+        .next-steps li {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+            list-style-type: none;
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="success-container">
+    <div class="success-icon">✅</div>
+    <h2>Đặt hàng thành công!</h2>
+    <p class="sp-text--muted">Cảm ơn bạn đã tin tưởng lựa chọn SellPhone.</p>
+
+    <div class="order-number" id="display-order-id">Mã đơn hàng: #...</div>
+
+    <div class="next-steps">
+        <h4>Quy trình tiếp theo:</h4>
+        <ul>
+            <li><span>📞</span> Nhân viên sẽ gọi điện xác nhận đơn hàng trong vòng 15-30 phút.</li>
+            <li><span>📦</span> Đơn hàng được đóng gói và bàn giao cho đơn vị vận chuyển.</li>
+            <li><span>🏠</span> Bạn chỉ cần chuẩn bị số tiền tương ứng để nhận hàng tại nhà.</li>
+        </ul>
+    </div>
+
+    <div style="display: flex; gap: 10px;">
+        <button onclick="window.location.href='index.html'" class="sp-btn sp-btn--primary sp-btn--full">
+            Tiếp tục mua sắm
+        </button>
+        <button onclick="window.location.href='account.html'" class="sp-btn sp-btn--outline sp-btn--full">
+            Xem đơn hàng
+        </button>
+    </div>
+</div>
+
+<script>
+    // Lấy mã đơn hàng từ URL để hiển thị cho khách yên tâm
+    const params = new URLSearchParams(window.location.search);
+    const orderId = params.get('orderId');
+    if (orderId) {
+        document.getElementById('display-order-id').innerText = `Mã đơn hàng: #${orderId}`;
+    }
+</script>
+</body>
+</html>

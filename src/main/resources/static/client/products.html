@@ -1,188 +1,125 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <title>Sản phẩm - SellPhone Black Friday</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8" />
+    <title>Sản phẩm - SellPhone Black Friday</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" href="style.css" />
-
 </head>
 <body data-page="products">
-  <header class="sp-header">
+<header class="sp-header">
     <div class="sp-header__left">
-      <div class="sp-logo">
-        <span class="sp-logo__icon">📱</span>
-        <div class="sp-logo__text">
-          <span class="sp-logo__brand">SellPhone</span>
-          <span class="sp-logo__tagline">Danh sách điện thoại khuyến mãi</span>
+        <div class="sp-logo">
+            <span class="sp-logo__icon">📱</span>
+            <div class="sp-logo__text">
+                <span class="sp-logo__brand">SellPhone</span>
+                <span class="sp-logo__tagline">Danh sách điện thoại khuyến mãi</span>
+            </div>
         </div>
-      </div>
-      <nav class="sp-nav">
-        <a href="index.html" class="sp-nav__item">Trang chủ</a>
-        <a href="products.html" class="sp-nav__item sp-nav__item--active">Sản phẩm</a>
-      </nav>
+        <nav class="sp-nav">
+            <a href="index.html" class="sp-nav__item">Trang chủ</a>
+            <a href="products.html" class="sp-nav__item sp-nav__item--active">Sản phẩm</a>
+        </nav>
     </div>
-
     <div class="sp-header__right">
-      <div class="sp-header__icons">
-        <a href="cart.html" class="sp-header-icon" title="Giỏ hàng">
-          <span class="sp-header-icon__badge" id="cart-header-count">0</span>
-          🛒
-        </a>
-        <a href="account.html" class="sp-header-icon" title="Tài khoản của tôi">
-          👤
-        </a>
-      </div>
-
-      <div class="sp-user">
-        <div class="sp-user__info">
-          <span id="user-label" class="sp-user__label">Chưa đăng nhập</span>
+        <div class="sp-header__icons">
+            <a href="cart.html" class="sp-header-icon" title="Giỏ hàng">
+                <span class="sp-header-icon__badge" id="cart-header-count">0</span>🛒
+            </a>
+            <a href="account.html" class="sp-header-icon" title="Tài khoản của tôi">👤</a>
         </div>
-        <div class="sp-user__actions">
-          <button id="login-header-btn" class="sp-btn sp-btn--outline sp-btn--sm">
-            Đăng nhập
-          </button>
-          <button
-            id="logout-header-btn"
-            class="sp-btn sp-btn--outline sp-btn--sm sp-hidden"
-          >
-            Đăng xuất
-          </button>
+        <div class="sp-user">
+            <div class="sp-user__info"><span id="user-label" class="sp-user__label">Chưa đăng nhập</span></div>
+            <div class="sp-user__actions">
+                <button id="login-header-btn" class="sp-btn sp-btn--outline sp-btn--sm">Đăng nhập</button>
+                <button id="logout-header-btn" class="sp-btn sp-btn--outline sp-btn--sm sp-hidden">Đăng xuất</button>
+            </div>
         </div>
-      </div>
     </div>
-  </header>
+</header>
 
-  <main class="sp-layout" style="grid-template-columns: minmax(0, 1.9fr) minmax(0, 1.1fr);">
+<main class="sp-layout" style="grid-template-columns: minmax(0, 1.9fr) minmax(0, 1.1fr);">
     <section class="sp-panel sp-panel--main">
-      <div class="sp-panel__header">
-        <div>
-          <h2 class="sp-panel__title">Điện thoại nổi bật</h2>
-          <p class="sp-panel__subtitle">
-            Dữ liệu lấy từ <code>/api/phones</code>, có hỗ trợ tìm kiếm & lọc.
-          </p>
+        <div class="sp-panel__header">
+            <div>
+                <h2 class="sp-panel__title">Điện thoại nổi bật</h2>
+                <p class="sp-panel__subtitle">Hỗ trợ cấu hình Chipset, RAM và tồn kho thực tế.</p>
+            </div>
+            <div class="sp-filters">
+                <select id="brand-filter" class="sp-select">
+                    <option value="">Tất cả Hãng</option>
+                    <option value="001000">Apple</option>
+                    <option value="002000">Samsung</option>
+                    <option value="003000">Xiaomi</option>
+                    <option value="004000">Oppo</option>
+                </select>
+                <select id="price-filter" class="sp-select">
+                    <option value="">Tất cả giá</option>
+                    <option value="under5">&lt; 5 triệu</option>
+                    <option value="5to10">5 - 10 triệu</option>
+                    <option value="10to20">10 - 20 triệu</option>
+                    <option value="over20">&gt; 20 triệu</option>
+                </select>
+                <select id="sort-filter" class="sp-select">
+                    <option value="">Mặc định</option>
+                    <option value="priceAsc">Giá tăng dần</option>
+                    <option value="priceDesc">Giá giảm dần</option>
+                    <option value="nameAsc">Tên A → Z</option>
+                </select>
+            </div>
         </div>
-        <div class="sp-filters">
-          <!-- Lọc hãng -->
-          <select id="brand-filter" class="sp-select">
-              <option value="">Tất cả Hãng</option>
-              <option value="001000">Apple</option>
-              <option value="002000">Samsung</option>
-              <option value="003000">Xiaomi</option>
-              <option value="004000">Oppo</option>
-              <option value="005000">Vivo</option>
-              <option value="006000">Realme</option>
-          </select>
 
-          <!-- Lọc khoảng giá -->
-          <select id="price-filter" class="sp-select">
-            <option value="">Tất cả giá</option>
-            <option value="under5">&lt; 5 triệu</option>
-            <option value="5to10">5 - 10 triệu</option>
-            <option value="10to20">10 - 20 triệu</option>
-            <option value="over20">&gt; 20 triệu</option>
-          </select>
-
-          <!-- Sắp xếp -->
-          <select id="sort-filter" class="sp-select">
-            <option value="">Mặc định</option>
-            <option value="priceAsc">Giá tăng dần</option>
-            <option value="priceDesc">Giá giảm dần</option>
-            <option value="nameAsc">Tên A → Z</option>
-          </select>
+        <div class="sp-search">
+            <input id="search-input" type="text" placeholder="Tìm theo tên hoặc Chipset..." />
+            <button id="clear-search-btn" class="sp-btn sp-btn--ghost">Xoá</button>
         </div>
-      </div>
 
-      <!-- Tìm kiếm -->
-      <div class="sp-search">
-        <input
-          id="search-input"
-          type="text"
-          placeholder="Tìm theo tên điện thoại (vd: iPhone 15, Galaxy S23...)"
-        />
-        <button id="clear-search-btn" class="sp-btn sp-btn--ghost">Xoá</button>
-      </div>
+        <div class="sp-panel__toolbar">
+            <span id="product-count" class="sp-text--muted"></span>
+        </div>
 
-      <div class="sp-panel__toolbar">
-        <span id="product-count" class="sp-text--muted"></span>
-        <span id="product-loading" class="sp-text--muted sp-hidden">
-          Đang tải sản phẩm...
-        </span>
-      </div>
-
-      <div id="product-error" class="sp-alert sp-alert--error sp-hidden"></div>
-
-      <div id="product-list" class="sp-products">
-        <!-- Render bằng JS -->
-      </div>
-
-      <div id="pagination" class="sp-pagination"></div>
+        <div id="product-list" class="sp-products"></div>
+        <div id="pagination" class="sp-pagination"></div>
     </section>
 
     <aside class="sp-panel sp-panel--side">
-      <div class="sp-panel__header">
-        <div>
-          <h2 class="sp-panel__title">Hướng dẫn mua hàng</h2>
-          <p class="sp-panel__subtitle">
-            Các bước cơ bản khi chọn mua điện thoại trên website.
-          </p>
+        <div class="sp-panel__header">
+            <h2 class="sp-panel__title">Hướng dẫn mua hàng</h2>
         </div>
-      </div>
-
-      <div style="margin-top: 10px; font-size: 13px;">
-        <ol style="margin-left: 18px; margin-bottom: 10px;">
-          <li>Chọn hãng, chọn khoảng giá hoặc nhập tên model để lọc.</li>
-          <li>Bấm “Xem chi tiết” để đọc mô tả, cấu hình.</li>
-          <li>Nhấn “Thêm vào giỏ” với sản phẩm muốn mua.</li>
-          <li>Chuyển sang trang <b>Giỏ hàng</b> để kiểm tra và đặt mua.</li>
-        </ol>
-        <p class="sp-text--muted" style="font-size: 12px;">
-          Bộ lọc được xử lý ở frontend dựa trên dữ liệu trả về từ dịch vụ
-          <code>/api/phones</code>.
-        </p>
-      </div>
+        <div style="margin-top: 10px; font-size: 13px;">
+            <ol style="margin-left: 18px;">
+                <li>Lọc theo Hãng hoặc Chipset mạnh mẽ.</li>
+                <li>Xem chi tiết để kiểm tra thông số Pin/Màn hình.</li>
+                <li>Thêm vào giỏ và thanh toán an toàn.</li>
+            </ol>
+        </div>
     </aside>
-  </main>
+</main>
 
-  <!-- PRODUCT DETAIL MODAL -->
-  <div id="detail-modal" class="sp-modal sp-hidden">
+<div id="detail-modal" class="sp-modal sp-hidden">
     <div class="sp-modal__backdrop"></div>
     <div class="sp-modal__dialog">
-      <div class="sp-modal__header">
-        <h3 id="detail-name">Chi tiết sản phẩm</h3>
-        <button class="sp-modal__close" data-close-modal="detail">×</button>
-      </div>
-      <div class="sp-modal__body">
-        <p id="detail-price" class="sp-detail__price"></p>
-        <p id="detail-desc" class="sp-text--muted sp-mb-8"></p>
-        <dl class="sp-detail__meta">
-          <div>
-            <dt>Hãng</dt>
-            <dd id="detail-brand">N/A</dd>
-          </div>
-          <div>
-            <dt>Bộ nhớ</dt>
-            <dd id="detail-storage">N/A</dd>
-          </div>
-        </dl>
-      </div>
-      <div class="sp-modal__footer">
-        <button
-          id="detail-add"
-          class="sp-btn sp-btn--primary sp-btn--full"
-        >
-          Thêm vào giỏ
-        </button>
-      </div>
+        <div class="sp-modal__header">
+            <h3 id="detail-name">Chi tiết sản phẩm</h3>
+            <button class="sp-modal__close" data-close-modal="detail">×</button>
+        </div>
+        <div class="sp-modal__body">
+            <div id="detail-gallery" class="sp-detail__gallery sp-mb-8"></div>
+
+            <p id="detail-price" class="sp-detail__price"></p>
+            <p id="detail-desc" class="sp-text--muted sp-mb-8"></p>
+
+            <h4 style="margin: 15px 0 10px; font-size: 15px;">Thông số kỹ thuật</h4>
+            <div id="detail-specs-table"></div> </div>
+        <div class="sp-modal__footer">
+            <button id="detail-add" class="sp-btn sp-btn--primary sp-btn--full">Thêm vào giỏ</button>
+        </div>
     </div>
-  </div>
+</div>
 
-  <div id="toast" class="sp-toast sp-hidden"></div>
-  <script type="module" src="js/main.js"></script>
-
+<script type="module" src="js/main.js"></script>
 </body>
 </html>

@@ -11,6 +11,7 @@ import com.ptmhdv.SellPhone.cart.repository.CartItemRepository;
 import com.ptmhdv.SellPhone.cart.repository.CartRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CartService {
@@ -37,6 +38,7 @@ public class CartService {
         return cartRepo.findByUser_UserId(userId);
     }
 
+    @Transactional
     public Cart addToCart(String userId, String phoneId, Integer quantity) {
 
         Users user = usersRepo.findById(userId)
@@ -50,8 +52,10 @@ public class CartService {
 
         if (cart == null) {
             cart = new Cart();
+            // Sinh ID cho Cart nếu Cart cũng dùng ID String tự sinh
+            cart.setCartId("C" + System.currentTimeMillis());
             cart.setUser(user);
-            cart = cartRepo.save(cart); // nếu fail → exception, không return null
+            cart = cartRepo.save(cart);
         }
 
         CartItem item = cartItemRepo
@@ -60,6 +64,10 @@ public class CartService {
 
         if (item == null) {
             item = new CartItem();
+            // [FIX LỖI]: Sinh ID tự động cho CartItem tại đây
+            // Kết quả ví dụ: CI1734633600123 (15 ký tự - cực an toàn cho VARCHAR(50))
+            item.setCartItemId("CI" + System.currentTimeMillis());
+
             item.setCart(cart);
             item.setPhone(phone);
             item.setQuantity(quantity);
@@ -71,28 +79,23 @@ public class CartService {
         return cart;
     }
 
+    // Các hàm khác giữ nguyên...
     public Cart updateQuantity(String cartItemId, Integer quantity) {
-
         CartItem item = cartItemRepo.findById(cartItemId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart item not found"));
-
         Cart cart = item.getCart();
-
         if (quantity <= 0) {
             cartItemRepo.delete(item);
             return cart;
         }
-
         item.setQuantity(quantity);
         cartItemRepo.save(item);
         return cart;
     }
 
     public Cart removeItem(String cartItemId) {
-
         CartItem item = cartItemRepo.findById(cartItemId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart item not found"));
-
         Cart cart = item.getCart();
         cartItemRepo.delete(item);
         return cart;

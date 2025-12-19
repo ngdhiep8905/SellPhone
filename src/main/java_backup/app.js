@@ -1,5 +1,5 @@
 // ============ CONFIG ============
-const API_BASE_URL = ""; // cùng host với Spring Boot, dùng path tương đối
+//*const API_BASE_URL = ""; // cùng host với Spring Boot, dùng path tương đối
 
 // ============ GLOBAL STATE ============
 const AppState = {
@@ -1065,4 +1065,4 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       break;
   }
-});
+});u

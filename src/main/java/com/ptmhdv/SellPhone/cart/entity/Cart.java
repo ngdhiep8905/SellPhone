@@ -14,7 +14,7 @@ import java.util.List;
 public class Cart {
 
     @Id
-    @Column(name = "cart_id", length = 6)
+    @Column(name = "cart_id", length = 50)
     private String cartId;
 
     @PrePersist

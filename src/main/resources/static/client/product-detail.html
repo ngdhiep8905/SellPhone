@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Chi tiết sản phẩm - SellPhone</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .detail-container { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; padding: 40px; max-width: 1200px; margin: auto; }
+        .detail-image img { width: 100%; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .detail-info h1 { font-size: 32px; margin-bottom: 10px; }
+        .price-tag { font-size: 28px; color: #d63031; font-weight: bold; margin-bottom: 20px; }
+        .specs-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .specs-table td { padding: 10px; border-bottom: 1px solid #eee; }
+        .specs-table td:first-child { font-weight: bold; color: #666; width: 30%; }
+        .description { line-height: 1.6; color: #444; margin-top: 20px; background: #f9f9f9; padding: 20px; border-radius: 8px; white-space: pre-line; }
+    </style>
+</head>
+<body data-page="product-detail">
+<div id="header-container"></div>
+
+<main class="detail-container">
+    <div class="detail-image">
+        <img id="phone-img" src="" alt="Sản phẩm">
+    </div>
+
+    <div class="detail-info">
+        <h1 id="phone-name">Đang tải tên máy...</h1>
+        <div id="phone-price" class="price-tag"></div>
+
+        <table class="specs-table">
+            <tr><td>Chipset</td><td id="spec-chip">Đang tải...</td></tr>
+            <tr><td>RAM</td><td id="spec-ram"></td></tr>
+            <tr><td>Bộ nhớ</td><td id="spec-storage"></td></tr>
+            <tr><td>Màn hình</td><td id="spec-screen"></td></tr>
+            <tr><td>Pin</td><td id="spec-battery"></td></tr>
+            <tr><td>Màu sắc</td><td id="spec-color"></td></tr>
+            <tr><td>Tình trạng</td><td id="spec-stock"></td></tr>
+        </table>
+
+        <button id="btn-add-cart" class="sp-btn sp-btn--primary sp-btn--full" style="padding: 15px; cursor: pointer;">
+            THÊM VÀO GIỎ HÀNG
+        </button>
+    </div>
+</main>
+
+<section style="max-width: 1200px; margin: 20px auto; padding: 0 40px;">
+    <h3>Mô tả sản phẩm</h3>
+    <div id="phone-desc" class="description"></div>
+</section>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

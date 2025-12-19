@@ -13,10 +13,10 @@ public interface PhonesRepository extends JpaRepository<Phones, String> {
 
     List<Phones> findByPhoneNameContainingIgnoreCase(String keyword);
     @Query("SELECT p FROM Phones p WHERE " +
-            "(:keyword IS NULL OR LOWER(p.phoneName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(p.phoneDescription) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND " +
-            "(:brandId IS NULL OR p.brand.brandId = :brandId)")
-    List<Phones> searchByFilter(
-            @Param("keyword") String keyword,
-            @Param("brandId") String brandId
-    );
+            "(:keyword IS NULL OR LOWER(p.phoneName) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR LOWER(p.chipset) LIKE LOWER(CONCAT('%', :keyword, '%')) " + // Tìm theo chip
+            "OR LOWER(p.phoneDescription) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND " +
+            "(:brandId IS NULL OR p.brand.brandId = :brandId) AND " +
+            "(p.status = 'ACTIVE')")
+    List<Phones> searchByFilter(@Param("keyword") String keyword, @Param("brandId") String brandId);
 }

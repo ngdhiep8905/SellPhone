@@ -18,7 +18,7 @@ import java.util.UUID;
 public class CartItem {
 
     @Id
-    @Column(name = "cart_item_id", length = 36)
+    @Column(name = "cart_item_id", length = 50) // Đảm bảo length đủ lớn
     private String cartItemId;
 
     @PrePersist

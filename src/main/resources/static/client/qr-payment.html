@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh toán đơn hàng - SellPhone</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .qr-container {
+            max-width: 500px;
+            margin: 50px auto;
+            text-align: center;
+            padding: 30px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .qr-image {
+            width: 100%;
+            max-width: 300px;
+            margin: 20px auto;
+            border: 1px solid #eee;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .payment-info {
+            text-align: left;
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .payment-info div {
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .status-waiting {
+            color: #f59e0b;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+<div class="qr-container">
+    <h2>Thanh toán chuyển khoản</h2>
+    <p class="sp-text--muted">Quét mã QR bằng ứng dụng Ngân hàng hoặc Ví điện tử</p>
+
+    <img id="qr-code-img" src="https://placehold.co/300x300?text=Dang+tai+ma+QR..." alt="Mã QR Thanh Toán" class="qr-image">
+
+    <div class="status-waiting">
+        <div class="loader"></div>
+        <span>Đang chờ hệ thống ghi nhận...</span>
+    </div>
+
+    <div class="payment-info">
+        <div><span>Mã đơn hàng:</span> <strong id="display-order-id">#000</strong></div>
+        <div><span>Số tiền:</span> <strong id="display-amount" class="text-primary">0₫</strong></div>
+        <div><span>Nội dung:</span> <strong id="display-content">THANHTOAN</strong></div>
+    </div>
+
+    <p style="font-size: 12px; color: #666; font-style: italic; margin-bottom: 20px;">
+        * Vui lòng giữ nguyên nội dung chuyển khoản để đơn hàng được duyệt tự động.
+    </p>
+
+    <button onclick="window.location.href='index.html'" class="sp-btn sp-btn--outline sp-btn--full">
+        Quay về trang chủ
+    </button>
+</div>
+
+<script type="module">
+    import { formatVND } from "./js/common/helpers.js";
+
+    // 1. Lấy thông tin từ URL (amount và orderId từ checkout.js truyền sang)
+    const params = new URLSearchParams(window.location.search);
+    const amount = params.get('amount') || 0;
+    const orderId = params.get('orderId') || 'N/A';
+    const content = `THANHTOAN ${orderId}`;
+
+    // 2. Hiển thị thông tin lên giao diện
+    document.getElementById('display-order-id').innerText = `#${orderId}`;
+    document.getElementById('display-amount').innerText = formatVND(parseInt(amount));
+    document.getElementById('display-content').innerText = content;
+
+    // 3. Cấu hình ngân hàng của bro (Thay đổi ở đây)
+    const BANK_ID = "MB"; // Ví dụ: MB, VCB, ICB (VietinBank)...
+    const ACCOUNT_NO = "123456789"; // Số tài khoản của bro
+    const TEMPLATE = "compact"; // Kiểu QR: compact, qr_only, hoặc print
+
+    // 4. Gọi VietQR API để tạo link ảnh
+    // Cấu trúc: https://img.vietqr.io/image/<BANK_ID>-<ACCOUNT_NO>-<TEMPLATE>.png?amount=<AMOUNT>&addInfo=<CONTENT>
+    const qrUrl = `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-${TEMPLATE}.png?amount=${amount}&addInfo=${encodeURIComponent(content)}`;
+    document.getElementById('qr-code-img').src = qrUrl;
+
+    // 5. Demo Logic nâng cấp sau này: Tự động kiểm tra trạng thái
+    // Sau này bro có thể dùng setInterval để gọi API backend kiểm tra đơn hàng đã chuyển status thành "PAID" chưa
+    /*
+    setInterval(async () => {
+        const res = await fetch(`/api/orders/check-status/${orderId}`);
+        const data = await res.json();
+        if(data.status === 'PAID') {
+            window.location.href = 'order-success.html?orderId=' + orderId;
+        }
+    }, 5000); // 5 giây kiểm tra 1 lần
+    */
+</script>
+</body>
+</html>

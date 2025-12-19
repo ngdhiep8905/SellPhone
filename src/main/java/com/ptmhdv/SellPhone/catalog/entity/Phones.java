@@ -9,7 +9,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
+
 
 @Entity
 @Table(name = "phones")
@@ -20,47 +20,75 @@ public class Phones {
     @Column(name = "phone_id", length = 6)
     private String phoneId;
 
-    @PrePersist
-    public void generateId() {
-        if (phoneId == null) {
-            phoneId = generateCustomId();
-        }
-    }
-    private String generateCustomId() {
-        return String.format("%06d", (int)(Math.random() * 999999));
-    }
-
-
     @NotBlank(message = "Phone name is required")
-    @Size(min = 3, max = 100, message = "Phone name must be between 3 and 100 characters")
-    @Column(name = "phone_name", unique = true, nullable = false, length = 100)
+    @Column(name = "phone_name", nullable = false, length = 100)
     private String phoneName;
 
+    // --- THÔNG SỐ KỸ THUẬT MỚI ---
+    @Column(name = "chipset")
+    private String chipset;
+
+    @Column(name = "ram_size")
+    private String ramSize;
+
+    @Column(name = "storage_size")
+    private String storageSize;
+
+    @Column(name = "screen_info")
+    private String screenInfo;
+
+    @Column(name = "battery_info")
+    private String batteryInfo;
+
+    @Column(name = "rear_camera")
+    private String rearCamera;
+
+    @Column(name = "front_camera")
+    private String frontCamera;
+
+    @Column(name = "os_version")
+    private String osVersion;
+
+    @Column(name = "color")
+    private String color;
+
+    // --- QUẢN LÝ KHO & GIÁ ---
     @NotNull(message = "Price is required")
-    @DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than 0")
-    @Digits(integer = 12, fraction = 2)
-    @Column(name = "price", precision = 12, scale = 2, nullable = false)
+    @Column(name = "price", precision = 12, scale = 2, columnDefinition = "DECIMAL(12,2)")
     private BigDecimal price;
 
-    @Size(max = 255, message = "Image URL must not exceed 255 characters")
-    @Column(name = "phone_image", length = 255)
+    @Column(name = "stock_quantity")
+    private Integer stockQuantity;
+
+    @Column(name = "status")
+    private String status = "ACTIVE";
+
+    @Column(name = "phone_image_thumb")
     private String coverImageURL;
 
     @Column(name = "phone_description", columnDefinition = "TEXT")
     private String phoneDescription;
 
-    // LIÊN KẾT VỚI BRAND (UUID)
     @ManyToOne
     @JoinColumn(name = "brand_id")
     private Brands brand;
 
-    // TRONG ĐƠN HÀNG
+    // --- LIÊN KẾT ẢNH CHI TIẾT ---
+    @OneToMany(mappedBy = "phone", cascade = CascadeType.ALL)
+    private List<ProductImage> productImages; // Bạn cần tạo thêm Entity ProductImage
+
     @OneToMany(mappedBy = "phone", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<OrdersPhones> orderPhones;
 
-    // TRONG GIỎ HÀNG
     @OneToMany(mappedBy = "phone", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<CartItem> cartItems;
+
+    @PrePersist
+    public void generateId() {
+        if (phoneId == null) {
+            phoneId = String.format("%06d", (int)(Math.random() * 999999));
+        }
+    }
 }

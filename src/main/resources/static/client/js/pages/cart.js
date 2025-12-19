@@ -1,48 +1,36 @@
 import { $ } from "../common/dom.js";
-import { AppState, CartState, PaymentState } from "../common/state.js";
+import { AppState, CartState } from "../common/state.js";
 import { requireLogin } from "../common/auth.js";
 import {
-  apiFetchCart, apiUpdateCartItem, apiRemoveCartItem, apiCheckout,
-  apiFetchPayments
+  apiFetchCart, apiUpdateCartItem, apiRemoveCartItem
 } from "../common/api.js";
 import { formatVND, getPhonePrice } from "../common/helpers.js";
 import { updateCartHeaderCount } from "../common/header.js";
-
-function renderPaymentOptions() {
-  const sel = $("#checkout-payment");
-  if (!sel) return;
-  sel.innerHTML = "";
-
-  (PaymentState.methods || []).forEach((p) => {
-    const id = p.paymentId ?? p.id ?? p.payment_id;
-    const name = p.paymentMethod ?? p.method ?? "Thanh toán";
-    const opt = document.createElement("option");
-    opt.value = String(id);
-    opt.textContent = name;
-    sel.appendChild(opt);
-  });
-}
 
 function renderCartPage() {
   const itemsEl = $("#cart-items");
   const countEl = $("#cart-count");
   const subtotalEl = $("#cart-subtotal");
-  const shippingEl = $("#cart-shipping");
   const totalEl = $("#cart-total");
   const emptyEl = $("#cart-empty");
+  const checkoutBtn = $("#go-to-checkout");
+
   if (!itemsEl) return;
 
+  // 1. Kiểm tra giỏ hàng trống
   if (!CartState.cart?.items?.length) {
     itemsEl.innerHTML = "";
-    emptyEl && emptyEl.classList.remove("sp-hidden");
-    countEl && (countEl.textContent = "0 sp");
-    subtotalEl && (subtotalEl.textContent = "0₫");
-    shippingEl && (shippingEl.textContent = "0₫");
-    totalEl && (totalEl.textContent = "0₫");
+    if (emptyEl) emptyEl.classList.remove("sp-hidden");
+    if (countEl) countEl.textContent = "0 sản phẩm";
+    if (subtotalEl) subtotalEl.textContent = "0₫";
+    if (totalEl) totalEl.textContent = "0₫";
+    if (checkoutBtn) checkoutBtn.disabled = true; // Vô hiệu hóa nút nếu giỏ hàng trống
     return;
   }
 
-  emptyEl && emptyEl.classList.add("sp-hidden");
+  // 2. Render danh sách sản phẩm
+  if (emptyEl) emptyEl.classList.add("sp-hidden");
+  if (checkoutBtn) checkoutBtn.disabled = false;
   itemsEl.innerHTML = "";
 
   let totalQty = 0;
@@ -59,63 +47,56 @@ function renderCartPage() {
 
     const row = document.createElement("div");
     row.className = "sp-cart-item";
+
+    // Hiển thị thêm thông số Chip/RAM ở giỏ hàng cho chuyên nghiệp
+    const specsInfo = phone.chipset ? `<small class="sp-text--muted">${phone.chipset} | ${phone.ramSize}</small>` : "";
+
     row.innerHTML = `
-      <div class="sp-cart-item__row">
-        <span>${phone.phoneName || "Điện thoại"}</span>
-        <span>${formatVND(lineTotal)}</span>
-      </div>
-      <div class="sp-cart-item__row">
-        <small>${phone.phoneDescription || ""}</small>
-        <div class="sp-cart-item__controls">
-          <button class="sp-btn sp-btn--outline sp-btn--icon" data-cart-action="minus" data-id="${item.cartItemId}">-</button>
-          <span>${qty}</span>
-          <button class="sp-btn sp-btn--outline sp-btn--icon" data-cart-action="plus" data-id="${item.cartItemId}">+</button>
-          <button class="sp-btn sp-btn--ghost sp-btn--sm" data-cart-action="remove" data-id="${item.cartItemId}">X</button>
+      <div class="sp-cart-item__main">
+        <div class="sp-cart-item__info">
+            <span class="sp-cart-item__name">${phone.phoneName || "Điện thoại"}</span>
+            ${specsInfo}
         </div>
+        <span class="sp-cart-item__price">${formatVND(lineTotal)}</span>
+      </div>
+      <div class="sp-cart-item__controls">
+          <div class="sp-quantity-group">
+            <button class="sp-btn sp-btn--outline sp-btn--icon" data-cart-action="minus" data-id="${item.cartItemId}">-</button>
+            <span class="sp-quantity-val">${qty}</span>
+            <button class="sp-btn sp-btn--outline sp-btn--icon" data-cart-action="plus" data-id="${item.cartItemId}">+</button>
+          </div>
+          <button class="sp-btn sp-btn--ghost sp-btn--sm" data-cart-action="remove" data-id="${item.cartItemId}">
+            <span style="color: red;">Xoá</span>
+          </button>
       </div>
     `;
     itemsEl.appendChild(row);
   });
 
-  const shipping = subtotal > 0 ? 30000 : 0;
-  const total = subtotal + shipping;
-
-  countEl && (countEl.textContent = `${totalQty} sp`);
-  subtotalEl && (subtotalEl.textContent = formatVND(subtotal));
-  shippingEl && (shippingEl.textContent = formatVND(shipping));
-  totalEl && (totalEl.textContent = formatVND(total));
+  // 3. Cập nhật tổng tiền (Không tính phí ship ở đây, để dành cho trang checkout)
+  if (countEl) countEl.textContent = `${totalQty} sản phẩm`;
+  if (subtotalEl) subtotalEl.textContent = formatVND(subtotal);
+  if (totalEl) totalEl.textContent = formatVND(subtotal);
 }
 
 export function initCartPage() {
+  // Yêu cầu đăng nhập để xem giỏ hàng
   if (!requireLogin("cart.html")) {
     updateCartHeaderCount();
     return;
   }
 
   const itemsEl = $("#cart-items");
-  const checkoutBtn = $("#checkout-submit");
-  const errorEl = $("#checkout-error");
-  const successEl = $("#checkout-success");
-  const paymentSelect = $("#checkout-payment");
+  const checkoutBtn = $("#go-to-checkout"); // Nút mới chuyển sang checkout.html
+
   if (!itemsEl || !checkoutBtn) return;
 
-  if (paymentSelect) {
-    apiFetchPayments()
-      .then(() => {
-        renderPaymentOptions();
-        if (paymentSelect.options.length > 0) paymentSelect.selectedIndex = 0;
-      })
-      .catch(() => {
-        errorEl.textContent = "Không tải được phương thức thanh toán. Kiểm tra API /api/payments.";
-        errorEl.classList.remove("sp-hidden");
-      });
-  }
-
+  // Xử lý tăng/giảm số lượng và xóa
   itemsEl.addEventListener("click", (e) => {
     const btn = e.target.closest("button[data-cart-action]");
     if (!btn) return;
 
-    const cartItemId = btn.dataset.id; // giữ string
+    const cartItemId = btn.dataset.id;
     const action = btn.dataset.cartAction;
 
     const current = CartState.cart?.items?.find(
@@ -126,63 +107,38 @@ export function initCartPage() {
 
     const qty = current.quantity || 0;
 
-    if (action === "plus") apiUpdateCartItem(cartItemId, qty + 1).then(renderCartPage);
+    if (action === "plus") {
+        // Kiểm tra tồn kho trước khi tăng (Ghi điểm đồ án)
+        if (current.phone && qty >= current.phone.stockQuantity) {
+            alert(`Sản phẩm này chỉ còn ${current.phone.stockQuantity} chiếc trong kho!`);
+            return;
+        }
+        apiUpdateCartItem(cartItemId, qty + 1).then(renderCartPage);
+    }
+
     if (action === "minus") {
       const newQty = qty - 1;
       if (newQty <= 0) apiRemoveCartItem(cartItemId).then(renderCartPage);
       else apiUpdateCartItem(cartItemId, newQty).then(renderCartPage);
     }
-    if (action === "remove") apiRemoveCartItem(cartItemId).then(renderCartPage);
+
+    if (action === "remove") {
+        if(confirm("Bạn muốn xóa sản phẩm này khỏi giỏ hàng?")) {
+            apiRemoveCartItem(cartItemId).then(renderCartPage);
+        }
+    }
   });
 
-  checkoutBtn.onclick = async () => {
-    const name = $("#checkout-name").value.trim();
-    const addr = $("#checkout-address").value.trim();
-    const phone = $("#checkout-phone").value.trim();
-    const coupon = $("#checkout-coupon").value.trim();
-
-    errorEl.classList.add("sp-hidden");
-    successEl.classList.add("sp-hidden");
-
+  // CHUYỂN TRANG: Sang trang thanh toán
+  checkoutBtn.onclick = () => {
     if (!CartState.cart?.items?.length) {
-      errorEl.textContent = "Giỏ hàng đang trống.";
-      errorEl.classList.remove("sp-hidden");
+      alert("Giỏ hàng của bạn đang trống!");
       return;
     }
-    if (!name || !addr || !phone) {
-      errorEl.textContent = "Vui lòng nhập đầy đủ tên, địa chỉ và số điện thoại.";
-      errorEl.classList.remove("sp-hidden");
-      return;
-    }
-
-    try {
-      const selectedPaymentId = paymentSelect ? paymentSelect.value : "";
-      if (!selectedPaymentId) {
-        errorEl.textContent = "Vui lòng chọn phương thức thanh toán.";
-        errorEl.classList.remove("sp-hidden");
-        return;
-      }
-
-      const order = await apiCheckout({
-        userId: AppState.currentUser.userId,
-        receiverName: name,
-        receiverAddress: addr,
-        receiverPhone: phone,
-        couponCode: coupon,
-        paymentId: selectedPaymentId,
-      });
-
-      successEl.textContent = "Đặt hàng thành công! Mã đơn hàng: " + order.orderId;
-      successEl.classList.remove("sp-hidden");
-
-      CartState.cart = null;
-      updateCartHeaderCount();
-      renderCartPage();
-    } catch (err) {
-      errorEl.textContent = `Thanh toán thất bại: ${err.message}`;
-      errorEl.classList.remove("sp-hidden");
-    }
+    // Chuyển hướng người dùng sang trang checkout.html
+    window.location.href = "checkout.html";
   };
 
+  // Tải dữ liệu giỏ hàng ban đầu
   apiFetchCart().then(renderCartPage);
 }

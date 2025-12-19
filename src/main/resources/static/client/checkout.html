@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <title>Thanh toán - SellPhone</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="checkout">
+<header class="sp-header">
+    <div class="sp-header__left">
+        <div class="sp-logo">
+            <span class="sp-logo__icon">📱</span>
+            <div class="sp-logo__text">
+                <span class="sp-logo__brand">SellPhone</span>
+                <span class="sp-logo__tagline">Xác nhận đơn hàng</span>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="sp-layout" style="grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.8fr);">
+    <section class="sp-panel">
+        <h2 class="sp-panel__title">Thông tin giao hàng</h2>
+        <div class="sp-form-group">
+            <label class="sp-field">
+                <span>Họ tên người nhận *</span>
+                <input id="checkout-name" type="text" placeholder="Họ và tên" />
+            </label>
+            <label class="sp-field">
+                <span>Số điện thoại *</span>
+                <input id="checkout-phone" type="text" />
+            </label>
+
+            <label class="sp-field">
+                <span>Tỉnh / Thành phố *</span>
+                <select id="provinces" class="sp-select">
+                    <option value="">Chọn Tỉnh/Thành phố</option>
+                </select>
+            </label>
+
+            <label class="sp-field">
+                <span>Xã / Phường / Thị trấn *</span>
+                <select id="wards" class="sp-select">
+                    <option value="">Chọn Xã/Phường (Chọn Tỉnh trước)</option>
+                </select>
+            </label>
+
+            <label class="sp-field">
+                <span>Số nhà, tên đường, tổ/ấp *</span>
+                <input id="checkout-street" type="text" placeholder="Ví dụ: 123 Đường Cách Mạng Tháng 8" />
+            </label>
+
+            <label class="sp-field">
+                <span>Hình thức thanh toán *</span>
+                <select id="checkout-payment-method" class="sp-select">
+                    <option value="01">Thanh toán khi nhận hàng (COD)</option>
+                    <option value="02">Chuyển khoản (VietQR)</option>
+                </select>
+            </label>
+        </div>
+    </section>
+
+    <section class="sp-panel">
+        <h2 class="sp-panel__title">Đơn hàng của bạn</h2>
+        <div id="checkout-items-list" class="sp-checkout-list"></div>
+        <div class="sp-checkout-summary">
+            <div class="sp-cart__row"><span>Tạm tính:</span><span id="checkout-subtotal">0₫</span></div>
+            <div class="sp-cart__row"><span>Phí vận chuyển:</span><span>30.000₫</span></div>
+            <div class="sp-cart__row sp-cart__row--total"><span>Tổng cộng:</span><span id="checkout-total" class="text-primary">0₫</span></div>
+        </div>
+        <div class="sp-delivery-info" style="background: #eef2ff; padding: 10px; border-radius: 6px; margin-top: 15px;">
+            <span class="sp-icon">🚚</span> <strong>Dự kiến giao:</strong> <span id="delivery-time" style="color: #4338ca;"></span>
+        </div>
+        <button id="confirm-order-btn" class="sp-btn sp-btn--primary sp-btn--full" style="margin-top: 20px; padding: 15px; font-weight: bold;">XÁC NHẬN ĐẶT HÀNG</button>
+        <div id="checkout-error" class="sp-alert sp-alert--error sp-hidden" style="margin-top: 10px;"></div>
+    </section>
+</main>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -945,4 +945,55 @@ body::before{
   border-color: rgba(220, 38, 38, 0.85) !important;
   box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12) !important;
 }
+/* Badge cấu hình trên Card */
+.sp-product-card__specs { display: flex; gap: 5px; margin: 8px 0; flex-wrap: wrap; }
+.badge-item { background: #eee; color: #444; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
 
+/* Grid thông số trong Modal */
+.specs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #f9f9f9; padding: 12px; border-radius: 6px; border: 1px solid #ddd; }
+.specs-item { display: flex; flex-direction: column; font-size: 12px; }
+.specs-item strong { color: #222; margin-bottom: 2px; }
+.specs-item span { color: #555; }
+
+/* Gallery */
+.sp-detail__gallery { display: flex; gap: 8px; overflow-x: auto; padding: 5px 0; }
+.gallery-thumb { width: 50px; height: 50px; object-fit: cover; border: 1px solid #ccc; border-radius: 4px; }
+
+/* Trạng thái kho */
+.out-of-stock { opacity: 0.6; pointer-events: none; position: relative; }
+.out-of-stock::after { content: "HẾT HÀNG"; position: absolute; top: 20%; left: 0; width: 100%; background: red; color: white; text-align: center; font-weight: bold; font-size: 12px; transform: rotate(-15deg); }
+//*checkout*//
+.sp-checkout-list {
+    margin: 15px 0;
+    max-height: 300px;
+    overflow-y: auto;
+}
+.sp-checkout-summary {
+    background: #f8fafc;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+.sp-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+/* style.css QR */
+.sp-checkout-list {
+    margin: 15px 0;
+    max-height: 250px;
+    overflow-y: auto;
+    border: 1px solid #f0f0f0;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.text-primary {
+    color: #2563eb;
+    font-weight: bold;
+}
+
+.sp-hidden {
+    display: none !important;
+}
