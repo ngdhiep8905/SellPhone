@@ -50,6 +50,7 @@ export async function initProductDetailPage() {
             } else {
                 addBtn.onclick = async () => {
                     await apiAddToCart(phoneId, 1);
+                    updateCartHeaderCount();
                     alert("Đã thêm vào giỏ hàng! 🛒");
                 };
             }
