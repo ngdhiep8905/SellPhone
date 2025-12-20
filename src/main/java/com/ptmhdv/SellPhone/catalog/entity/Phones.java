@@ -85,10 +85,5 @@ public class Phones {
     @JsonIgnore
     private List<CartItem> cartItems;
 
-    @PrePersist
-    public void generateId() {
-        if (phoneId == null) {
-            phoneId = String.format("%06d", (int)(Math.random() * 999999));
-        }
-    }
+
 }

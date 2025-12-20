@@ -1,110 +1,121 @@
-import { API_BASE_URL } from "./config.js";
-import { AppState, CartState, PaymentState, ProductsState } from "./state.js";
-import { requireLogin } from "./auth.js";
-import { showToast } from "./helpers.js";
-import { updateCartHeaderCount } from "./header.js";
+    import { API_BASE_URL } from "./config.js";
+    import { AppState, CartState, PaymentState, ProductsState } from "./state.js";
+    import { requireLogin } from "./auth.js";
+    import { showToast } from "./helpers.js";
+    import { updateCartHeaderCount } from "./header.js";
 
-export async function apiFetchPayments() {
-  const res = await fetch(`${API_BASE_URL}/api/payments`);
-  if (!res.ok) throw new Error("Fetch payments failed");
-  PaymentState.methods = (await res.json()) || [];
-  return PaymentState.methods;
-}
+    export async function apiFetchPayments() {
+      const res = await fetch(`${API_BASE_URL}/api/payments`);
+      if (!res.ok) throw new Error("Fetch payments failed");
+      PaymentState.methods = (await res.json()) || [];
+      return PaymentState.methods;
+    }
 
-export async function apiLogin(email, password) {
-  const params = new URLSearchParams({ email, password });
-  const res = await fetch(`${API_BASE_URL}/api/auth/login?${params.toString()}`, { method: "POST" });
-  if (!res.ok) throw new Error("Sai email hoặc mật khẩu.");
-  return res.json();
-}
+    export async function apiLogin(email, password) {
+      const params = new URLSearchParams({ email, password });
+      const res = await fetch(`${API_BASE_URL}/api/auth/login?${params.toString()}`, { method: "POST" });
+      if (!res.ok) throw new Error("Sai email hoặc mật khẩu.");
+      return res.json();
+    }
 
-export async function apiRegister(payload) {
-  const res = await fetch(`${API_BASE_URL}/api/users/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-  if (!res.ok) throw new Error("Register failed");
-  return res.json();
-}
+    export async function apiRegister(payload) {
+      const res = await fetch(`${API_BASE_URL}/api/users/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error("Register failed");
+      return res.json();
+    }
 
-// Server filter: keyword/brandId
-export async function apiFetchProducts(keyword = "", brandId = "") {
-  const params = new URLSearchParams();
-  if (keyword) params.append("keyword", keyword);
-  if (brandId) params.append("brandId", brandId);
-  const qs = params.toString() ? `?${params.toString()}` : "";
+    export async function apiFetchProducts(keyword = "", brandId = "") {
+      const params = new URLSearchParams();
+      if (keyword) params.append("keyword", keyword);
+      if (brandId) params.append("brandId", brandId);
 
-  const res = await fetch(`${API_BASE_URL}/api/phones${qs}`);
-  if (!res.ok) throw new Error("HTTP " + res.status);
+      const qs = params.toString() ? `?${params.toString()}` : "";
+      const url = `${API_BASE_URL}/api/phones${qs}`;
+      console.log("[apiFetchProducts] GET", url);
 
-  const fetchedItems = (await res.json()) || [];
-  ProductsState.rawItems = fetchedItems;
-  return fetchedItems;
-}
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("HTTP " + res.status);
 
-export async function apiAddToCart(phoneId, quantity = 1) {
-  if (!requireLogin("products.html")) return;
+      const fetchedItems = (await res.json()) || [];
 
-  const params = new URLSearchParams({
-    userId: AppState.currentUser.userId,
-    phoneId,
-    quantity,
-  });
+      const normalized = fetchedItems.map((p) => ({
+        ...p,
+        phoneId: p.phoneId ?? p.id,
+      }));
 
-  const res = await fetch(`${API_BASE_URL}/api/cart/items?${params.toString()}`, { method: "POST" });
-  if (!res.ok) throw new Error("HTTP " + res.status);
+      ProductsState.rawItems = normalized;
+      ProductsState.items = [...normalized];
+      return normalized;
+    }
 
-  CartState.cart = await res.json();
-  updateCartHeaderCount();
-  showToast("Đã thêm vào giỏ hàng. Xem chi tiết tại trang Giỏ hàng.");
-  return CartState.cart;
-}
+    export async function apiAddToCart(phoneId, quantity = 1) {
+      if (!requireLogin("products.html")) return;
 
-export async function apiFetchCart() {
-  if (!AppState.currentUser) {
-    CartState.cart = null;
-    updateCartHeaderCount();
-    return null;
-  }
-  const res = await fetch(`${API_BASE_URL}/api/cart/${AppState.currentUser.userId}`);
-  if (!res.ok) throw new Error("HTTP " + res.status);
-  CartState.cart = await res.json();
-  updateCartHeaderCount();
-  return CartState.cart;
-}
+      const params = new URLSearchParams({
+        userId: AppState.currentUser.userId,
+        phoneId,
+        quantity,
+      });
 
-export async function apiUpdateCartItem(cartItemId, newQuantity) {
-  const res = await fetch(`${API_BASE_URL}/api/cart/items/${cartItemId}?quantity=${newQuantity}`, {
-    method: "PUT",
-  });
-  if (!res.ok) throw new Error("HTTP " + res.status);
-  CartState.cart = await res.json();
-  updateCartHeaderCount();
-  return CartState.cart;
-}
+      const res = await fetch(`${API_BASE_URL}/api/cart/items?${params.toString()}`, { method: "POST" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
 
-export async function apiRemoveCartItem(cartItemId) {
-  const res = await fetch(`${API_BASE_URL}/api/cart/items/${cartItemId}`, { method: "DELETE" });
-  if (!res.ok) throw new Error("HTTP " + res.status);
-  CartState.cart = await res.json();
-  updateCartHeaderCount();
-  return CartState.cart;
-}
+      CartState.cart = await res.json();
+      updateCartHeaderCount();
+      showToast("Đã thêm vào giỏ hàng.");
+      return CartState.cart;
+    }
 
-export async function apiCheckout(payload) {
-  const { userId, receiverName, receiverAddress, receiverPhone, couponCode, paymentId } = payload;
+    export async function apiFetchCart() {
+      if (!AppState.currentUser) {
+        CartState.cart = null;
+        updateCartHeaderCount();
+        return null;
+      }
 
-  const params = new URLSearchParams({
-    userId,
-    receiverName,
-    receiverAddress,
-    receiverPhone,
-    couponCode: couponCode || "",
-    paymentId: String(paymentId || ""),
-  });
+      const res = await fetch(`${API_BASE_URL}/api/cart/${AppState.currentUser.userId}`);
+      if (!res.ok) throw new Error("HTTP " + res.status);
 
-  const res = await fetch(`${API_BASE_URL}/api/orders/checkout?${params.toString()}`, { method: "POST" });
-  if (!res.ok) throw new Error("Checkout failed");
-  return res.json();
-}
+      CartState.cart = await res.json();
+      updateCartHeaderCount();
+      return CartState.cart;
+    }
+
+    export async function apiUpdateCartItem(cartItemId, newQuantity) {
+      const res = await fetch(`${API_BASE_URL}/api/cart/items/${cartItemId}?quantity=${newQuantity}`, {
+        method: "PUT",
+      });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+
+      CartState.cart = await res.json();
+      updateCartHeaderCount();
+      return CartState.cart;
+    }
+
+    export async function apiRemoveCartItem(cartItemId) {
+      const res = await fetch(`${API_BASE_URL}/api/cart/items/${cartItemId}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+
+      CartState.cart = await res.json();
+      updateCartHeaderCount();
+      return CartState.cart;
+    }
+
+    export async function apiCheckout(payload) {
+      const res = await fetch(`${API_BASE_URL}/api/orders/checkout`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const msg = await res.text();
+        throw new Error(msg || "Checkout failed");
+      }
+
+      return res.json();
+    }

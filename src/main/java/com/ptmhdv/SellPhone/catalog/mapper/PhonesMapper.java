@@ -12,7 +12,7 @@ public class PhonesMapper {
         if (e == null) return null;
 
         PhonesDTO d = new PhonesDTO();
-        d.setId(e.getPhoneId());
+        d.setPhoneId(e.getPhoneId());
         d.setPhoneName(e.getPhoneName());
         d.setPrice(e.getPrice());
         d.setCoverImageURL(e.getCoverImageURL());
@@ -51,7 +51,7 @@ public class PhonesMapper {
         if (d == null) return null;
 
         Phones e = new Phones();
-        e.setPhoneId(d.getId());
+        e.setPhoneId(d.getPhoneId());
         e.setPhoneName(d.getPhoneName());
         e.setPrice(d.getPrice());
         e.setCoverImageURL(d.getCoverImageURL());
@@ -73,5 +73,29 @@ public class PhonesMapper {
         e.setBrand(brand);
 
         return e;
+    }
+
+    public static void updateEntity(Phones entity, PhonesDTO dto, Brands brand) {
+        // ID: thường KHÔNG nên đổi khi update (đã lấy theo path variable)
+        // entity.setPhoneId(dto.getPhoneId()); // thường bỏ dòng này
+
+        entity.setPhoneName(dto.getPhoneName());
+        entity.setBrand(brand);
+
+        entity.setChipset(dto.getChipset());
+        entity.setRamSize(dto.getRamSize());
+        entity.setStorageSize(dto.getStorageSize());
+        entity.setScreenInfo(dto.getScreenInfo());
+        entity.setBatteryInfo(dto.getBatteryInfo());
+        entity.setRearCamera(dto.getRearCamera());
+        entity.setFrontCamera(dto.getFrontCamera());
+        entity.setOsVersion(dto.getOsVersion());
+        entity.setColor(dto.getColor());
+
+        entity.setPrice(dto.getPrice());
+        entity.setStockQuantity(dto.getStockQuantity());
+        entity.setStatus(dto.getStatus());
+        entity.setCoverImageURL(dto.getCoverImageURL());
+        entity.setPhoneDescription(dto.getPhoneDescription());
     }
 }

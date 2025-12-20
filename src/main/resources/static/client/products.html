@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css" />
 </head>
+
 <body data-page="products">
 <header class="sp-header">
     <div class="sp-header__left">
@@ -24,6 +25,7 @@
             <a href="products.html" class="sp-nav__item sp-nav__item--active">Sản phẩm</a>
         </nav>
     </div>
+
     <div class="sp-header__right">
         <div class="sp-header__icons">
             <a href="cart.html" class="sp-header-icon" title="Giỏ hàng">
@@ -31,8 +33,11 @@
             </a>
             <a href="account.html" class="sp-header-icon" title="Tài khoản của tôi">👤</a>
         </div>
+
         <div class="sp-user">
-            <div class="sp-user__info"><span id="user-label" class="sp-user__label">Chưa đăng nhập</span></div>
+            <div class="sp-user__info">
+                <span id="user-label" class="sp-user__label">Chưa đăng nhập</span>
+            </div>
             <div class="sp-user__actions">
                 <button id="login-header-btn" class="sp-btn sp-btn--outline sp-btn--sm">Đăng nhập</button>
                 <button id="logout-header-btn" class="sp-btn sp-btn--outline sp-btn--sm sp-hidden">Đăng xuất</button>
@@ -48,14 +53,16 @@
                 <h2 class="sp-panel__title">Điện thoại nổi bật</h2>
                 <p class="sp-panel__subtitle">Hỗ trợ cấu hình Chipset, RAM và tồn kho thực tế.</p>
             </div>
+
             <div class="sp-filters">
+                <!-- FIX: brandId khớp DB: B001/B002/B003 -->
                 <select id="brand-filter" class="sp-select">
                     <option value="">Tất cả Hãng</option>
-                    <option value="001000">Apple</option>
-                    <option value="002000">Samsung</option>
-                    <option value="003000">Xiaomi</option>
-                    <option value="004000">Oppo</option>
+                    <option value="B001">Apple</option>
+                    <option value="B002">Samsung</option>
+                    <option value="B003">Xiaomi</option>
                 </select>
+
                 <select id="price-filter" class="sp-select">
                     <option value="">Tất cả giá</option>
                     <option value="under5">&lt; 5 triệu</option>
@@ -63,6 +70,7 @@
                     <option value="10to20">10 - 20 triệu</option>
                     <option value="over20">&gt; 20 triệu</option>
                 </select>
+
                 <select id="sort-filter" class="sp-select">
                     <option value="">Mặc định</option>
                     <option value="priceAsc">Giá tăng dần</option>
@@ -106,6 +114,7 @@
             <h3 id="detail-name">Chi tiết sản phẩm</h3>
             <button class="sp-modal__close" data-close-modal="detail">×</button>
         </div>
+
         <div class="sp-modal__body">
             <div id="detail-gallery" class="sp-detail__gallery sp-mb-8"></div>
 
@@ -113,13 +122,16 @@
             <p id="detail-desc" class="sp-text--muted sp-mb-8"></p>
 
             <h4 style="margin: 15px 0 10px; font-size: 15px;">Thông số kỹ thuật</h4>
-            <div id="detail-specs-table"></div> </div>
+            <div id="detail-specs-table"></div>
+        </div>
+
         <div class="sp-modal__footer">
             <button id="detail-add" class="sp-btn sp-btn--primary sp-btn--full">Thêm vào giỏ</button>
         </div>
     </div>
 </div>
 
-<script type="module" src="js/main.js"></script>
+<script type="module" src="/client/js/main.js?v=1"></script>
+
 </body>
 </html>

@@ -12,11 +12,25 @@ public interface PhonesRepository extends JpaRepository<Phones, String> {
     List<Phones> findByBrand_BrandId(String brandId);
 
     List<Phones> findByPhoneNameContainingIgnoreCase(String keyword);
-    @Query("SELECT p FROM Phones p WHERE " +
-            "(:keyword IS NULL OR LOWER(p.phoneName) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-            "OR LOWER(p.chipset) LIKE LOWER(CONCAT('%', :keyword, '%')) " + // Tìm theo chip
-            "OR LOWER(p.phoneDescription) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND " +
-            "(:brandId IS NULL OR p.brand.brandId = :brandId) AND " +
-            "(p.status = 'ACTIVE')")
+
+    @Query("""
+        SELECT p FROM Phones p
+        WHERE
+          (:keyword IS NULL OR
+            LOWER(p.phoneName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+            LOWER(COALESCE(p.chipset, '')) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+            LOWER(COALESCE(p.phoneDescription, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
+          )
+          AND (:brandId IS NULL OR p.brand.brandId = :brandId)
+          AND p.status = 'ACTIVE'
+        """)
     List<Phones> searchByFilter(@Param("keyword") String keyword, @Param("brandId") String brandId);
+    // Lấy số lớn nhất từ phone_id dạng P001, P002...
+    @Query(value = """
+        SELECT MAX(CAST(SUBSTRING(phone_id, 2) AS UNSIGNED))
+        FROM phones
+        WHERE phone_id REGEXP '^P[0-9]+$'
+        """, nativeQuery = true)
+    Integer findMaxPhoneNumber();
 }
+

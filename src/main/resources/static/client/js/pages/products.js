@@ -1,92 +1,136 @@
-import { $, } from "../common/dom.js";
-import { AppState, ProductsState } from "../common/state.js";
-import { apiAddToCart, apiFetchCart, apiFetchProducts } from "../common/api.js";
-import { formatVND, getPhonePrice } from "../common/helpers.js";
-import { updateCartHeaderCount } from "../common/header.js";
+import { $ } from "../common/dom.js";
+import { ProductsState } from "../common/state.js";
+import { apiAddToCart, apiFetchProducts } from "../common/api.js";
 
-function applyClientFilters(renderProducts) {
+// Formatter nội bộ để tránh lỗi do helper không tương thích
+function formatVND_SAFE(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return "Liên hệ";
+  return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(n);
+}
+
+function getPrice_SAFE(p) {
+  // Backend của bạn trả field "price"
+  if (p && p.price != null) return Number(p.price);
+  // fallback nếu sau này có field khác
+  if (p && p.salePrice != null) return Number(p.salePrice);
+  return NaN;
+}
+
+function applyClientFilters(renderFn) {
   let list = [...(ProductsState.rawItems || [])];
+
+  // Price filter
   if (ProductsState.priceFilter) {
     list = list.filter((p) => {
-      const price = getPhonePrice(p);
+      const price = getPrice_SAFE(p);
       switch (ProductsState.priceFilter) {
-        case "under5": return price < 5_000_000;
-        case "5to10": return price >= 5_000_000 && price <= 10_000_000;
-        case "10to20": return price > 10_000_000 && price <= 20_000_000;
-        case "over20": return price > 20_000_000;
-        default: return true;
+        case "under5":
+          return price < 5_000_000;
+        case "5to10":
+          return price >= 5_000_000 && price <= 10_000_000;
+        case "10to20":
+          return price > 10_000_000 && price <= 20_000_000;
+        case "over20":
+          return price > 20_000_000;
+        default:
+          return true;
       }
     });
   }
+
+  // Sort
   if (ProductsState.sort) {
     const sort = ProductsState.sort;
     list.sort((a, b) => {
-      if (sort === "priceAsc") return getPhonePrice(a) - getPhonePrice(b);
-      if (sort === "priceDesc") return getPhonePrice(b) - getPhonePrice(a);
+      if (sort === "priceAsc") return getPrice_SAFE(a) - getPrice_SAFE(b);
+      if (sort === "priceDesc") return getPrice_SAFE(b) - getPrice_SAFE(a);
       if (sort === "nameAsc") return (a.phoneName || "").localeCompare(b.phoneName || "");
       return 0;
     });
   }
+
   ProductsState.items = list;
   ProductsState.currentPage = 1;
-  renderProducts();
+  renderFn();
 }
 
 function renderProducts() {
   const container = $("#product-list");
-  if (!container) return;
+  if (!container) {
+    console.error("[products] Missing #product-list");
+    return;
+  }
+
+  const items = ProductsState.items || [];
   container.innerHTML = "";
 
-  if (!ProductsState.items.length) {
+  console.log("[products] renderProducts items =", items.length, items);
+
+  if (!items.length) {
     container.innerHTML = "<p>Không tìm thấy sản phẩm nào.</p>";
     return;
   }
 
   const start = (ProductsState.currentPage - 1) * ProductsState.pageSize;
-  const pageItems = ProductsState.items.slice(start, start + ProductsState.pageSize);
+  const pageItems = items.slice(start, start + ProductsState.pageSize);
 
   pageItems.forEach((p) => {
-      const card = document.createElement("article");
-      card.className = "sp-product-card";
+    const card = document.createElement("article");
+    card.className = "sp-product-card";
 
-      const phoneId = p.phoneId || p.id;
-      const price = getPhonePrice(p);
+    // Backend trả id: "P001"..., nên dùng id
+    const phoneId = p.id;
+    const price = getPrice_SAFE(p);
 
-      // BỌC TOÀN BỘ NỘI DUNG TRONG THẺ <a>
-      // Lưu ý: href phải trỏ đúng đến file product-detail.html
-      card.innerHTML = `
-        <a href="product-detail.html?id=${phoneId}" class="sp-product-card__wrapper" style="text-decoration: none; color: inherit; display: block;">
-          <div class="sp-product-card__image">
-            <img src="${p.coverImageURL || 'placeholder.jpg'}" alt="${p.phoneName}">
-            ${p.stockQuantity <= 0 ? '<div class="out-of-stock-label">Hết hàng</div>' : ''}
-          </div>
-          <div class="sp-product-card__title">${p.phoneName}</div>
-          <div class="sp-product-card__specs">
-            <span class="badge-item">${p.chipset || ''}</span>
-            <span class="badge-item">${p.ramSize || ''}</span>
-          </div>
-          <div class="sp-product-card__price">${formatVND(price)}</div>
-        </a>
+    // Vì bạn đang chạy ở http://localhost:8080 nên "/img/..." là đúng
+    const imgSrc = p.coverImageURL || "placeholder.jpg";
 
-        <div class="sp-product-card__footer">
-          <button class="sp-btn sp-btn--primary sp-btn--sm"
-                  onclick="event.preventDefault(); event.stopPropagation(); apiAddToCart('${phoneId}', 1)">
-            Thêm vào giỏ
-          </button>
-          <a href="product-detail.html?id=${phoneId}" class="sp-btn sp-btn--outline sp-btn--sm">Chi tiết</a>
+    card.innerHTML = `
+      <a href="product-detail.html?id=${phoneId}" class="sp-product-card__wrapper" style="text-decoration: none; color: inherit; display: block;">
+        <div class="sp-product-card__image">
+          <img src="${imgSrc}" alt="${p.phoneName || ""}">
+          ${p.stockQuantity <= 0 ? '<div class="out-of-stock-label">Hết hàng</div>' : ""}
         </div>
-      `;
-      container.appendChild(card);
+        <div class="sp-product-card__title">${p.phoneName || ""}</div>
+        <div class="sp-product-card__specs">
+          <span class="badge-item">${p.chipset || ""}</span>
+          <span class="badge-item">${p.ramSize || ""}</span>
+        </div>
+        <div class="sp-product-card__price">${formatVND_SAFE(price)}</div>
+      </a>
+
+      <div class="sp-product-card__footer">
+        <button
+          class="sp-btn sp-btn--primary sp-btn--sm"
+          data-id="${phoneId}"
+          ${p.stockQuantity <= 0 ? "disabled" : ""}
+        >
+          Thêm vào giỏ
+        </button>
+        <a href="product-detail.html?id=${phoneId}" class="sp-btn sp-btn--outline sp-btn--sm">Chi tiết</a>
+      </div>
+    `;
+
+    container.appendChild(card);
   });
 }
 
 async function applyProductFilters() {
   const newKeyword = $("#search-input")?.value.trim() || "";
   const newBrandId = $("#brand-filter")?.value || "";
+
   ProductsState.keyword = newKeyword;
   ProductsState.brandId = newBrandId;
   ProductsState.priceFilter = $("#price-filter")?.value || "";
   ProductsState.sort = $("#sort-filter")?.value || "";
+
+  console.log("[products] applyProductFilters", {
+    keyword: newKeyword,
+    brandId: newBrandId,
+    priceFilter: ProductsState.priceFilter,
+    sort: ProductsState.sort,
+  });
 
   await apiFetchProducts(newKeyword, newBrandId);
   applyClientFilters(renderProducts);
@@ -94,30 +138,40 @@ async function applyProductFilters() {
 
 export function initProductsPage() {
   const listEl = $("#product-list");
-  if (!listEl) return;
+  if (!listEl) {
+    console.error("[products] initProductsPage: Missing #product-list");
+    return;
+  }
 
-  // 1. Lắng nghe sự kiện lọc (giữ nguyên)
-  ["search-input", "brand-filter", "price-filter", "sort-filter"].forEach(id => {
-    $(`#${id}`)?.addEventListener("change", applyProductFilters);
-    $(`#${id}`)?.addEventListener("input", applyProductFilters);
+  console.log("[products] initProductsPage called");
+
+  // Lắng nghe filter
+  ["search-input", "brand-filter", "price-filter", "sort-filter"].forEach((id) => {
+    const el = $(`#${id}`);
+    if (!el) return;
+    el.addEventListener("change", applyProductFilters);
+    el.addEventListener("input", applyProductFilters);
   });
 
-  // 2. SỬA LẠI ĐOẠN NÀY: Xử lý click linh hoạt
+  // Delegation add-to-cart
   listEl.addEventListener("click", (e) => {
-    // Nếu click trúng nút "Thêm vào giỏ" (hoặc icon bên trong nút)
     const addBtn = e.target.closest("button.sp-btn--primary");
-    if (addBtn) {
-        // Chỉ nút này mới chặn chuyển trang để thực hiện logic Add To Cart
-        e.preventDefault();
-        e.stopPropagation();
-        const id = addBtn.dataset.id;
-        apiAddToCart(id, 1);
-        return; // Thoát ra, không làm gì thêm
-    }
+    if (!addBtn) return;
 
-    // Nếu không phải nút Add to cart, hãy để trình duyệt tự xử lý thẻ <a>
-    // KHÔNG dùng e.preventDefault() ở đây thì nó sẽ "nhảy vèo" ngay.
+    e.preventDefault();
+    e.stopPropagation();
+
+    const id = addBtn.dataset.id;
+    console.log("[products] add to cart id =", id);
+    apiAddToCart(id, 1);
   });
 
-  apiFetchProducts().then(() => applyClientFilters(renderProducts));
+  // Load lần đầu (CÓ catch + hiển thị lỗi)
+  apiFetchProducts()
+    .then(() => applyClientFilters(renderProducts))
+    .catch((err) => {
+      console.error("[products] apiFetchProducts failed:", err);
+      listEl.innerHTML =
+        "<p>Không tải được sản phẩm. Mở DevTools (F12) để xem lỗi Network/Console.</p>";
+    });
 }

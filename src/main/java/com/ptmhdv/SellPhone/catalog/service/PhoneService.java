@@ -29,27 +29,31 @@ public class PhoneService {
     }
 
     public PhonesDTO getById(String id) {
-        Phones phone = phoneRepo.findById(id).orElse(null);
-        return PhonesMapper.toDTO(phone);
+        return phoneRepo.findById(id)
+                .map(PhonesMapper::toDTO)
+                .orElse(null);
     }
+
 
     @Transactional
     public PhonesDTO save(PhonesDTO dto) {
-        // Tìm brand từ brandId trong DTO
+        // Nếu create (FE không gửi phoneId) thì tự sinh
+        if (dto.getPhoneId() == null || dto.getPhoneId().trim().isEmpty()) {
+            dto.setPhoneId(generateNextPhoneId());
+        }
+
         Brands brand = null;
-        if (dto.getBrandId() != null) {
+        if (dto.getBrandId() != null && !dto.getBrandId().trim().isEmpty()) {
             brand = brandRepo.findById(dto.getBrandId()).orElse(null);
         }
 
-        // Chuyển DTO thành Entity
         Phones phone = PhonesMapper.toEntity(dto, brand);
-
-        // Lưu xuống DB
-        Phones savedPhone = phoneRepo.save(phone);
-
-        // Trả về DTO sau khi lưu
-        return PhonesMapper.toDTO(savedPhone);
+        Phones saved = phoneRepo.save(phone);
+        return PhonesMapper.toDTO(saved);
     }
+
+
+
 
     public void delete(String id) {
         phoneRepo.deleteById(id);
@@ -77,4 +81,10 @@ public class PhoneService {
         phone.setStockQuantity(phone.getStockQuantity() - quantity);
         phoneRepo.save(phone);
     }
+    private synchronized String generateNextPhoneId() {
+        Integer maxNum = phoneRepo.findMaxPhoneNumber();
+        int next = (maxNum == null) ? 1 : (maxNum + 1);
+        return "P" + String.format("%03d", next); // P001, P002...
+    }
+
 }

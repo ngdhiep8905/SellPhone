@@ -6,7 +6,7 @@ import java.util.List;
 
 @Data
 public class PhonesDTO {
-    private String id;
+    private String phoneId;
     private String phoneName;
     private BigDecimal price;
     private String coverImageURL;

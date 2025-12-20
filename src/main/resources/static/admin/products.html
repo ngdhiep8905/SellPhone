@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Quản lý sản phẩm – SellPhone Admin</title>
-
     <link rel="stylesheet" href="admin.css">
 </head>
 
 <body>
-
 <div class="admin-container">
 
-    <!-- SIDEBAR (đồng bộ) -->
+    <!-- SIDEBAR -->
     <aside class="sidebar">
         <div class="sidebar-header">
             <h2>📱 SellPhone</h2>
@@ -37,10 +35,9 @@
             <a href="users.html" class="menu-item">
                 <span class="icon">👤</span><span class="text">Người dùng</span>
             </a>
-            <!-- KHOẢNG CÁCH TRƯỚC LOGOUT -->
+
             <div class="sidebar-separator"></div>
 
-            <!-- NÚT LOGOUT -->
             <a href="#" class="menu-item logout-item" onclick="logout()">
                 <span class="icon">🚪</span>
                 <span class="text">Đăng xuất</span>
@@ -54,7 +51,10 @@
         <!-- HEADER -->
         <header class="topbar">
             <h1>Quản lý sản phẩm</h1>
-            <button class="btn" onclick="openAddModal()">+ Thêm sản phẩm</button>
+            <div style="display:flex; gap:10px;">
+                <button class="btn" onclick="openAddModal()">+ Thêm sản phẩm</button>
+                <button class="btn" onclick="openStockModal()">Sửa số lượng tồn kho</button>
+            </div>
         </header>
 
         <!-- TABLE -->
@@ -65,6 +65,7 @@
                     <th>ID</th>
                     <th>Tên</th>
                     <th>Giá</th>
+                    <th>Tồn kho</th>
                     <th>Ảnh</th>
                     <th>Thương hiệu</th>
                     <th>Hành động</th>
@@ -78,27 +79,79 @@
     </main>
 </div>
 
-<!-- MODAL THÊM/SỬA -->
+<!-- MODAL THÊM -->
 <div id="productModal" class="modal">
-    <div class="modal-content">
-        <h2 id="modalTitle">Thêm sản phẩm</h2>
+    <div class="modal-content modal-content-lg">
+        <div class="modal-header">
+            <h2 id="modalTitle">Thêm sản phẩm</h2>
+        </div>
 
-        <label>Tên sản phẩm</label>
-        <input type="text" id="phoneName">
+        <div class="modal-body">
+            <label>Tên sản phẩm</label>
+            <input type="text" id="phoneName">
 
-        <label>Giá</label>
-        <input type="number" id="price">
+            <label>Giá</label>
+            <input type="number" id="price">
 
-        <label>Ảnh (URL)</label>
-        <input type="text" id="coverImageURL">
+            <label>Ảnh đại diện</label>
+            <input type="file" id="coverImageFile" accept="image/*">
+            <img id="coverPreview" style="margin-top:10px; max-width:160px; border-radius:12px; display:none;" />
 
-        <label>Thương hiệu</label>
-        <select id="brandId"></select>
 
-        <button class="btn" onclick="saveProduct()">Lưu</button>
-        <button class="btn" style="background:#d63031" onclick="closeModal()">Hủy</button>
+            <label>Thương hiệu</label>
+            <select id="brandId"></select>
+
+            <label>Tồn kho</label>
+            <input type="number" id="stockQuantity" min="0" value="0">
+
+            <label>Trạng thái</label>
+            <select id="status">
+                <option value="ACTIVE">ACTIVE</option>
+                <option value="INACTIVE">INACTIVE</option>
+                <option value="OUT_OF_STOCK">OUT_OF_STOCK</option>
+            </select>
+
+            <hr style="margin:14px 0; opacity:0.4;">
+
+            <label>Chipset</label>
+            <input type="text" id="chipset">
+
+            <label>RAM</label>
+            <input type="text" id="ramSize" placeholder="Ví dụ: 8GB">
+
+            <label>Bộ nhớ</label>
+            <input type="text" id="storageSize" placeholder="Ví dụ: 256GB">
+
+            <label>Màn hình</label>
+            <input type="text" id="screenInfo">
+
+            <label>Pin</label>
+            <input type="text" id="batteryInfo">
+
+            <label>Camera sau</label>
+            <input type="text" id="rearCamera">
+
+            <label>Camera trước</label>
+            <input type="text" id="frontCamera">
+
+            <label>Hệ điều hành</label>
+            <input type="text" id="osVersion">
+
+            <label>Màu</label>
+            <input type="text" id="color">
+
+            <label>Mô tả</label>
+            <textarea id="phoneDescription" rows="4"></textarea>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn" onclick="saveProduct()">Lưu</button>
+            <button class="btn" style="background:#d63031" onclick="closeModal()">Hủy</button>
+        </div>
     </div>
 </div>
+
+
 
 <script src="products.js"></script>
 </body>

@@ -1,1 +1,1 @@
-export const API_BASE_URL = ""; // cùng host với Spring Boot
+export const API_BASE_URL = window.location.origin;
