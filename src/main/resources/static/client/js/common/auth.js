@@ -1,12 +1,28 @@
 import { AppState, CartState } from "./state.js";
 
 export function loadUser() {
+  console.log("🔍 loadUser() được gọi");
   try {
     const raw = localStorage.getItem("sellphone_user");
-    if (!raw) return;
+    console.log("📦 Raw data from localStorage:", raw);
+
+    if (!raw) {
+      console.log("❌ Không có dữ liệu trong localStorage");
+      return;
+    }
+
     const u = JSON.parse(raw);
-    if (u && u.userId) AppState.currentUser = u;
-  } catch {}
+    console.log("✅ Parsed user:", u);
+
+    if (u && u.userId) {
+      AppState.currentUser = u;
+      console.log("✅ AppState.currentUser đã được set:", AppState.currentUser);
+    } else {
+      console.log("❌ User data không hợp lệ (thiếu userId)");
+    }
+  } catch (err) {
+    console.error("❌ Lỗi khi load user:", err);
+  }
 }
 
 export function saveUser() {
