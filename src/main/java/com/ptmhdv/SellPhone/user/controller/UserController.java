@@ -19,8 +19,7 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-
-    // ====== LIST USER (ADMIN) ======
+    //List USER
     @GetMapping
     public Page<Users> getUsers(
             @RequestParam(defaultValue = "0") int page,
@@ -28,8 +27,9 @@ public class UserController {
             @RequestParam(required = false) String search
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        return userService.getUsers(pageable, search);
+        return userService.getCustomers(pageable, search);
     }
+
 
     // ====== GET ONE USER ======
     @GetMapping("/{id}")

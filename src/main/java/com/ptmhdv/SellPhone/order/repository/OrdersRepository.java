@@ -51,6 +51,15 @@ public interface OrdersRepository extends JpaRepository<Orders, String> {
     ORDER BY o.bookDate
 """)
     List<Object[]> filterRevenue(Integer month, Integer year, String brandId);
+    @Query("""
+   SELECT o
+   FROM Orders o
+   WHERE (:status IS NULL OR o.status = :status)
+     AND (:paymentMethod IS NULL OR o.payment.paymentMethod = :paymentMethod)
+     AND (:paymentStatus IS NULL OR o.payment.paymentStatus = :paymentStatus)
+   ORDER BY o.bookDate DESC
+""")
+    List<Orders> adminFilter(String status, String paymentMethod, String paymentStatus);
 
 
 }

@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.util.List;
-import java.util.UUID;
+
 
 @Entity
 @Table(name = "brands")
@@ -14,20 +14,8 @@ import java.util.UUID;
 public class Brands {
 
     @Id
-    @Column(name = "brand_id", length = 36)
+    @Column(name = "brand_id", length = 4, nullable = false, updatable = false)
     private String brandId;
-
-    @PrePersist
-    public void generateId() {
-        if (brandId == null) {
-            brandId = generateCustomId();
-        }
-    }
-
-    private String generateCustomId() {
-        return String.format("%06d", (int)(Math.random() * 999999));
-    }
-
 
     @NotBlank(message = "Brand name is required")
     @Column(name = "brand_name", nullable = false, length = 100)

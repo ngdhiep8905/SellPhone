@@ -1,96 +1,104 @@
 const API = "/api";
 
-let currentUser = null;
+// Modal refs
+const userModal = document.getElementById("userModal");
+const modalUserId = document.getElementById("modalUserId");
+const modalUserName = document.getElementById("modalUserName");
+const modalUserEmail = document.getElementById("modalUserEmail");
+const modalUserPhone = document.getElementById("modalUserPhone");
+const modalUserAddress = document.getElementById("modalUserAddress");
 
-// LOAD USERS
 window.onload = function () {
-    loadUsers();
+  loadUsers();
+  setupBackdropClose();
 };
 
+function setupBackdropClose() {
+  if (!userModal) return;
+  userModal.addEventListener("click", (e) => {
+    if (e.target === userModal) closeModal();
+  });
+}
+
 function loadUsers() {
-    fetch(`${API}/users`)
-        .then(res => res.json())
-        .then(data => renderUsers(data));
+  // BE đã lọc chỉ role_id = '02' (khách hàng)
+  fetch(`${API}/users?page=0&size=50`)
+    .then(res => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    })
+    .then(page => {
+      renderUsers(page?.content || []);
+    })
+    .catch(err => {
+      alert("Lỗi tải khách hàng: " + err.message);
+      console.error(err);
+    });
 }
 
 function renderUsers(users) {
-    let html = "";
+  const tbody = document.querySelector("#userTable tbody");
+  if (!tbody) return;
 
-    users.forEach(u => {
-        html += `
-            <tr>
-                <td>${u.userId}</td>
-                <td>${u.fullName}</td>
-                <td>${u.email}</td>
-                <td>${roleBadge(u.role)}</td>
-                <td>${statusBadge(u.status)}</td>
-                <td>
-                    <button class="btn" onclick="viewUser(${u.userId})">Xem</button>
-                </td>
-            </tr>
-        `;
-    });
+  if (!users.length) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:16px; opacity:.7;">Không có khách hàng.</td></tr>`;
+    return;
+  }
 
-    document.querySelector("#userTable tbody").innerHTML = html;
+  let html = "";
+  users.forEach(u => {
+    html += `
+      <tr ondblclick="viewUser('${escapeAttr(u.userId)}')">
+        <td>${escapeHtml(u.userId)}</td>
+        <td>${escapeHtml(u.fullName || "")}</td>
+        <td>${escapeHtml(u.email || "")}</td>
+        <td>${escapeHtml(u.phone || "")}</td>
+        <td>${escapeHtml(u.address || "")}</td>
+      </tr>
+    `;
+  });
+
+  tbody.innerHTML = html;
 }
 
-function roleBadge(role) {
-    const colors = {
-        "ADMIN": "#8e44ad",
-        "USER": "#3498db"
-    };
-    return `<span style="background:${colors[role]}; padding:6px 12px; color:white; border-radius:8px;">${role}</span>`;
-}
-
-function statusBadge(status) {
-    const colors = {
-        "ACTIVE": "#2ecc71",
-        "LOCKED": "#e74c3c"
-    };
-    const text = {
-        "ACTIVE": "Hoạt động",
-        "LOCKED": "Đã khóa"
-    };
-    return `<span style="background:${colors[status]}; padding:6px 12px; color:white; border-radius:8px;">${text[status]}</span>`;
-}
-
-// VIEW USER
 function viewUser(id) {
-    fetch(`${API}/users/${id}`)
-        .then(res => res.json())
-        .then(u => {
-            currentUser = u;
-
-            modalUserId.innerText = u.userId;
-            modalUserName.innerText = u.fullName;
-            modalUserEmail.innerText = u.email;
-            modalUserRole.innerText = u.role;
-            modalUserStatus.innerText = u.status === "ACTIVE" ? "Hoạt động" : "Đã khóa";
-
-            userModal.style.display = "flex";
-        });
+  fetch(`${API}/users/${encodeURIComponent(id)}`)
+    .then(res => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    })
+    .then(u => {
+      modalUserId.innerText = u.userId || "";
+      modalUserName.innerText = u.fullName || "";
+      modalUserEmail.innerText = u.email || "";
+      modalUserPhone.innerText = u.phone || "";
+      modalUserAddress.innerText = u.address || "";
+      userModal.style.display = "flex";
+    })
+    .catch(err => {
+      alert("Lỗi xem khách hàng: " + err.message);
+      console.error(err);
+    });
 }
 
 function closeModal() {
-    userModal.style.display = "none";
+  if (userModal) userModal.style.display = "none";
 }
 
-// TOGGLE USER STATUS (LOCK/UNLOCK)
-function toggleUserStatus() {
-    const newStatus = currentUser.status === "ACTIVE" ? "LOCKED" : "ACTIVE";
-
-    fetch(`${API}/users/${currentUser.userId}/status`, {
-        method: "PUT",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ status: newStatus })
-    })
-    .then(() => {
-        alert("Cập nhật trạng thái thành công!");
-        closeModal();
-        loadUsers();
-    });
+// helpers
+function escapeHtml(str) {
+  return String(str ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
+function escapeAttr(str) {
+  return String(str ?? "").replaceAll("'", "\\'");
+}
+
 function logout() {
-    localStorage.removeItem("isAdmin");
-    window.location.href = "admin-login.html";
+  localStorage.removeItem("isAdmin");
+  window.location.href = "admin-login.html";
 }

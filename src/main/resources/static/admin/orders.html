@@ -56,13 +56,41 @@
             <h1>Quản lý Đơn hàng</h1>
         </header>
 
-        <!-- FILTER STATUS -->
-        <div class="cards" style="grid-template-columns: repeat(4, 1fr); margin-bottom:25px;">
-            <div class="card status-filter" onclick="filterStatus('PENDING')">Chờ xử lý</div>
-            <div class="card status-filter" onclick="filterStatus('PROCESSING')">Đang xử lý</div>
-            <div class="card status-filter" onclick="filterStatus('COMPLETED')">Hoàn thành</div>
-            <div class="card status-filter" onclick="filterStatus('CANCELLED')">Đã hủy</div>
+        <!-- FILTER BAR -->
+        <div class="order-filter">
+            <div class="order-filter__group">
+                <label>Trạng thái đơn</label>
+                <select id="filterOrderStatus">
+                    <option value="">Tất cả</option>
+                    <option value="PENDING">Cần xác nhận</option>
+                    <option value="SHIPPED">Đã xác nhận, đang vận chuyển</option>
+                    <option value="DELIVERED">Giao thành công</option>
+                    <option value="CANCELLED">Đã hủy</option>
+                </select>
+            </div>
+
+            <div class="order-filter__group">
+                <label>Phương thức thanh toán</label>
+                <select id="filterPaymentMethod">
+                    <option value="">Tất cả</option>
+                    <option value="COD">COD</option>
+                    <option value="BANKING">Chuyển khoản</option>
+                </select>
+            </div>
+
+            <div class="order-filter__group">
+                <label>Trạng thái thanh toán</label>
+                <select id="filterPaymentStatus">
+                    <option value="">Tất cả</option>
+                    <option value="PAID">Đã thanh toán</option>
+                    <option value="PENDING">Chưa thanh toán</option>
+                </select>
+            </div>
+
+            <button class="btn" onclick="loadOrders()">Lọc</button>
+            <button class="btn" style="background:#64748b" onclick="resetFilters()">Reset</button>
         </div>
+
 
         <!-- ORDER TABLE -->
         <div class="table-container">
@@ -73,13 +101,16 @@
                     <th>Khách hàng</th>
                     <th>Ngày đặt</th>
                     <th>Tổng tiền</th>
+                    <th>Sản phẩm + SL</th>
+                    <th>Địa chỉ</th>
                     <th>Trạng thái</th>
+                    <th>Thanh toán</th>
                     <th>Hành động</th>
                 </tr>
                 </thead>
-
                 <tbody></tbody>
             </table>
+
         </div>
 
     </main>
@@ -87,13 +118,21 @@
 
 <!-- MODAL CHI TIẾT ĐƠN -->
 <div id="orderModal" class="modal">
-    <div class="modal-content">
+    <div class="modal-content modal-content-lg">
         <h2>Chi tiết đơn hàng</h2>
 
         <p><b>Mã đơn:</b> <span id="orderId"></span></p>
         <p><b>Khách hàng:</b> <span id="orderUser"></span></p>
+        <p><b>SĐT khách:</b> <span id="customerPhone"></span></p>
         <p><b>Ngày đặt:</b> <span id="orderDate"></span></p>
+
+        <p><b>Người nhận:</b> <span id="recipientName"></span></p>
+        <p><b>SĐT nhận:</b> <span id="recipientPhone"></span></p>
+        <p><b>Địa chỉ:</b> <span id="shippingAddress"></span></p>
+
+        <p><b>Thanh toán:</b> <span id="paymentInfo"></span></p>
         <p><b>Tổng tiền:</b> <span id="orderTotal"></span></p>
+        <p><b>Trạng thái:</b> <span id="orderStatusText"></span></p>
 
         <h3>Sản phẩm</h3>
         <table>
@@ -107,18 +146,29 @@
             <tbody id="orderItems"></tbody>
         </table>
 
-        <label>Cập nhật trạng thái</label>
-        <select id="orderStatus">
-            <option value="PENDING">Chờ xử lý</option>
-            <option value="PROCESSING">Đang xử lý</option>
-            <option value="COMPLETED">Hoàn thành</option>
-            <option value="CANCELLED">Đã hủy</option>
-        </select>
-
-        <button class="btn" onclick="updateStatus()">Cập nhật</button>
-        <button class="btn" style="background:#d63031" onclick="closeModal()">Đóng</button>
+        <div style="display:flex; gap:10px; margin-top:14px;">
+            <button class="btn" id="btnConfirm">Xác nhận</button>
+            <button class="btn" id="btnDelivered">Giao thành công</button>
+            <button class="btn" style="background:#d63031" id="btnReject">Từ chối</button>
+            <button class="btn" style="background:#64748b" onclick="closeModal()">Đóng</button>
+        </div>
     </div>
 </div>
+<!-- MODAL LÝ DO TỪ CHỐI -->
+<div id="rejectModal" class="modal">
+    <div class="modal-content">
+        <h2>Từ chối đơn hàng</h2>
+
+        <label>Lý do từ chối</label>
+        <textarea id="rejectReason" rows="4" placeholder="Nhập lý do..."></textarea>
+
+        <div style="display:flex; gap:10px; margin-top:14px;">
+            <button class="btn" style="background:#d63031" id="btnSubmitReject">Xác nhận từ chối</button>
+            <button class="btn" style="background:#64748b" onclick="closeRejectModal()">Hủy</button>
+        </div>
+    </div>
+</div>
+
 
 <script src="orders.js"></script>
 </body>

@@ -4,29 +4,19 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Table(name = "roles")
 @Data
-@Getter
-@Setter
 public class Roles {
 
     @Id
-    @Column(name = "role_id", length = 36)
-    private String roleId;
+    @Column(name = "role_id", length = 2)
+    private String roleId; // ví dụ: "01" (ADMIN), "02" (USER)
 
-    @PrePersist
-    public void generateId() {
-        if (roleId == null) {
-            roleId = UUID.randomUUID().toString();
-        }
-    }
+    // BỎ @PrePersist generate UUID vì role_id cố định theo DB
 
     @NotBlank(message = "Role name is required")
     @Column(name = "role_name", nullable = false, length = 50)
@@ -38,5 +28,4 @@ public class Roles {
     @OneToMany(mappedBy = "role")
     @JsonIgnore
     private List<Users> users;
-
 }

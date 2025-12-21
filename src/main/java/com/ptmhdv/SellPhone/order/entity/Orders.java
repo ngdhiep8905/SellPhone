@@ -10,6 +10,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -21,19 +22,18 @@ public class Orders {
     @Column(name = "order_id", length = 13) // ví dụ: O + 12 số
     private String orderId;
 
+
+    @Column(name = "book_date")
+    private LocalDateTime bookDate;
+
     @PrePersist
     public void generateId() {
         if (orderId == null) {
-            // O + yyyyMMddHHmm (12 số)
             java.time.format.DateTimeFormatter f = java.time.format.DateTimeFormatter.ofPattern("yyyyMMddHHmm");
             orderId = "O" + java.time.LocalDateTime.now().format(f);
         }
-        if (bookDate == null) bookDate = LocalDate.now();
+        if (bookDate == null) bookDate = LocalDateTime.now();
     }
-
-
-    @Column(name = "book_date")
-    private LocalDate bookDate;
 
     @Column(name = "recipient_name", length = 100)
     private String recipientName;
@@ -64,5 +64,7 @@ public class Orders {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrdersPhones> orderPhones;
 
+    @Column(name = "reject_reason", length = 500)
+    private String rejectReason;
 
 }

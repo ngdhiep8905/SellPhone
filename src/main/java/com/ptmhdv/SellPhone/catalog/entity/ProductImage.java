@@ -16,9 +16,6 @@ public class ProductImage {
     @Column(name = "image_url")
     private String imageUrl;
 
-    @Column(name = "image_type")
-    private String imageType;
-
     @ManyToOne
     @JoinColumn(name = "phone_id")
     @JsonIgnore

@@ -35,11 +35,16 @@ public class BrandController {
         brandService.delete(id);
     }
     @PutMapping("/{id}")
-    public Brands update(@PathVariable String id, @RequestBody Brands brandDetails) {
-        // 1. Gán ID từ URL vào đối tượng (để đảm bảo cập nhật đúng)
-        brandDetails.setBrandId(id);
-        // 2. Gọi hàm save (hàm này có thể xử lý cả Create và Update)
-        return brandService.save(brandDetails);
+    public Brands update(@PathVariable String id, @RequestBody Brands input) {
+        Brands existing = brandService.getById(id);
+        if (existing == null) return null; // hoặc throw 404
+
+        if (input.getBrandName() != null) existing.setBrandName(input.getBrandName());
+        if (input.getBrandDescription() != null) existing.setBrandDescription(input.getBrandDescription());
+
+        return brandService.save(existing);
     }
+
+
 }
 

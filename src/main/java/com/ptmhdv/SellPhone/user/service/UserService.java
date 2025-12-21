@@ -56,8 +56,13 @@ public class UserService {
 
 
 
-      public Optional<Users> getByEmail(String email) {
+    public Optional<Users> getByEmail(String email) {
         return usersRepo.findByEmail(email);
     }
+
+    public Page<Users> getCustomers(Pageable pageable, String search) {
+        return usersRepo.findCustomers(search, pageable);
+    }
+
 
 }

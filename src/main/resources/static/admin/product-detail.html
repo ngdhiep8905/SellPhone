@@ -2,81 +2,198 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8" />
-    <title>Chi tiết sản phẩm</title>
+    <title>Chi tiết sản phẩm – SellPhone Admin</title>
     <link rel="stylesheet" href="admin.css" />
 </head>
 <body>
-<div class="admin-container" style="padding:20px;">
-    <h1>Chi tiết sản phẩm</h1>
 
-    <div style="max-width:820px;">
-        <label>Mã sản phẩm (ID)</label>
-        <input id="d_phoneId" type="text" disabled />
+<div class="admin-container">
 
-        <label>Tên sản phẩm</label>
-        <input id="d_phoneName" type="text"/>
-
-        <label>Giá</label>
-        <input id="d_price" type="number"/>
-
-        <label>Ảnh đại diện (URL)</label>
-        <input id="d_coverImageURL" type="text"/>
-
-        <label>Thương hiệu</label>
-        <select id="d_brandId"></select>
-
-        <label>Tồn kho</label>
-        <input id="d_stockQuantity" type="number" min="0"/>
-
-        <label>Trạng thái</label>
-        <select id="d_status">
-            <option value="ACTIVE">ACTIVE</option>
-            <option value="INACTIVE">INACTIVE</option>
-            <option value="OUT_OF_STOCK">OUT_OF_STOCK</option>
-        </select>
-
-        <hr style="margin:14px 0; opacity:0.4;">
-
-        <label>Chipset</label>
-        <input id="d_chipset" type="text"/>
-
-        <label>RAM</label>
-        <input id="d_ramSize" type="text"/>
-
-        <label>Bộ nhớ</label>
-        <input id="d_storageSize" type="text"/>
-
-        <label>Màn hình</label>
-        <input id="d_screenInfo" type="text"/>
-
-        <label>Pin</label>
-        <input id="d_batteryInfo" type="text"/>
-
-        <label>Camera sau</label>
-        <input id="d_rearCamera" type="text"/>
-
-        <label>Camera trước</label>
-        <input id="d_frontCamera" type="text"/>
-
-        <label>Hệ điều hành</label>
-        <input id="d_osVersion" type="text"/>
-
-        <label>Màu</label>
-        <input id="d_color" type="text"/>
-
-        <label>Mô tả</label>
-        <textarea id="d_phoneDescription" rows="5"></textarea>
-
-        <label>Ảnh chi tiết (mỗi dòng 1 URL)</label>
-        <textarea id="d_detailImages" rows="4" placeholder="/img/a.jpg&#10;/img/b.jpg"></textarea>
-
-        <div style="display:flex; gap:10px; margin-top:14px;">
-            <button class="btn" onclick="saveDetail()">Lưu</button>
-            <button class="btn" style="background:#d63031" onclick="window.close()">Đóng</button>
+    <!-- SIDEBAR giống các trang admin -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>📱 SellPhone</h2>
         </div>
-    </div>
+
+        <div class="sidebar-menu">
+            <a href="admin.html" class="menu-item">
+                <span class="icon">📊</span><span class="text">Dashboard</span>
+            </a>
+            <a href="products.html" class="menu-item active">
+                <span class="icon">📦</span><span class="text">Sản phẩm</span>
+            </a>
+            <a href="brands.html" class="menu-item">
+                <span class="icon">🏷️</span><span class="text">Thương hiệu</span>
+            </a>
+            <a href="orders.html" class="menu-item">
+                <span class="icon">🧾</span><span class="text">Đơn hàng</span>
+            </a>
+            <a href="users.html" class="menu-item">
+                <span class="icon">👤</span><span class="text">Người dùng</span>
+            </a>
+
+            <div class="sidebar-separator"></div>
+
+            <a href="#" class="menu-item logout-item" onclick="window.close()">
+                <span class="icon">🚪</span>
+                <span class="text">Đóng tab</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <h1 style="margin:0;">Chi tiết sản phẩm</h1>
+                <div style="opacity:.8; font-size:13px; margin-top:4px;">
+                    Chỉnh sửa thông tin, lưu để cập nhật
+                </div>
+            </div>
+
+            <div style="display:flex; gap:10px;">
+                <button class="btn" onclick="saveDetail()">Lưu</button>
+                <button class="btn" style="background:#d63031" onclick="window.close()">Đóng</button>
+            </div>
+        </header>
+
+        <div class="detail-wrap">
+            <!-- Cột trái: thông tin + cấu hình -->
+            <section class="card">
+                <div class="card-title">Thông tin cơ bản</div>
+
+                <div class="form-grid">
+                    <div class="field">
+                        <label>Mã sản phẩm (ID)</label>
+                        <input id="d_phoneId" type="text" disabled />
+                    </div>
+
+                    <div class="field">
+                        <label>Trạng thái</label>
+                        <select id="d_status">
+                            <option value="ACTIVE">ACTIVE</option>
+                            <option value="INACTIVE">INACTIVE</option>
+                            <option value="OUT_OF_STOCK">OUT_OF_STOCK</option>
+                        </select>
+                    </div>
+
+                    <div class="field full">
+                        <label>Tên sản phẩm</label>
+                        <input id="d_phoneName" type="text" />
+                    </div>
+
+                    <div class="field">
+                        <label>Giá</label>
+                        <input id="d_price" type="number" />
+                    </div>
+
+                    <div class="field">
+                        <label>Tồn kho</label>
+                        <input id="d_stockQuantity" type="number" min="0" />
+                    </div>
+
+                    <div class="field full">
+                        <label>Thương hiệu</label>
+                        <select id="d_brandId"></select>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="card-title">Cấu hình</div>
+                <div class="form-grid">
+                    <div class="field">
+                        <label>Chipset</label>
+                        <input id="d_chipset" type="text" />
+                    </div>
+
+                    <div class="field">
+                        <label>RAM</label>
+                        <input id="d_ramSize" type="text" placeholder="Ví dụ: 8GB" />
+                    </div>
+
+                    <div class="field">
+                        <label>Bộ nhớ</label>
+                        <input id="d_storageSize" type="text" placeholder="Ví dụ: 256GB" />
+                    </div>
+
+                    <div class="field">
+                        <label>Màn hình</label>
+                        <input id="d_screenInfo" type="text" />
+                    </div>
+
+                    <div class="field">
+                        <label>Pin</label>
+                        <input id="d_batteryInfo" type="text" />
+                    </div>
+
+                    <div class="field">
+                        <label>Camera sau</label>
+                        <input id="d_rearCamera" type="text" />
+                    </div>
+
+                    <div class="field">
+                        <label>Camera trước</label>
+                        <input id="d_frontCamera" type="text" />
+                    </div>
+
+                    <div class="field">
+                        <label>Hệ điều hành</label>
+                        <input id="d_osVersion" type="text" />
+                    </div>
+
+                    <div class="field">
+                        <label>Màu</label>
+                        <input id="d_color" type="text" />
+                    </div>
+
+                    <div class="field full">
+                        <label>Mô tả</label>
+                        <textarea id="d_phoneDescription" rows="5"></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Cột phải: ảnh -->
+            <aside class="card">
+                <div class="card-title">Hình ảnh</div>
+
+                <div class="field">
+                    <label>Ảnh đại diện</label>
+                    <input id="d_coverImageFile" type="file" accept="image/*">
+                    <div class="hint">Chọn ảnh từ máy. Hệ thống sẽ upload và lưu đường dẫn vào DB.</div>
+
+                    <img id="d_coverPreview" class="img-preview" alt="preview" style="display:none;" />
+                </div>
+
+
+                <div class="divider"></div>
+
+                <div class="field">
+                    <label>Ảnh chi tiết (mỗi dòng 1 URL)</label>
+                    <textarea id="d_detailImages" rows="10" placeholder="/images/a.jpg&#10;/images/b.jpg"></textarea>
+                    <div class="hint">Gợi ý: mỗi dòng 1 đường dẫn ảnh. Backend phải hỗ trợ lưu `detailImages`.</div>
+                </div>
+            </aside>
+        </div>
+
+    </main>
 </div>
 
 <script src="product-detail.js"></script>
+<script>
+    // Preview cover URL (frontend-only)
+    const coverInput = document.getElementById("d_coverImageURL");
+    const coverPrev = document.getElementById("d_coverPreview");
+    function refreshCoverPreview() {
+      const v = (coverInput.value || "").trim();
+      if (!v) { coverPrev.style.display = "none"; coverPrev.src = ""; return; }
+      coverPrev.src = v;
+      coverPrev.style.display = "block";
+    }
+    coverInput.addEventListener("input", refreshCoverPreview);
+    window.addEventListener("load", () => setTimeout(refreshCoverPreview, 300));
+</script>
 </body>
 </html>

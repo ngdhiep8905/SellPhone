@@ -119,3 +119,7 @@ function logout() {
     localStorage.removeItem("isAdmin");
     window.location.href = "admin-login.html";
 }
+// Đóng modal khi click vào nền tối
+brandModal.addEventListener("click", (e) => {
+  if (e.target === brandModal) closeModal();
+});

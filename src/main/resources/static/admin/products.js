@@ -50,6 +50,7 @@ async function uploadCoverImage(file) {
 window.onload = function () {
   loadBrands();
   loadProducts();
+  setupBackdropClose();
 };
 
 function loadProducts() {
@@ -223,23 +224,39 @@ function deleteProduct(id, name) {
 
 // MODAL TỒN KHO (áp dụng toàn bộ)
 function openStockModal() {
+  const stockModal = document.getElementById("stockModal");
   const stockList = document.getElementById("stockList");
 
+  if (!stockModal || !stockList) {
+    alert("Thiếu HTML của stockModal/stockList trong products.html");
+    return;
+  }
+
+  if (!Array.isArray(cachedProducts) || cachedProducts.length === 0) {
+    stockList.innerHTML = `<p style="margin:0;">Chưa có sản phẩm để chỉnh tồn kho.</p>`;
+    stockModal.style.display = "flex";
+    return;
+  }
+
   stockList.innerHTML = cachedProducts.map(p => `
-    <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:8px 0; border-bottom:1px solid #eee;">
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 0; border-bottom:1px solid rgba(148,163,184,.35);">
       <div style="flex:1;">
-        <div style="font-weight:600;">${p.phoneName}</div>
+        <div style="font-weight:700;">${p.phoneName}</div>
         <div style="font-size:12px; opacity:0.8;">${p.phoneId} • ${p.brandName || "N/A"}</div>
       </div>
-      <input type="number" min="0" style="width:120px;"
+      <input
+        type="number"
+        min="0"
+        style="width:140px;"
         data-phone-id="${p.phoneId}"
         value="${p.stockQuantity ?? 0}"
       />
     </div>
   `).join("");
 
-  document.getElementById("stockModal").style.display = "flex";
+  stockModal.style.display = "flex";
 }
+
 
 function closeStockModal() {
   document.getElementById("stockModal").style.display = "none";
@@ -288,6 +305,23 @@ function saveStockChanges() {
       console.error(err);
       alert("Lỗi cập nhật tồn kho: " + err.message);
     });
+}
+function setupBackdropClose() {
+  const productModal = document.getElementById("productModal");
+  const stockModal = document.getElementById("stockModal");
+
+  if (productModal) {
+    productModal.addEventListener("click", (e) => {
+      // chỉ đóng khi click vào nền tối (overlay)
+      if (e.target === productModal) closeModal();
+    });
+  }
+
+  if (stockModal) {
+    stockModal.addEventListener("click", (e) => {
+      if (e.target === stockModal) closeStockModal();
+    });
+  }
 }
 
 function logout() {

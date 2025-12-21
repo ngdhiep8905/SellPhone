@@ -62,11 +62,10 @@
                 <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Tên người dùng</th>
+                    <th>Tên khách hàng</th>
                     <th>Email</th>
-                    <th>Vai trò</th>
-                    <th>Trạng thái</th>
-                    <th>Hành động</th>
+                    <th>SĐT</th>
+                    <th>Địa chỉ</th>
                 </tr>
                 </thead>
 
@@ -81,15 +80,14 @@
 <div id="userModal" class="modal">
     <div class="modal-content">
 
-        <h2>Thông tin người dùng</h2>
+        <h2>Thông tin khách hàng</h2>
 
         <p><b>ID:</b> <span id="modalUserId"></span></p>
         <p><b>Tên:</b> <span id="modalUserName"></span></p>
         <p><b>Email:</b> <span id="modalUserEmail"></span></p>
-        <p><b>Vai trò:</b> <span id="modalUserRole"></span></p>
-        <p><b>Trạng thái:</b> <span id="modalUserStatus"></span></p>
+        <p><b>SĐT:</b> <span id="modalUserPhone"></span></p>
+        <p><b>Địa chỉ:</b> <span id="modalUserAddress"></span></p>
 
-        <button class="btn" onclick="toggleUserStatus()">Khóa / Mở khóa</button>
         <button class="btn" style="background:#d63031" onclick="closeModal()">Đóng</button>
     </div>
 </div>

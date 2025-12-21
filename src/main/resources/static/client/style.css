@@ -924,22 +924,12 @@ body{
 /* Nền Noel nằm dưới nội dung */
 body{
   background:
-    url("/images/pexels-ifreestock-695971.jpg") center / cover no-repeat fixed;
+    url("/images/bg-mainv2.png") center / cover no-repeat fixed;
 }
 
 /* Overlay sáng để nội dung nổi, nhưng vẫn thấy ảnh phía dưới */
 body::before{
-  content:"";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background: linear-gradient(
-    180deg,
-    rgba(255,255,255,.82),
-    rgba(255,255,255,.72) 35%,
-    rgba(255,255,255,.86) 100%
-  );
+  content: none !important;
 }
 .sp-input--error{
   border-color: rgba(220, 38, 38, 0.85) !important;

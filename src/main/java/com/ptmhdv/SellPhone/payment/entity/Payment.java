@@ -16,24 +16,19 @@ import java.util.UUID;
 public class Payment {
 
     @Id
-    @Column(name = "payment_id", length = 36)
-    private String paymentId;
+    @Column(name = "payment_id", length = 2)
+    private String paymentId; // '01' hoặc '02'
 
-    @PrePersist
-    public void generateId() {
-        if (paymentId == null) {
-            paymentId = UUID.randomUUID().toString();
-        }
-    }
+    // BỎ @PrePersist generate UUID
 
     @NotBlank(message = "Payment method is required")
-    @Size(max = 50, message = "Payment method must not exceed 50 characters")
+    @Size(max = 50)
     @Column(name = "payment_method", length = 50)
-    private String paymentMethod;
+    private String paymentMethod; // COD / BANKING
 
     @Size(max = 50)
     @Column(name = "payment_status", length = 50)
-    private String paymentStatus = "PENDING";  // default
+    private String paymentStatus = "PENDING"; // PENDING / PAID
 
     @OneToMany(mappedBy = "payment")
     @JsonIgnore

@@ -78,18 +78,26 @@
     </main>
 </div>
 
-<!-- MODAL -->
-<div id="brandModal" class="modal">
-    <div class="modal-content">
-        <h2 id="modalTitle">Thêm thương hiệu</h2>
+<!-- BRAND MODAL (RIÊNG) -->
+<div id="brandModal" class="brand-modal">
+    <div class="brand-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="brand-modal__header">
+            <h2 id="modalTitle" class="brand-modal__title">Thêm thương hiệu</h2>
+            <button type="button" class="brand-modal__close" onclick="closeModal()" aria-label="Đóng">×</button>
+        </div>
 
-        <label>Tên thương hiệu</label>
-        <input type="text" id="brandName">
+        <div class="brand-modal__body">
+            <label class="brand-modal__label" for="brandName">Tên thương hiệu</label>
+            <input class="brand-modal__input" type="text" id="brandName" placeholder="Ví dụ: Apple, Samsung..." />
+        </div>
 
-        <button class="btn" onclick="saveBrand()">Lưu</button>
-        <button class="btn" style="background:#d63031" onclick="closeModal()">Hủy</button>
+        <div class="brand-modal__footer">
+            <button class="brand-modal__btn brand-modal__btn--primary" onclick="saveBrand()">Lưu</button>
+            <button class="brand-modal__btn brand-modal__btn--danger" onclick="closeModal()">Hủy</button>
+        </div>
     </div>
 </div>
+
 
 <script src="brands.js"></script>
 </body>

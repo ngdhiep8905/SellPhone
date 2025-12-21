@@ -79,15 +79,22 @@ function renderProducts() {
     const card = document.createElement("article");
     card.className = "sp-product-card";
 
-    // Backend trả id: "P001"..., nên dùng id
-    const phoneId = p.id;
+    // FIX: backend trả key là phoneId (P001...), không phải id
+    const phoneId = p.phoneId;
+    if (!phoneId) {
+      console.warn("[products] Missing phoneId in product:", p);
+      return;
+    }
+
     const price = getPrice_SAFE(p);
 
     // Vì bạn đang chạy ở http://localhost:8080 nên "/img/..." là đúng
     const imgSrc = p.coverImageURL || "placeholder.jpg";
 
+    const pid = encodeURIComponent(phoneId);
+
     card.innerHTML = `
-      <a href="product-detail.html?id=${phoneId}" class="sp-product-card__wrapper" style="text-decoration: none; color: inherit; display: block;">
+      <a href="product-detail.html?id=${pid}" class="sp-product-card__wrapper" style="text-decoration: none; color: inherit; display: block;">
         <div class="sp-product-card__image">
           <img src="${imgSrc}" alt="${p.phoneName || ""}">
           ${p.stockQuantity <= 0 ? '<div class="out-of-stock-label">Hết hàng</div>' : ""}
@@ -103,18 +110,19 @@ function renderProducts() {
       <div class="sp-product-card__footer">
         <button
           class="sp-btn sp-btn--primary sp-btn--sm"
-          data-id="${phoneId}"
+          data-id="${pid}"
           ${p.stockQuantity <= 0 ? "disabled" : ""}
         >
           Thêm vào giỏ
         </button>
-        <a href="product-detail.html?id=${phoneId}" class="sp-btn sp-btn--outline sp-btn--sm">Chi tiết</a>
+        <a href="product-detail.html?id=${pid}" class="sp-btn sp-btn--outline sp-btn--sm">Chi tiết</a>
       </div>
     `;
 
     container.appendChild(card);
   });
 }
+
 
 async function applyProductFilters() {
   const newKeyword = $("#search-input")?.value.trim() || "";
@@ -153,18 +161,44 @@ export function initProductsPage() {
     el.addEventListener("input", applyProductFilters);
   });
 
-  // Delegation add-to-cart
-  listEl.addEventListener("click", (e) => {
-    const addBtn = e.target.closest("button.sp-btn--primary");
+  // Delegation add-to-cart + thông báo thành công/thất bại
+  listEl.addEventListener("click", async (e) => {
+    const addBtn = e.target.closest("button[data-id]");
     if (!addBtn) return;
 
     e.preventDefault();
     e.stopPropagation();
 
-    const id = addBtn.dataset.id;
-    console.log("[products] add to cart id =", id);
-    apiAddToCart(id, 1);
+    const raw = addBtn.dataset.id;
+    const phoneId = raw ? decodeURIComponent(raw) : "";
+
+    if (!phoneId) {
+      alert("Không lấy được mã sản phẩm để thêm vào giỏ.");
+      return;
+    }
+
+    // Tránh double click
+    const oldText = addBtn.textContent;
+    addBtn.disabled = true;
+    addBtn.textContent = "Đang thêm...";
+
+    try {
+      await apiAddToCart(phoneId, 1);
+
+      alert("Đã thêm vào giỏ hàng!");
+      // Nếu bạn có header count thì cập nhật luôn (nếu hàm này đã import sẵn)
+      // updateCartHeaderCount?.();
+
+    } catch (err) {
+      console.error("[products] add to cart failed:", err);
+      alert("Thêm vào giỏ thất bại. Vui lòng thử lại.");
+    } finally {
+      // Trả lại trạng thái nút (nếu còn hàng)
+      addBtn.disabled = false;
+      addBtn.textContent = oldText;
+    }
   });
+
 
   // Load lần đầu (CÓ catch + hiển thị lỗi)
   apiFetchProducts()
