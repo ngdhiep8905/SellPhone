@@ -80,11 +80,7 @@ function renderCartPage() {
 }
 
 export function initCartPage() {
-  // Yêu cầu đăng nhập để xem giỏ hàng
-  if (!requireLogin("cart.html")) {
-    updateCartHeaderCount();
-    return;
-  }
+
 
   const itemsEl = $("#cart-items");
   const checkoutBtn = $("#go-to-checkout"); // Nút mới chuyển sang checkout.html
@@ -139,6 +135,6 @@ export function initCartPage() {
     window.location.href = "checkout.html";
   };
 
-  // Tải dữ liệu giỏ hàng ban đầu
+
   apiFetchCart().then(renderCartPage);
 }

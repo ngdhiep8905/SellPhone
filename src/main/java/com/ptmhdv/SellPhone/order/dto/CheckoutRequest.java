@@ -4,10 +4,9 @@ import lombok.Data;
 
 @Data
 public class CheckoutRequest {
-    private String userId;
-    private String recipientName;
-    private String recipientPhone;
-    private String shippingAddress;
-    private String paymentId;
+    private String fullName;
+    private String phone;
+    private String address;
+    private String paymentMethodId;
     private String couponCode;
 }

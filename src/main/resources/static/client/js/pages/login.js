@@ -1,9 +1,11 @@
 import { $ } from "../common/dom.js";
 import { AppState } from "../common/state.js";
-import { apiLogin } from "../common/api.js";
+import { apiLogin, apiFetchCart } from "../common/api.js";
 import { saveUser } from "../common/auth.js";
 import { updateHeaderUI } from "../common/header.js";
 import { showToast, getQueryParam } from "../common/helpers.js";
+
+
 
 export function initLoginPage() {
   const emailInput = $("#login-email");
@@ -35,6 +37,8 @@ export function initLoginPage() {
 
       AppState.currentUser = user;
       saveUser();
+      // ✅ refresh cart theo cookie mới (giỏ user)
+      await apiFetchCart();
       updateHeaderUI();
       showToast("Đăng nhập thành công.");
       window.location.href = redirect || "products.html";

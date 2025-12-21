@@ -6,10 +6,16 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.List;
-
+import java.util.UUID;
 
 @Entity
-@Table(name = "cart")
+@Table(
+        name = "cart",
+        indexes = {
+                @Index(name = "idx_cart_token", columnList = "cart_token"),
+                @Index(name = "idx_cart_user_id", columnList = "user_id")
+        }
+)
 @Data
 public class Cart {
 
@@ -17,15 +23,26 @@ public class Cart {
     @Column(name = "cart_id", length = 50)
     private String cartId;
 
+    /**
+     * Token dùng cho guest cart (không đăng nhập).
+     * FE giữ token này trong cookie/localStorage và gửi lên để thao tác giỏ.
+     */
+    @Column(name = "cart_token", nullable = false, unique = true)
+    private String cartToken;
+
     @PrePersist
-    public void generateId() {
+    public void generateIdAndToken() {
         if (cartId == null) {
             cartId = "C" + String.format("%05d", System.currentTimeMillis() % 100000);
         }
+        if (cartToken == null || cartToken.isBlank()) {
+            cartToken = UUID.randomUUID().toString();
+        }
     }
 
-    @OneToOne
-    @JoinColumn(name = "user_id", unique = true)
+
+    @OneToOne(optional = true)
+    @JoinColumn(name = "user_id", nullable = true)
     private Users user;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -35,5 +52,4 @@ public class Cart {
     public List<CartItem> getItems() {
         return items == null ? List.of() : items;
     }
-
 }

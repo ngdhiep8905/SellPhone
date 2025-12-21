@@ -18,11 +18,35 @@
             <span class="sp-logo__icon">📱</span>
             <div class="sp-logo__text">
                 <span class="sp-logo__brand">SellPhone</span>
-                <span class="sp-logo__tagline">Xác nhận đơn hàng</span>
+                <span class="sp-logo__tagline">Danh sách điện thoại khuyến mãi</span>
+            </div>
+        </div>
+        <nav class="sp-nav">
+            <a href="index.html" class="sp-nav__item">Trang chủ</a>
+            <a href="products.html" class="sp-nav__item sp-nav__item--active">Sản phẩm</a>
+        </nav>
+    </div>
+
+    <div class="sp-header__right">
+        <div class="sp-header__icons">
+            <a href="cart.html" class="sp-header-icon" title="Giỏ hàng">
+                <span class="sp-header-icon__badge" id="cart-header-count">0</span>🛒
+            </a>
+            <a href="account.html" class="sp-header-icon" title="Tài khoản của tôi">👤</a>
+        </div>
+
+        <div class="sp-user">
+            <div class="sp-user__info">
+                <span id="user-label" class="sp-user__label">Chưa đăng nhập</span>
+            </div>
+            <div class="sp-user__actions">
+                <button id="login-header-btn" class="sp-btn sp-btn--outline sp-btn--sm">Đăng nhập</button>
+                <button id="logout-header-btn" class="sp-btn sp-btn--outline sp-btn--sm sp-hidden">Đăng xuất</button>
             </div>
         </div>
     </div>
 </header>
+
 
 <!-- 🔥 FORM BẮT BUỘC -->
 <form id="checkout-form" autocomplete="off">

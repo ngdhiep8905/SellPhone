@@ -21,15 +21,11 @@ async function initApp() {
   updateHeaderUI();
   console.log("✅ Header updated");
 
-  if (AppState.currentUser) {
-    try {
-      await apiFetchCart();
-      console.log("✅ Cart loaded from backend");
-    } catch (err) {
-      console.error("❌ Failed to load cart:", err);
-      updateCartHeaderCount();
-    }
-  } else {
+  try {
+    await apiFetchCart(); // luôn gọi để đảm bảo CART_TOKEN được set và cart state nhất quán
+    console.log("✅ Cart loaded from backend");
+  } catch (err) {
+    console.error("❌ Failed to load cart:", err);
     updateCartHeaderCount();
   }
 

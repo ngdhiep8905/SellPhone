@@ -114,13 +114,15 @@ export function initCheckoutPage() {
   blockFormSubmit();
   initAddress2Levels();
 
+  // Nếu có login thì prefill cho tiện, không bắt buộc
   if (AppState.currentUser) {
     const nameEl = $("#checkout-name");
     const phoneEl = $("#checkout-phone");
-    if (nameEl) nameEl.value = AppState.currentUser.fullName || "";
-    if (phoneEl) phoneEl.value = AppState.currentUser.phone || "";
+    if (nameEl && !nameEl.value) nameEl.value = AppState.currentUser.fullName || "";
+    if (phoneEl && !phoneEl.value) phoneEl.value = AppState.currentUser.phone || "";
   }
 
+  // Token-based cart (không cần login)
   apiFetchCart().then(renderSummary);
 
   const confirmBtn = $("#confirm-order-btn");
@@ -129,6 +131,12 @@ export function initCheckoutPage() {
   confirmBtn.addEventListener("click", async (e) => {
     e.preventDefault();
     e.stopPropagation();
+
+    // Giỏ trống thì chặn
+    if (!CartState.cart?.items?.length) {
+      alert("Giỏ hàng của bạn đang trống!");
+      return;
+    }
 
     const name = $("#checkout-name")?.value.trim() || "";
     const phone = $("#checkout-phone")?.value.trim() || "";
@@ -148,16 +156,25 @@ export function initCheckoutPage() {
       return;
     }
 
-    const payload = {
-      userId: AppState.currentUser.userId,
-      recipientName: name,
-      recipientPhone: phone,
-      shippingAddress: `${street}, ${wardText}, ${provinceText}`,
-      paymentId: paymentMethod,
-      couponCode: "",
-    };
+    // Validate phone basic
+    if (!/^\d{10}$/.test(phone)) {
+      alert("Số điện thoại phải gồm 10 chữ số");
+      return;
+    }
 
-    console.log("📦 Payload checkout:", payload);
+    // ✅ Payload mới: không cần userId
+    // Bạn map theo backend mới (khuyến nghị):
+   const payload = {
+     fullName: name,
+     phone: phone,
+     address: `${street}, ${wardText}, ${provinceText}`,
+     paymentMethodId: paymentMethod,
+     couponCode: "",
+   };
+
+
+
+    console.log("📦 Payload checkout (guest):", payload);
 
     try {
       confirmBtn.disabled = true;
@@ -165,6 +182,7 @@ export function initCheckoutPage() {
 
       const result = await apiCheckout(payload);
 
+      // Giữ logic redirect như cũ
       if (paymentMethod === "02") {
         window.location.href = `qr-payment.html?amount=${result.totalAmount}&orderId=${result.orderId}`;
       } else {

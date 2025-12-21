@@ -1,4 +1,7 @@
 import { AppState, CartState } from "./state.js";
+import { apiLogout, apiFetchCart } from "./api.js";
+
+
 
 export function loadUser() {
   console.log("🔍 loadUser() được gọi");
@@ -48,3 +51,22 @@ export function clearSession() {
   CartState.cart = null;
   saveUser();
 }
+export async function handleLogout() {
+  try {
+    await apiLogout();
+  } catch (e) {
+    console.warn("apiLogout failed:", e?.message || e);
+  }
+
+  clearSession();
+
+  try {
+    await apiFetchCart(); // load cart guest mới vào CartState
+  } catch (e) {
+    console.warn("apiFetchCart after logout failed:", e?.message || e);
+  }
+
+  window.location.href = "index.html";
+}
+
+

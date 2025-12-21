@@ -50,35 +50,44 @@
     </div>
 </header>
 
-<main class="detail-container">
-    <div class="detail-image">
-        <img id="phone-img" src="" alt="Sản phẩm">
-    </div>
+<main class="sp-layout" style="grid-template-columns: minmax(0, 1fr);">
+    <section class="sp-panel sp-panel--main">
 
-    <div class="detail-info">
-        <h1 id="phone-name">Đang tải tên máy...</h1>
-        <div id="phone-price" class="price-tag"></div>
+        <div class="detail-container" style="padding: 0;">
+            <div class="detail-image">
+                <img id="phone-img" src="" alt="Sản phẩm">
+            </div>
 
-        <table class="specs-table">
-            <tr><td>Chipset</td><td id="spec-chip">Đang tải...</td></tr>
-            <tr><td>RAM</td><td id="spec-ram"></td></tr>
-            <tr><td>Bộ nhớ</td><td id="spec-storage"></td></tr>
-            <tr><td>Màn hình</td><td id="spec-screen"></td></tr>
-            <tr><td>Pin</td><td id="spec-battery"></td></tr>
-            <tr><td>Màu sắc</td><td id="spec-color"></td></tr>
-            <tr><td>Tình trạng</td><td id="spec-stock"></td></tr>
-        </table>
+            <div class="detail-info">
+                <h1 id="phone-name">Đang tải tên máy...</h1>
+                <div id="phone-price" class="price-tag"></div>
 
-        <button id="btn-add-cart" class="sp-btn sp-btn--primary sp-btn--full" style="padding: 15px; cursor: pointer;">
-            THÊM VÀO GIỎ HÀNG
-        </button>
-    </div>
+                <table class="specs-table">
+                    <tr><td>Chipset</td><td id="spec-chip">Đang tải...</td></tr>
+                    <tr><td>RAM</td><td id="spec-ram"></td></tr>
+                    <tr><td>Bộ nhớ</td><td id="spec-storage"></td></tr>
+                    <tr><td>Màn hình</td><td id="spec-screen"></td></tr>
+                    <tr><td>Pin</td><td id="spec-battery"></td></tr>
+                    <tr><td>Màu sắc</td><td id="spec-color"></td></tr>
+                    <tr><td>Tình trạng</td><td id="spec-stock"></td></tr>
+                </table>
+
+                <button id="btn-add-cart" class="sp-btn sp-btn--primary sp-btn--full" style="padding: 15px; cursor: pointer;">
+                    THÊM VÀO GIỎ HÀNG
+                </button>
+            </div>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <h3>Mô tả sản phẩm</h3>
+            <div id="phone-desc" class="description"></div>
+        </div>
+
+    </section>
 </main>
 
-<section style="max-width: 1200px; margin: 20px auto; padding: 0 40px;">
-    <h3>Mô tả sản phẩm</h3>
-    <div id="phone-desc" class="description"></div>
-</section>
+
+
 
 <script type="module" src="js/main.js"></script>
 </body>

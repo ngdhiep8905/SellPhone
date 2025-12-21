@@ -12,11 +12,21 @@
     }
 
     export async function apiLogin(email, password) {
-      const params = new URLSearchParams({ email, password });
-      const res = await fetch(`${API_BASE_URL}/api/auth/login?${params.toString()}`, { method: "POST" });
-      if (!res.ok) throw new Error("Sai email hoặc mật khẩu.");
-      return res.json();
+      const url = `/api/auth/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
+
+      const res = await fetch(url, {
+        method: "POST",
+        credentials: "include", // QUAN TRỌNG: gửi cookie CART_TOKEN lên server
+      });
+
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        throw new Error(text || `HTTP ${res.status}`);
+      }
+
+      return await res.json();
     }
+
 
     export async function apiRegister(payload) {
       const res = await fetch(`${API_BASE_URL}/api/users/register`, {
@@ -53,15 +63,12 @@
     }
 
     export async function apiAddToCart(phoneId, quantity = 1) {
-      if (!requireLogin("products.html")) return;
+      const params = new URLSearchParams({ phoneId, quantity });
 
-      const params = new URLSearchParams({
-        userId: AppState.currentUser.userId,
-        phoneId,
-        quantity,
+      const res = await fetch(`${API_BASE_URL}/api/cart/items?${params.toString()}`, {
+        method: "POST",
+        credentials: "include",
       });
-
-      const res = await fetch(`${API_BASE_URL}/api/cart/items?${params.toString()}`, { method: "POST" });
       if (!res.ok) throw new Error("HTTP " + res.status);
 
       CartState.cart = await res.json();
@@ -70,20 +77,18 @@
       return CartState.cart;
     }
 
-    export async function apiFetchCart() {
-      if (!AppState.currentUser) {
-        CartState.cart = null;
-        updateCartHeaderCount();
-        return null;
-      }
 
-      const res = await fetch(`${API_BASE_URL}/api/cart/${AppState.currentUser.userId}`);
+    export async function apiFetchCart() {
+      const res = await fetch(`${API_BASE_URL}/api/cart`, {
+        credentials: "include",
+      });
       if (!res.ok) throw new Error("HTTP " + res.status);
 
       CartState.cart = await res.json();
       updateCartHeaderCount();
       return CartState.cart;
     }
+
 
     export async function apiUpdateCartItem(cartItemId, newQuantity) {
       const res = await fetch(`${API_BASE_URL}/api/cart/items/${cartItemId}?quantity=${newQuantity}`, {
@@ -97,7 +102,10 @@
     }
 
     export async function apiRemoveCartItem(cartItemId) {
-      const res = await fetch(`${API_BASE_URL}/api/cart/items/${cartItemId}`, { method: "DELETE" });
+      const res = await fetch(`${API_BASE_URL}/api/cart/items/${cartItemId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
       if (!res.ok) throw new Error("HTTP " + res.status);
 
       CartState.cart = await res.json();
@@ -105,9 +113,11 @@
       return CartState.cart;
     }
 
+
     export async function apiCheckout(payload) {
       const res = await fetch(`${API_BASE_URL}/api/orders/checkout`, {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
@@ -119,3 +129,12 @@
 
       return res.json();
     }
+    export async function apiLogout() {
+      const res = await fetch(`/api/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Logout failed");
+    }
+
+

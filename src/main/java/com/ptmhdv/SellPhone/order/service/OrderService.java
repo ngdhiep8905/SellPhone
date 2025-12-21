@@ -1,18 +1,17 @@
 package com.ptmhdv.SellPhone.order.service;
 
-import com.ptmhdv.SellPhone.catalog.entity.Phones;
-import com.ptmhdv.SellPhone.catalog.repository.PhonesRepository;
+import com.ptmhdv.SellPhone.cart.entity.Cart;
 import com.ptmhdv.SellPhone.cart.entity.CartItem;
 import com.ptmhdv.SellPhone.cart.repository.CartItemRepository;
+import com.ptmhdv.SellPhone.cart.repository.CartRepository;
+import com.ptmhdv.SellPhone.catalog.entity.Phones;
+import com.ptmhdv.SellPhone.catalog.repository.PhonesRepository;
 import com.ptmhdv.SellPhone.order.dto.CheckoutRequest;
 import com.ptmhdv.SellPhone.order.entity.Orders;
 import com.ptmhdv.SellPhone.order.entity.OrdersPhones;
-import com.ptmhdv.SellPhone.order.entity.OrdersPhonesId;
 import com.ptmhdv.SellPhone.order.repository.OrdersRepository;
 import com.ptmhdv.SellPhone.payment.entity.Payment;
 import com.ptmhdv.SellPhone.payment.repository.PaymentRepository;
-import com.ptmhdv.SellPhone.user.entity.Users;
-import com.ptmhdv.SellPhone.user.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,45 +27,62 @@ public class OrderService {
     private final OrdersRepository ordersRepo;
     private final PhonesRepository phonesRepo;
     private final PaymentRepository paymentRepo;
-    private final UsersRepository usersRepo;
+
+    private final CartRepository cartRepo;
     private final CartItemRepository cartItemRepo;
 
     @Transactional
-    public Orders checkout(CheckoutRequest req) {
+    public Orders checkoutGuest(String cartToken, CheckoutRequest req) {
 
-        // 1. Lấy thông tin User
-        Users user = usersRepo.findById(req.getUserId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
+        if (cartToken == null || cartToken.isBlank()) {
+            throw new RuntimeException("Thiếu CART_TOKEN (giỏ hàng chưa được khởi tạo)");
+        }
 
-        List<CartItem> cartItems = user.getCartItems();
-        if (cartItems.isEmpty()) throw new RuntimeException("Giỏ hàng trống!");
+        Cart cart = cartRepo.findByCartToken(cartToken)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy giỏ hàng"));
 
-        // 2. Khởi tạo Đơn hàng
+        List<CartItem> cartItems = cart.getItems();
+        if (cartItems == null || cartItems.isEmpty()) throw new RuntimeException("Giỏ hàng trống!");
+
+        // Validate thông tin người nhận
+        if (req.getFullName() == null || req.getFullName().isBlank()) {
+            throw new RuntimeException("Vui lòng nhập họ tên người nhận");
+        }
+        if (req.getPhone() == null || req.getPhone().isBlank()) {
+            throw new RuntimeException("Vui lòng nhập số điện thoại");
+        }
+        if (req.getAddress() == null || req.getAddress().isBlank()) {
+            throw new RuntimeException("Vui lòng nhập địa chỉ giao hàng");
+        }
+        if (req.getPaymentMethodId() == null || req.getPaymentMethodId().isBlank()) {
+            throw new RuntimeException("Vui lòng chọn phương thức thanh toán");
+        }
+
         Orders order = new Orders();
-        // ID tự sinh ở @PrePersist hoặc gán thủ công nếu muốn khớp logic FE
-        order.setUser(user);
-        order.setRecipientName(req.getRecipientName());
-        order.setRecipientPhone(req.getRecipientPhone());
-        order.setShippingAddress(req.getShippingAddress());
 
-        Payment payment = paymentRepo.findById(req.getPaymentId())
+        // Nếu khách đã login và cart đã attach -> user sẽ khác null
+        order.setUser(cart.getUser());
+
+        order.setRecipientName(req.getFullName());
+        order.setRecipientPhone(req.getPhone());
+        order.setShippingAddress(req.getAddress());
+
+        Payment payment = paymentRepo.findById(req.getPaymentMethodId())
                 .orElseThrow(() -> new RuntimeException("Phương thức thanh toán không hợp lệ"));
         order.setPayment(payment);
 
         List<OrdersPhones> orderDetails = new ArrayList<>();
         BigDecimal totalOrderAmount = BigDecimal.ZERO;
 
-        // 3. Xử lý từng sản phẩm: Kiểm tra kho + Trừ kho + Tạo detail
-        for (CartItem cart : cartItems) {
-            Phones phone = cart.getPhone();
-            int orderQty = cart.getQuantity();
+        for (CartItem ci : cartItems) {
+            Phones phone = ci.getPhone();
+            int orderQty = ci.getQuantity();
 
-            // --- QUAN TRỌNG: KIỂM TRA TỒN KHO ---
             if (phone.getStockQuantity() < orderQty) {
                 throw new RuntimeException("Sản phẩm " + phone.getPhoneName() + " không đủ hàng trong kho!");
             }
 
-            // --- TRỪ KHO ---
+            // Trừ kho
             phone.setStockQuantity(phone.getStockQuantity() - orderQty);
             phonesRepo.save(phone);
 
@@ -74,30 +90,27 @@ public class OrderService {
             BigDecimal lineTotal = phone.getPrice().multiply(BigDecimal.valueOf(orderQty));
             totalOrderAmount = totalOrderAmount.add(lineTotal);
 
-            // Tạo Detail
+            // Detail (KHÔNG set id thủ công; @MapsId tự map)
             OrdersPhones detail = new OrdersPhones();
             detail.setOrder(order);
             detail.setPhone(phone);
             detail.setQuantity(orderQty);
             detail.setPrice(phone.getPrice());
             detail.setTotalPrice(lineTotal);
-            // Gán Id phức hợp (nếu dùng EmbeddedId)
-            detail.setId(new OrdersPhonesId(order.getOrderId(), phone.getPhoneId()));
 
             orderDetails.add(detail);
         }
 
-        // 4. Lưu đơn hàng (Cascade ALL sẽ lưu luôn details)
         order.setTotalPrice(totalOrderAmount);
         order.setOrderPhones(orderDetails);
         order.setStatus("PENDING");
 
-        Orders savedOrder = ordersRepo.save(order);
+        // Lưu order (Cascade ALL sẽ lưu luôn order_details)
+        Orders saved = ordersRepo.save(order);
 
-        // 5. Xóa giỏ hàng
-        cartItemRepo.deleteAll(cartItems);
-        user.getCartItems().clear();
+        // Xóa cart items (clear giỏ)
+        cartItemRepo.deleteByCart_CartId(cart.getCartId());
 
-        return savedOrder;
+        return saved;
     }
 }
