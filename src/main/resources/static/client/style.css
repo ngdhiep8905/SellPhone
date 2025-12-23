@@ -987,3 +987,41 @@ body::before{
 .sp-hidden {
     display: none !important;
 }
+<style>
+  .sp-gallery { display: grid; gap: 12px; }
+  .sp-gallery__main {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid rgba(148,163,184,.35);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  }
+  .sp-gallery__main img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* chuẩn TMĐT: không cắt hình */
+    background: #fff;
+    display: block;
+  }
+  .sp-gallery__thumbs {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .sp-thumb {
+    width: 72px;
+    height: 72px;
+    flex: 0 0 auto;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid rgba(148,163,184,.35);
+    cursor: pointer;
+    background: #fff;
+    opacity: .9;
+  }
+  .sp-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .sp-thumb.is-active { outline: 2px solid rgba(30,64,175,.75); opacity: 1; }
+</style>
