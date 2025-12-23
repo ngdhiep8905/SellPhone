@@ -11,6 +11,7 @@ import { initProductDetailPage } from "./pages/product-detail.js";
 import { initCheckoutPage } from "./pages/checkout.js";
 import { initAccountPage } from "./pages/account.js";
 import { initHomePage } from "./pages/home.js";
+import { initOrderSuccessPage } from "./pages/order-success.js";
 
 async function initApp() {
   console.log("🚀 Initializing app...");
@@ -58,7 +59,12 @@ async function initApp() {
     default:
       initHomePage();
       break;
+    case "order-success":
+      initOrderSuccessPage();
+      break;
+
   }
+
 
   console.log("✅ Page initialized");
 }

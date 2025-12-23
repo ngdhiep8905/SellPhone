@@ -33,9 +33,6 @@ public class CartService {
         this.cartItemRepo = cartItemRepo;
     }
 
-    /**
-     * Lấy cart theo token; nếu chưa có thì tạo mới (guest cart).
-     */
     @Transactional
     public Cart getOrCreateCartByToken(String token) {
         if (token == null || token.isBlank()) {
@@ -45,9 +42,6 @@ public class CartService {
                 .orElseGet(() -> createGuestCart(token));
     }
 
-    /**
-     * Thêm sản phẩm vào giỏ theo token (không cần login).
-     */
     @Transactional
     public Cart addToCartByToken(String token, String phoneId, Integer quantity) {
         if (token == null || token.isBlank()) {
@@ -71,7 +65,7 @@ public class CartService {
 
         if (item == null) {
             item = new CartItem();
-            item.setCartItemId("CI" + System.currentTimeMillis());
+            // ✅ KHÔNG set cartItemId thủ công (entity @PrePersist sẽ tự sinh UUID)
             item.setCart(cart);
             item.setPhone(phone);
             item.setQuantity(quantity);
@@ -83,10 +77,6 @@ public class CartService {
         return cart;
     }
 
-    /**
-     * Update quantity nhưng phải đảm bảo cartItem thuộc đúng token.
-     * quantity <= 0 => xóa item.
-     */
     @Transactional
     public Cart updateQuantityByToken(String token, String cartItemId, Integer quantity) {
         if (token == null || token.isBlank()) {
@@ -98,7 +88,6 @@ public class CartService {
 
         Cart cart = item.getCart();
         if (cart == null || cart.getCartToken() == null || !cart.getCartToken().equals(token)) {
-            // Không cho phép sửa item của cart khác
             throw new ResourceNotFoundException("Cart item not found");
         }
 
@@ -112,9 +101,6 @@ public class CartService {
         return cart;
     }
 
-    /**
-     * Xóa item nhưng phải đảm bảo cartItem thuộc đúng token.
-     */
     @Transactional
     public Cart removeItemByToken(String token, String cartItemId) {
         if (token == null || token.isBlank()) {
@@ -133,38 +119,28 @@ public class CartService {
         return cart;
     }
 
-    /**
-     * Tạo cart guest mới.
-     * cartId: giữ format bạn đang dùng (VARCHAR(50) OK).
-     */
     private Cart createGuestCart(String token) {
         Cart cart = new Cart();
         cart.setCartId("C" + System.currentTimeMillis());
         cart.setCartToken(token);
-        cart.setUser(null); // guest
-
+        cart.setUser(null);
         return cartRepo.save(cart);
     }
+
     @Transactional
     public Cart attachGuestCartToUser(String token, Users user) {
         if (user == null) return null;
 
-        // 1) Nếu user đã có cart => kiểu A: giữ nguyên, không merge
         Optional<Cart> userCartOpt = cartRepo.findByUser_UserId(user.getUserId());
         if (userCartOpt.isPresent()) {
             return userCartOpt.get();
         }
 
-        // 2) Không có token => không có guest cart để attach
         if (token == null || token.isBlank()) return null;
 
-        // 3) Lấy guest cart theo token
         Cart guestCart = cartRepo.findByCartToken(token).orElse(null);
         if (guestCart == null) return null;
 
-        // 4) Nếu guestCart đã gắn user rồi:
-        //    - Nếu đúng user hiện tại => OK
-        //    - Nếu user khác => không attach (an toàn)
         if (guestCart.getUser() != null) {
             if (guestCart.getUser().getUserId() != null
                     && guestCart.getUser().getUserId().equals(user.getUserId())) {
@@ -173,8 +149,10 @@ public class CartService {
             return null;
         }
 
-        // 5) Attach
         guestCart.setUser(user);
+
+        // Lưu ý: Flow hiện tại của bạn đang chọn “Cách A” (login dùng cart user, xoá guest),
+        // nên attachGuestCartToUser có thể không dùng tới.
         return cartRepo.save(guestCart);
     }
 
@@ -197,11 +175,8 @@ public class CartService {
         Cart guest = cartRepo.findByCartToken(token).orElse(null);
         if (guest == null) return;
 
-        // Chỉ xóa nếu đúng guest cart (chưa attach user)
         if (guest.getUser() != null) return;
 
-        // Xóa cart (orphanRemoval/cascade sẽ xóa cart_item)
         cartRepo.delete(guest);
     }
-
 }

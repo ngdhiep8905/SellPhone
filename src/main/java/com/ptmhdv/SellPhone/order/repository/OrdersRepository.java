@@ -7,6 +7,9 @@ import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
+
+
 
 public interface OrdersRepository extends JpaRepository<Orders, String> {
 
@@ -61,5 +64,5 @@ public interface OrdersRepository extends JpaRepository<Orders, String> {
 """)
     List<Orders> adminFilter(String status, String paymentMethod, String paymentStatus);
 
-
+    Optional<Orders> findByPayosOrderCode(Long payosOrderCode);
 }

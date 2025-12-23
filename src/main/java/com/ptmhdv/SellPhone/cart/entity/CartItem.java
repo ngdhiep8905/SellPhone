@@ -10,47 +10,40 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.UUID;
-@Setter
+
 @Getter
+@Setter
 @Entity
-@Table(name = "cart_item")
-@Data
+@Table(
+        name = "cart_item",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"cart_id", "phone_id"})
+)
 public class CartItem {
 
     @Id
-    @Column(name = "cart_item_id", length = 50) // Đảm bảo length đủ lớn
+    @Column(name = "cart_item_id", length = 50)
     private String cartItemId;
 
     @PrePersist
     public void generateId() {
-        if (cartItemId == null) {
-            cartItemId = UUID.randomUUID().toString();
-        }
+        if (cartItemId == null) cartItemId = UUID.randomUUID().toString();
     }
 
-    // Mỗi Cart có nhiều CartItem
-    @ManyToOne
-    @JoinColumn(name="cart_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cart_id", nullable = false)
     @JsonBackReference
     private Cart cart;
 
-    // Mỗi CartItem gắn với một Phone
-    @ManyToOne
-    @JoinColumn(name = "phone_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "phone_id", nullable = false)
     private Phones phone;
 
-    // Số lượng sản phẩm
-    @NotNull(message = "Quantity is required")
-    @Min(value = 1, message = "Quantity must be at least 1")
     @Column(name = "quantity", nullable = false)
     private int quantity;
 
     public BigDecimal getQuantityPrice() {
-        if (phone == null || phone.getPrice() == null) {
-            return BigDecimal.ZERO;
-        }
+        if (phone == null || phone.getPrice() == null) return BigDecimal.ZERO;
         return phone.getPrice().multiply(BigDecimal.valueOf(quantity));
     }
-
-
 }
+

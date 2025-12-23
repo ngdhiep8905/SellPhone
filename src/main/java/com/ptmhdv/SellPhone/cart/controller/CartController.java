@@ -53,25 +53,24 @@ public class CartController {
     public CartViewDTO updateItem(
             @PathVariable String cartItemId,
             @RequestParam Integer quantity,
-            HttpServletRequest req) {
+            HttpServletRequest req,
+            HttpServletResponse res) {
 
-        String token = getCartToken(req);
+        String token = ensureCartToken(req, res);
         Cart cart = cartService.updateQuantityByToken(token, cartItemId, quantity);
         return toView(cart);
     }
 
-    // DELETE /api/cart/items/{cartItemId}
     @DeleteMapping("/items/{cartItemId}")
     public CartViewDTO removeItem(
             @PathVariable String cartItemId,
-            HttpServletRequest req) {
+            HttpServletRequest req,
+            HttpServletResponse res) {
 
-        String token = getCartToken(req);
+        String token = ensureCartToken(req, res);
         Cart cart = cartService.removeItemByToken(token, cartItemId);
         return toView(cart);
     }
-
-    // ===================== Token helpers =====================
 
     private String ensureCartToken(HttpServletRequest req, HttpServletResponse res) {
         String token = getCartToken(req);
@@ -80,7 +79,7 @@ public class CartController {
             Cookie cookie = new Cookie(CART_TOKEN_COOKIE, token);
             cookie.setPath("/");
             cookie.setMaxAge(CART_TOKEN_MAX_AGE);
-            cookie.setHttpOnly(false); // FE có thể không cần đọc; nhưng để đơn giản cứ false
+            cookie.setHttpOnly(true);   // ✅ đổi
             res.addCookie(cookie);
         }
         return token;

@@ -6,6 +6,16 @@ import { formatVND, getPhonePrice } from "../common/helpers.js";
 /* ===============================
    CHẶN FORM SUBMIT TRUYỀN THỐNG
 ================================ */
+const SELECTED_KEY = "sellphone_selected_cart_item_ids";
+function getSelectedIds() {
+  try {
+    const arr = JSON.parse(sessionStorage.getItem(SELECTED_KEY) || "[]");
+    return Array.isArray(arr) ? arr.map(String) : [];
+  } catch {
+    return [];
+  }
+}
+
 function blockFormSubmit() {
   const form = document.querySelector("form");
   if (!form) return;
@@ -77,35 +87,41 @@ function renderSummary() {
   if (!listEl) return;
   if (!CartState.cart?.items) return;
 
-  listEl.innerHTML = CartState.cart.items
+  const selectedIds = new Set(getSelectedIds());
+  const items = CartState.cart.items.filter((i) => selectedIds.has(String(i.cartItemId)));
+
+  if (!items.length) {
+    listEl.innerHTML = `<p class="sp-text--muted">Bạn chưa chọn sản phẩm để thanh toán. Vui lòng quay lại giỏ hàng.</p>`;
+    const subtotalEl = $("#checkout-subtotal");
+    const totalEl = $("#checkout-total");
+    if (subtotalEl) subtotalEl.textContent = "0₫";
+    if (totalEl) totalEl.textContent = "0₫";
+    return;
+  }
+
+  listEl.innerHTML = items
     .map(
       (item) => `
-    <div style="padding:10px 0;border-bottom:1px dashed #eee">
-      <span>${item.phone.phoneName} (x${item.quantity})</span>
-      <strong>${formatVND(getPhonePrice(item.phone) * item.quantity)}</strong>
-    </div>
-  `
+      <div style="padding:10px 0;border-bottom:1px dashed #eee">
+        <span>${item.phone.phoneName} (x${item.quantity})</span>
+        <strong>${formatVND(getPhonePrice(item.phone) * item.quantity)}</strong>
+      </div>
+    `
     )
     .join("");
 
-  const subtotal = CartState.cart.items.reduce(
+  const subtotal = items.reduce(
     (sum, item) => sum + getPhonePrice(item.phone) * item.quantity,
     0
   );
 
   const subtotalEl = $("#checkout-subtotal");
   const totalEl = $("#checkout-total");
-  const deliveryEl = $("#delivery-time");
 
   if (subtotalEl) subtotalEl.textContent = formatVND(subtotal);
   if (totalEl) totalEl.textContent = formatVND(subtotal + 30000);
-
-  if (deliveryEl) {
-    const d = new Date();
-    d.setDate(d.getDate() + 3);
-    deliveryEl.textContent = d.toLocaleDateString("vi-VN");
-  }
 }
+
 
 /* ===============================
    TRANG CHECKOUT (EXPORT CHO main.js)
@@ -164,13 +180,21 @@ export function initCheckoutPage() {
 
     // ✅ Payload mới: không cần userId
     // Bạn map theo backend mới (khuyến nghị):
+   const selected = getSelectedIds();
+   if (!selected.length) {
+     alert("Bạn chưa chọn sản phẩm để thanh toán!");
+     return;
+   }
+
    const payload = {
      fullName: name,
      phone: phone,
      address: `${street}, ${wardText}, ${provinceText}`,
      paymentMethodId: paymentMethod,
      couponCode: "",
+     cartItemIds: selected, // ✅ thêm
    };
+
 
 
 
@@ -182,16 +206,32 @@ export function initCheckoutPage() {
 
       const result = await apiCheckout(payload);
 
-      // Giữ logic redirect như cũ
-      if (paymentMethod === "02") {
-        window.location.href = `qr-payment.html?amount=${result.totalAmount}&orderId=${result.orderId}`;
-      } else {
-        window.location.href = `order-success.html?orderId=${result.orderId}`;
+      sessionStorage.removeItem(SELECTED_KEY);
+
+      await apiFetchCart();
+
+      // Backend trả: { order: OrdersDTO, checkoutUrl: string|null }
+      const orderId = result?.order?.orderId;
+
+      if (!orderId) {
+        throw new Error("Không nhận được mã đơn hàng từ server.");
       }
+
+      // Option A: redirect PayOS hosted checkout page
+      if (result.checkoutUrl) {
+        window.location.href = result.checkoutUrl;
+        return;
+      }
+
+      // COD hoặc không có link PayOS
+      window.location.href = `order-success.html?orderId=${encodeURIComponent(orderId)}`;
+
+
     } catch (err) {
       alert("Lỗi đặt hàng: " + err.message);
       confirmBtn.disabled = false;
       confirmBtn.textContent = "XÁC NHẬN ĐẶT HÀNG";
     }
+
   });
 }

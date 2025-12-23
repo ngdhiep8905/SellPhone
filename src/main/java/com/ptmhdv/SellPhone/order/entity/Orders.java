@@ -54,7 +54,7 @@ public class Orders {
     private String status = "PENDING";
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = true)
     private Users user;
 
     @ManyToOne
@@ -66,5 +66,11 @@ public class Orders {
 
     @Column(name = "reject_reason", length = 500)
     private String rejectReason;
+
+    @Column(name = "payos_order_code")
+    private Long payosOrderCode;
+
+    @Column(name = "payos_payment_link_id", length = 100)
+    private String payosPaymentLinkId;
 
 }

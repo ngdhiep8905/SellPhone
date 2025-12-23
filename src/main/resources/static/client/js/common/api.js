@@ -93,6 +93,7 @@
     export async function apiUpdateCartItem(cartItemId, newQuantity) {
       const res = await fetch(`${API_BASE_URL}/api/cart/items/${cartItemId}?quantity=${newQuantity}`, {
         method: "PUT",
+        credentials: "include", // ✅ thêm
       });
       if (!res.ok) throw new Error("HTTP " + res.status);
 
@@ -100,6 +101,7 @@
       updateCartHeaderCount();
       return CartState.cart;
     }
+
 
     export async function apiRemoveCartItem(cartItemId) {
       const res = await fetch(`${API_BASE_URL}/api/cart/items/${cartItemId}`, {

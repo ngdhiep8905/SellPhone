@@ -7,47 +7,48 @@
     <link rel="stylesheet" href="style.css">
     <style>
         .success-container {
-            max-width: 600px;
-            margin: 80px auto;
-            text-align: center;
-            padding: 40px;
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+          max-width: 600px;
+          margin: 80px auto;
+          text-align: center;
+          padding: 40px;
+          background: #fff;
+          border-radius: 16px;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.08);
         }
         .success-icon {
-            font-size: 64px;
-            color: #22c55e;
-            margin-bottom: 20px;
+          font-size: 64px;
+          color: #22c55e;
+          margin-bottom: 20px;
         }
         .order-number {
-            font-size: 20px;
-            font-weight: 700;
-            color: #1e40af;
-            background: #eff6ff;
-            padding: 10px 20px;
-            border-radius: 8px;
-            display: inline-block;
-            margin: 15px 0;
+          font-size: 20px;
+          font-weight: 700;
+          color: #1e40af;
+          background: #eff6ff;
+          padding: 10px 20px;
+          border-radius: 8px;
+          display: inline-block;
+          margin: 15px 0;
         }
         .next-steps {
-            text-align: left;
-            margin: 30px 0;
-            padding: 20px;
-            border-top: 1px solid #eee;
+          text-align: left;
+          margin: 30px 0;
+          padding: 20px;
+          border-top: 1px solid #eee;
         }
         .next-steps h4 { margin-bottom: 10px; color: #333; }
         .next-steps li {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 8px;
-            list-style-type: none;
-            display: flex;
-            gap: 10px;
+          font-size: 14px;
+          color: #666;
+          margin-bottom: 8px;
+          list-style-type: none;
+          display: flex;
+          gap: 10px;
         }
     </style>
 </head>
-<body>
+
+<body data-page="order-success">
 <div class="success-container">
     <div class="success-icon">✅</div>
     <h2>Đặt hàng thành công!</h2>
@@ -74,13 +75,7 @@
     </div>
 </div>
 
-<script>
-    // Lấy mã đơn hàng từ URL để hiển thị cho khách yên tâm
-    const params = new URLSearchParams(window.location.search);
-    const orderId = params.get('orderId');
-    if (orderId) {
-        document.getElementById('display-order-id').innerText = `Mã đơn hàng: #${orderId}`;
-    }
-</script>
+
+<script type="module" src="js/main.js"></script>
 </body>
 </html>

@@ -33,7 +33,8 @@ public class Cart {
     @PrePersist
     public void generateIdAndToken() {
         if (cartId == null) {
-            cartId = "C" + String.format("%05d", System.currentTimeMillis() % 100000);
+            cartId = "C" + java.util.UUID.randomUUID().toString().replace("-", "");
+
         }
         if (cartToken == null || cartToken.isBlank()) {
             cartToken = UUID.randomUUID().toString();
@@ -47,7 +48,8 @@ public class Cart {
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<CartItem> items;
+    private List<CartItem> items = new java.util.ArrayList<>();
+
 
     public List<CartItem> getItems() {
         return items == null ? List.of() : items;

@@ -13,7 +13,7 @@ public class OrdersMapper {
         if (e == null) return null;
 
         OrdersDTO d = new OrdersDTO();
-        d.setId(e.getOrderId());
+        d.setOrderId(e.getOrderId());
         d.setUserId(e.getUser() != null ? e.getUser().getUserId() : null);
         d.setStatus(e.getStatus());
         d.setPaymentId(e.getPayment() != null ? e.getPayment().getPaymentId() : null);
@@ -22,7 +22,7 @@ public class OrdersMapper {
         d.setRecipientName(e.getRecipientName());
         d.setRecipientPhone(e.getRecipientPhone());
         d.setShippingAddress(e.getShippingAddress());
-        d.setTotalPrice(e.getTotalPrice()); // Khớp với Entity totalPrice
+        d.setTotalAmount(e.getTotalPrice()); // Khớp với Entity totalPrice
 
         // Chuyển đổi danh sách chi tiết sản phẩm
         if (e.getOrderPhones() != null) {
