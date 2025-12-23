@@ -12,7 +12,7 @@ public class PhonesDTO {
     private String coverImageURL;
     private String phoneDescription;
     private String brandId;
-    private String brandName; // Thêm tên brand để Frontend đỡ phải gọi thêm API brand
+    private String brandName;
 
     // Thông số cấu hình
     private String chipset;

@@ -166,15 +166,19 @@
 
                     <img id="d_coverPreview" class="img-preview" alt="preview" style="display:none;" />
                 </div>
+                <div class="field">
+                    <label>Upload ảnh chi tiết (nhiều ảnh)</label>
+                    <input id="d_detailImagesFile" type="file" accept="image/*" multiple>
+                    <div class="hint">Chọn nhiều ảnh. Hệ thống sẽ upload và tự thêm URL vào danh sách ảnh chi tiết.</div>
+
+                    <div id="d_detailPreview" style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;"></div>
+                </div>
+
 
 
                 <div class="divider"></div>
 
-                <div class="field">
-                    <label>Ảnh chi tiết (mỗi dòng 1 URL)</label>
-                    <textarea id="d_detailImages" rows="10" placeholder="/images/a.jpg&#10;/images/b.jpg"></textarea>
-                    <div class="hint">Gợi ý: mỗi dòng 1 đường dẫn ảnh. Backend phải hỗ trợ lưu `detailImages`.</div>
-                </div>
+
             </aside>
         </div>
 
@@ -182,18 +186,6 @@
 </div>
 
 <script src="product-detail.js"></script>
-<script>
-    // Preview cover URL (frontend-only)
-    const coverInput = document.getElementById("d_coverImageURL");
-    const coverPrev = document.getElementById("d_coverPreview");
-    function refreshCoverPreview() {
-      const v = (coverInput.value || "").trim();
-      if (!v) { coverPrev.style.display = "none"; coverPrev.src = ""; return; }
-      coverPrev.src = v;
-      coverPrev.style.display = "block";
-    }
-    coverInput.addEventListener("input", refreshCoverPreview);
-    window.addEventListener("load", () => setTimeout(refreshCoverPreview, 300));
-</script>
+
 </body>
 </html>

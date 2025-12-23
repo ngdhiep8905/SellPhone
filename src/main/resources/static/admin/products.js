@@ -19,6 +19,8 @@ const color = document.getElementById("color");
 const phoneDescription = document.getElementById("phoneDescription");
 const coverImageFile = document.getElementById("coverImageFile");
 const coverPreview = document.getElementById("coverPreview");
+const detailImagesFile = document.getElementById("detailImagesFile");
+const detailPreview = document.getElementById("detailPreview");
 
 
 if (coverImageFile && coverPreview) {
@@ -43,6 +45,18 @@ async function uploadCoverImage(file) {
 
   const data = await res.json();
   return data.url; // "/images/xxx.jpg"
+}
+async function uploadManyImages(files) {
+  const arr = Array.from(files || []);
+  if (!arr.length) return [];
+
+  // Upload tuần tự (an toàn, dễ debug). Nếu muốn nhanh hơn có thể Promise.all.
+  const urls = [];
+  for (const f of arr) {
+    const url = await uploadCoverImage(f); // dùng lại endpoint /api/files/upload
+    urls.push(url);
+  }
+  return urls;
 }
 
 
@@ -143,6 +157,8 @@ function openAddModal() {
     coverPreview.style.display = "none";
     coverPreview.src = "";
   }
+   if (detailImagesFile) detailImagesFile.value = "";
+   if (detailPreview) detailPreview.innerHTML = "";
 
   document.getElementById("modalTitle").innerText = "Thêm sản phẩm";
   document.getElementById("productModal").style.display = "flex";
@@ -157,17 +173,21 @@ function closeModal() {
 // POST tạo sản phẩm (sửa thông tin sẽ làm ở product-detail)
 async function saveProduct() {
   try {
-    const file = coverImageFile.files?.[0];
-    let coverUrl = ""; // đường dẫn lưu DB
+    const coverFile = coverImageFile.files?.[0];
+    let coverUrl = "";
 
-    if (file) {
-      coverUrl = await uploadCoverImage(file);
+    if (coverFile) {
+      coverUrl = await uploadCoverImage(coverFile);
     }
+
+    // ✅ upload nhiều ảnh chi tiết
+    const detailFiles = detailImagesFile?.files;
+    const detailUrls = await uploadManyImages(detailFiles); // array "/images/xxx.jpg"
 
     const data = {
       phoneName: phoneName.value.trim(),
       price: Number(price.value),
-      coverImageURL: coverUrl,     // DB vẫn lưu string path/url
+      coverImageURL: coverUrl,
       brandId: brandId.value,
 
       stockQuantity: Number(stockQuantity.value),
@@ -182,7 +202,10 @@ async function saveProduct() {
       frontCamera: frontCamera.value.trim(),
       osVersion: osVersion.value.trim(),
       color: color.value.trim(),
-      phoneDescription: phoneDescription.value.trim()
+      phoneDescription: phoneDescription.value.trim(),
+
+      // ✅ quan trọng: backend sẽ lưu vào product_images
+      detailImages: detailUrls
     };
 
     if (!data.phoneName) return alert("Tên sản phẩm không được để trống.");
@@ -195,16 +218,20 @@ async function saveProduct() {
       body: JSON.stringify(data)
     });
 
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    if (!res.ok) {
+      const msg = await res.text().catch(() => "");
+      throw new Error(msg || `HTTP ${res.status}`);
+    }
 
     closeModal();
     loadProducts();
-    alert("Đã thêm sản phẩm.");
+    alert("Đã thêm sản phẩm (kèm ảnh chi tiết).");
   } catch (err) {
     console.error(err);
     alert("Lỗi thêm sản phẩm: " + err.message);
   }
 }
+
 
 
 
@@ -323,6 +350,25 @@ function setupBackdropClose() {
     });
   }
 }
+if (detailImagesFile && detailPreview) {
+  detailImagesFile.addEventListener("change", () => {
+    detailPreview.innerHTML = "";
+    const files = Array.from(detailImagesFile.files || []);
+    if (!files.length) return;
+
+    files.forEach((f) => {
+      const img = document.createElement("img");
+      img.src = URL.createObjectURL(f);
+      img.style.width = "90px";
+      img.style.height = "90px";
+      img.style.objectFit = "cover";
+      img.style.borderRadius = "12px";
+      img.style.border = "1px solid rgba(0,0,0,0.08)";
+      detailPreview.appendChild(img);
+    });
+  });
+}
+
 
 function logout() {
   localStorage.removeItem("isAdmin");

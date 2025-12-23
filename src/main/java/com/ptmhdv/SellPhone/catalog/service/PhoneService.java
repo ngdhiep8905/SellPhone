@@ -3,6 +3,7 @@ package com.ptmhdv.SellPhone.catalog.service;
 import com.ptmhdv.SellPhone.catalog.dto.PhonesDTO;
 import com.ptmhdv.SellPhone.catalog.entity.Brands;
 import com.ptmhdv.SellPhone.catalog.entity.Phones;
+import com.ptmhdv.SellPhone.catalog.entity.ProductImage;
 import com.ptmhdv.SellPhone.catalog.mapper.PhonesMapper;
 import com.ptmhdv.SellPhone.catalog.repository.BrandsRepository; // Giả định bạn đã có repo này
 import com.ptmhdv.SellPhone.catalog.repository.PhonesRepository;
@@ -37,20 +38,67 @@ public class PhoneService {
 
     @Transactional
     public PhonesDTO save(PhonesDTO dto) {
-        // Nếu create (FE không gửi phoneId) thì tự sinh
-        if (dto.getPhoneId() == null || dto.getPhoneId().trim().isEmpty()) {
+
+        boolean isCreate = (dto.getPhoneId() == null || dto.getPhoneId().trim().isEmpty());
+        if (isCreate) {
             dto.setPhoneId(generateNextPhoneId());
         }
 
         Brands brand = null;
         if (dto.getBrandId() != null && !dto.getBrandId().trim().isEmpty()) {
-            brand = brandRepo.findById(dto.getBrandId()).orElse(null);
+            brand = brandRepo.findById(dto.getBrandId())
+                    .orElseThrow(() -> new RuntimeException("Brand không hợp lệ"));
         }
 
-        Phones phone = PhonesMapper.toEntity(dto, brand);
+        Phones phone = phoneRepo.findById(dto.getPhoneId()).orElse(null);
+        if (phone == null) {
+            phone = new Phones();
+            phone.setPhoneId(dto.getPhoneId());
+            phone.setProductImages(new java.util.ArrayList<>());
+        }
+
+        phone.setPhoneName(dto.getPhoneName());
+        phone.setPrice(dto.getPrice());
+        phone.setCoverImageURL(dto.getCoverImageURL());
+        phone.setPhoneDescription(dto.getPhoneDescription());
+
+        phone.setChipset(dto.getChipset());
+        phone.setRamSize(dto.getRamSize());
+        phone.setStorageSize(dto.getStorageSize());
+        phone.setScreenInfo(dto.getScreenInfo());
+        phone.setBatteryInfo(dto.getBatteryInfo());
+        phone.setRearCamera(dto.getRearCamera());
+        phone.setFrontCamera(dto.getFrontCamera());
+        phone.setOsVersion(dto.getOsVersion());
+        phone.setColor(dto.getColor());
+
+        phone.setStockQuantity(dto.getStockQuantity() == null ? 0 : dto.getStockQuantity());
+        phone.setStatus(dto.getStatus() == null || dto.getStatus().isBlank() ? "ACTIVE" : dto.getStatus());
+
+        phone.setBrand(brand);
+
+        // ✅ replace toàn bộ ảnh chi tiết theo dto.detailImages
+        if (dto.getDetailImages() != null) {
+            if (phone.getProductImages() == null) {
+                phone.setProductImages(new java.util.ArrayList<>());
+            } else {
+                phone.getProductImages().clear(); // orphanRemoval => xoá DB ảnh cũ
+            }
+
+            for (String url : dto.getDetailImages()) {
+                if (url == null || url.isBlank()) continue;
+
+                ProductImage img = new ProductImage();
+                img.setImageUrl(url.trim());
+                img.setPhone(phone);
+                phone.getProductImages().add(img);
+            }
+        }
+
         Phones saved = phoneRepo.save(phone);
         return PhonesMapper.toDTO(saved);
     }
+
 
 
 

@@ -24,7 +24,7 @@ public class Phones {
     @Column(name = "phone_name", nullable = false, length = 100)
     private String phoneName;
 
-    // --- THÔNG SỐ KỸ THUẬT MỚI ---
+    // --- THÔNG SỐ KỸ THUẬT ---
     @Column(name = "chipset")
     private String chipset;
 
@@ -74,8 +74,9 @@ public class Phones {
     private Brands brand;
 
     // --- LIÊN KẾT ẢNH CHI TIẾT ---
-    @OneToMany(mappedBy = "phone", cascade = CascadeType.ALL)
-    private List<ProductImage> productImages; // Bạn cần tạo thêm Entity ProductImage
+    @OneToMany(mappedBy = "phone", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductImage> productImages;
+
 
     @OneToMany(mappedBy = "phone", cascade = CascadeType.ALL)
     @JsonIgnore

@@ -6,7 +6,7 @@ function getQueryParam(name) {
   return url.searchParams.get(name);
 }
 
-async function uploadCoverImage(file) {
+async function uploadOneImage(file) {
   const formData = new FormData();
   formData.append("file", file);
 
@@ -17,6 +17,35 @@ async function uploadCoverImage(file) {
   return data.url;
 }
 
+async function uploadManyImages(files) {
+  const arr = Array.from(files || []);
+  if (!arr.length) return [];
+
+  const urls = [];
+  for (const f of arr) {
+    const url = await uploadOneImage(f);
+    urls.push(url);
+  }
+  return urls;
+}
+
+function renderDetailPreview(urls) {
+  const box = document.getElementById("d_detailPreview");
+  if (!box) return;
+
+  box.innerHTML = "";
+  (urls || []).forEach((url) => {
+    const img = document.createElement("img");
+    img.src = url;
+    img.style.width = "90px";
+    img.style.height = "90px";
+    img.style.objectFit = "cover";
+    img.style.borderRadius = "12px";
+    img.style.border = "1px solid rgba(0,0,0,0.08)";
+    box.appendChild(img);
+  });
+}
+
 window.onload = async function () {
   currentId = getQueryParam("id");
   if (!currentId) return alert("Thiếu id sản phẩm");
@@ -25,16 +54,57 @@ window.onload = async function () {
     await loadBrands();
     await loadDetail();
 
-    // setup preview cho file
-    const fileInput = document.getElementById("d_coverImageFile");
-    const preview = document.getElementById("d_coverPreview");
+    // preview cover khi chọn file mới
+    const coverFileInput = document.getElementById("d_coverImageFile");
+    const coverPreview = document.getElementById("d_coverPreview");
 
-    if (fileInput && preview) {
-      fileInput.addEventListener("change", () => {
-        const f = fileInput.files?.[0];
+    if (coverFileInput && coverPreview) {
+      coverFileInput.addEventListener("change", () => {
+        const f = coverFileInput.files?.[0];
         if (!f) return;
-        preview.src = URL.createObjectURL(f);
-        preview.style.display = "block";
+        coverPreview.src = URL.createObjectURL(f);
+        coverPreview.style.display = "block";
+      });
+    }
+
+    // upload nhiều ảnh chi tiết -> auto thêm vào textarea + preview
+    const detailFileInput = document.getElementById("d_detailImagesFile");
+    if (detailFileInput) {
+      detailFileInput.addEventListener("change", async () => {
+        try {
+          const urls = await uploadManyImages(detailFileInput.files);
+
+          // append vào textarea (mỗi dòng 1 url)
+          const ta = document.getElementById("d_detailImages");
+          const current = (ta?.value || "")
+            .split("\n")
+            .map((s) => s.trim())
+            .filter(Boolean);
+
+          const merged = [...current, ...urls];
+          if (ta) ta.value = merged.join("\n");
+
+          // preview theo merged list
+          renderDetailPreview(merged);
+
+          // reset input để lần sau chọn lại vẫn trigger change
+          detailFileInput.value = "";
+        } catch (e) {
+          console.error(e);
+          alert("Lỗi upload ảnh chi tiết: " + e.message);
+        }
+      });
+    }
+
+    // khi admin sửa textarea thủ công -> cập nhật preview
+    const ta = document.getElementById("d_detailImages");
+    if (ta) {
+      ta.addEventListener("input", () => {
+        const urls = (ta.value || "")
+          .split("\n")
+          .map((s) => s.trim())
+          .filter(Boolean);
+        renderDetailPreview(urls);
       });
     }
   } catch (e) {
@@ -50,7 +120,7 @@ async function loadBrands() {
 
   const sel = document.getElementById("d_brandId");
   sel.innerHTML = (data || [])
-    .map(b => `<option value="${b.brandId}">${b.brandName}</option>`)
+    .map((b) => `<option value="${b.brandId}">${b.brandName}</option>`)
     .join("");
 }
 
@@ -81,7 +151,9 @@ async function loadDetail() {
   const detailBox = document.getElementById("d_detailImages");
   if (detailBox) detailBox.value = images.join("\n");
 
-  // Preview ảnh đại diện hiện có (từ DB)
+  renderDetailPreview(images);
+
+  // cover preview từ DB
   const preview = document.getElementById("d_coverPreview");
   if (preview) {
     if (p.coverImageURL) {
@@ -96,23 +168,23 @@ async function loadDetail() {
 
 async function saveDetail() {
   try {
-    // nếu có chọn file mới thì upload và lấy url mới
-    const fileInput = document.getElementById("d_coverImageFile");
+    const coverFileInput = document.getElementById("d_coverImageFile");
+    const coverPreview = document.getElementById("d_coverPreview");
     let coverImageURL = null;
 
-    const chosenFile = fileInput?.files?.[0];
+    // nếu chọn file mới -> upload
+    const chosenFile = coverFileInput?.files?.[0];
     if (chosenFile) {
-      coverImageURL = await uploadCoverImage(chosenFile);
+      coverImageURL = await uploadOneImage(chosenFile);
     } else {
-      // không chọn mới => giữ nguyên cover hiện có bằng cách lấy từ preview src
-      const preview = document.getElementById("d_coverPreview");
-      coverImageURL = (preview?.src || "").trim() || null;
+      // không chọn mới => giữ theo preview hiện tại (DB)
+      coverImageURL = (coverPreview?.getAttribute("src") || "").trim() || null;
     }
 
     const detailImagesRaw = document.getElementById("d_detailImages")?.value || "";
     const detailImages = detailImagesRaw
       .split("\n")
-      .map(s => s.trim())
+      .map((s) => s.trim())
       .filter(Boolean);
 
     const payload = {
@@ -147,10 +219,13 @@ async function saveDetail() {
       body: JSON.stringify(payload)
     });
 
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    if (!res.ok) {
+      const msg = await res.text().catch(() => "");
+      throw new Error(msg || `HTTP ${res.status}`);
+    }
 
     alert("Đã lưu.");
-    await loadDetail(); // reload để preview cập nhật theo DB
+    await loadDetail();
   } catch (e) {
     console.error(e);
     alert("Lỗi lưu: " + e.message);
