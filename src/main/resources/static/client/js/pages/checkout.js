@@ -119,7 +119,7 @@ function renderSummary() {
   const totalEl = $("#checkout-total");
 
   if (subtotalEl) subtotalEl.textContent = formatVND(subtotal);
-  if (totalEl) totalEl.textContent = formatVND(subtotal + 30000);
+  if (totalEl) totalEl.textContent = formatVND(subtotal + 0);
 }
 
 
@@ -165,7 +165,8 @@ export function initCheckoutPage() {
     const provinceCode = provincesEl?.value || "";
     const wardText = wardsEl?.value || "";
 
-    const paymentMethod = $("#checkout-payment-method")?.value || "";
+    const paymentMethod =
+      document.querySelector('input[name="paymentMethod"]:checked')?.value || "";
 
     if (!name || !phone || !street || !provinceCode || !wardText) {
       alert("Vui lòng điền đầy đủ thông tin bắt buộc");

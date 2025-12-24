@@ -6,12 +6,11 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
+
 public class CartItemViewDTO {
-
-    private String cartItemId;
-    private int quantity;
+    private Integer cartItemId;
+    private Integer quantity;
     private PhonesDTO phone;
-
-
 }
+
 

@@ -20,36 +20,31 @@ import java.util.UUID;
 public class Cart {
 
     @Id
-    @Column(name = "cart_id", length = 50)
+    @Column(name = "cart_id", length = 36)
     private String cartId;
 
-    /**
-     * Token dùng cho guest cart (không đăng nhập).
-     * FE giữ token này trong cookie/localStorage và gửi lên để thao tác giỏ.
-     */
-    @Column(name = "cart_token", nullable = false, unique = true)
+    @Column(name = "cart_token", nullable = false, unique = true, length = 36)
     private String cartToken;
 
     @PrePersist
     public void generateIdAndToken() {
-        if (cartId == null) {
-            cartId = "C" + java.util.UUID.randomUUID().toString().replace("-", "");
-
+        if (cartId == null || cartId.isBlank()) {
+            cartId = UUID.randomUUID().toString(); // ✅ 36 chars, match DB CHAR(36)
         }
         if (cartToken == null || cartToken.isBlank()) {
             cartToken = UUID.randomUUID().toString();
         }
     }
 
-
-    @OneToOne(optional = true)
+    // DB cho phép nhiều cart cùng trỏ 1 user? Thực tế bạn muốn 1-1 thì giữ OneToOne cũng được.
+    // Nhưng phổ biến & an toàn hơn là ManyToOne (vì DB không enforce UNIQUE(user_id)).
+    @ManyToOne(optional = true)
     @JoinColumn(name = "user_id", nullable = true)
     private Users user;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<CartItem> items = new java.util.ArrayList<>();
-
 
     public List<CartItem> getItems() {
         return items == null ? List.of() : items;

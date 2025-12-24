@@ -51,7 +51,7 @@ public class CartController {
     // PUT /api/cart/items/{cartItemId}?quantity=...
     @PutMapping("/items/{cartItemId}")
     public CartViewDTO updateItem(
-            @PathVariable String cartItemId,
+            @PathVariable Integer cartItemId,
             @RequestParam Integer quantity,
             HttpServletRequest req,
             HttpServletResponse res) {
@@ -63,7 +63,7 @@ public class CartController {
 
     @DeleteMapping("/items/{cartItemId}")
     public CartViewDTO removeItem(
-            @PathVariable String cartItemId,
+            @PathVariable Integer cartItemId,
             HttpServletRequest req,
             HttpServletResponse res) {
 
@@ -71,6 +71,7 @@ public class CartController {
         Cart cart = cartService.removeItemByToken(token, cartItemId);
         return toView(cart);
     }
+
 
     private String ensureCartToken(HttpServletRequest req, HttpServletResponse res) {
         String token = getCartToken(req);

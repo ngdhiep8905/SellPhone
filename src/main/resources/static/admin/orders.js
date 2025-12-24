@@ -111,8 +111,7 @@ function renderOrders(list) {
         <td>${escapeHtml(o.itemsPreview || "")}</td>
         <td>${escapeHtml(o.shippingAddress || "")}</td>
         <td>${statusBadge(o.status)}</td>
-        <td>${escapeHtml(pay)}</td>
-        <td onclick="event.stopPropagation();">
+        <td>${escapeHtml(pay)}</td>        <td onclick="event.stopPropagation();">
           ${renderActions(o, canConfirm, canCancel, canDelivered)}
         </td>
 
@@ -199,7 +198,8 @@ function openOrder(id) {
       if (recipientPhoneEl) recipientPhoneEl.innerText = data.recipientPhone || "";
       if (shippingAddressEl) shippingAddressEl.innerText = data.shippingAddress || "";
 
-      if (paymentInfoEl) paymentInfoEl.innerText = `${data.paymentMethod || ""} • ${data.paymentStatus || ""}`;
+      if (paymentInfoEl) paymentInfoEl.innerHTML = paymentBadge(data.paymentMethod, data.paymentStatus);
+
       if (orderStatusTextEl) orderStatusTextEl.innerText = mapStatusText(data.status);
 
       // items
@@ -369,3 +369,27 @@ function syncModalButtons(data) {
 
   // DELIVERED / CANCELLED: không nút nào
 }
+function paymentBadge(method, status) {
+  if (!method) return "";
+
+  const isPaid = status === "PAID";
+
+  const color = isPaid ? "#2ecc71" : "#f1c40f";
+  const label = isPaid ? "Đã thanh toán" : "Chưa thanh toán";
+
+  return `
+    <span style="
+      background:${color};
+      padding:5px 10px;
+      color:white;
+      border-radius:6px;
+      font-weight:600;
+      display:inline-block;
+      min-width:120px;
+      text-align:center;
+    ">
+      ${method} • ${label}
+    </span>
+  `;
+}
+

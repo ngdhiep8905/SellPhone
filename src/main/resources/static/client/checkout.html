@@ -81,13 +81,38 @@
                 <input id="checkout-street" type="text" />
             </label>
 
-            <label class="sp-field">
+            <div class="sp-field">
                 <span>Hình thức thanh toán *</span>
-                <select id="checkout-payment-method" class="sp-select">
-                    <option value="01">Thanh toán khi nhận hàng (COD)</option>
-                    <option value="02">Chuyển khoản (VietQR)</option>
-                </select>
-            </label>
+
+                <div class="sp-payments sp-payments--cards" role="radiogroup" aria-label="Hình thức thanh toán">
+                    <label class="sp-paycard">
+                        <input type="radio" name="paymentMethod" value="02" />
+                        <span class="sp-paycard__radio" aria-hidden="true"></span>
+
+                        <span class="sp-paycard__icon" aria-hidden="true">🏦</span>
+
+                        <span class="sp-paycard__body">
+        <span class="sp-paycard__title">Chuyển khoản ngân hàng</span>
+        <span class="sp-paycard__desc">Thanh toán bằng hình thức chuyển khoản (QR)</span>
+      </span>
+                    </label>
+
+                    <label class="sp-paycard">
+                        <input type="radio" name="paymentMethod" value="01" checked />
+                        <span class="sp-paycard__radio" aria-hidden="true"></span>
+
+                        <span class="sp-paycard__icon" aria-hidden="true">💵</span>
+
+                        <span class="sp-paycard__body">
+        <span class="sp-paycard__title">Thanh toán khi nhận hàng (COD)</span>
+        <span class="sp-paycard__desc">Trả tiền mặt khi nhận máy</span>
+      </span>
+                    </label>
+                </div>
+
+
+            </div>
+
         </section>
 
         <section class="sp-panel">
@@ -96,7 +121,7 @@
             <div id="checkout-items-list"></div>
 
             <div class="sp-cart__row"><span>Tạm tính:</span><span id="checkout-subtotal">0₫</span></div>
-            <div class="sp-cart__row"><span>Phí ship:</span><span>30.000₫</span></div>
+            <div class="sp-cart__row"><span>Phí ship:</span><span>Miễn phí</span></div>
             <div class="sp-cart__row sp-cart__row--total">
                 <span>Tổng cộng:</span><span id="checkout-total">0₫</span>
             </div>

@@ -47,8 +47,9 @@ public class Orders {
     @NotNull
     @DecimalMin(value = "0.0", inclusive = false)
     @Digits(integer = 12, fraction = 2)
-    @Column(name = "total_amount", precision = 12, scale = 2)
-    private BigDecimal totalPrice;
+    @Column(name = "total_amount", precision = 12, scale = 2, nullable = false)
+    private BigDecimal totalAmount;
+
 
     @Column(name = "order_status", length = 20)
     private String status = "PENDING";
@@ -72,5 +73,7 @@ public class Orders {
 
     @Column(name = "payos_payment_link_id", length = 100)
     private String payosPaymentLinkId;
+    @Column(name = "payment_status", length = 50, nullable = false)
+    private String paymentStatus = "PENDING"; // PENDING / PAID
 
 }

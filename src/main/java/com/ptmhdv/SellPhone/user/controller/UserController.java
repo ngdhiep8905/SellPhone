@@ -1,6 +1,8 @@
 package com.ptmhdv.SellPhone.user.controller;
 
+import com.ptmhdv.SellPhone.user.entity.Roles;
 import com.ptmhdv.SellPhone.user.entity.Users;
+import com.ptmhdv.SellPhone.user.repository.RolesRepository;
 import com.ptmhdv.SellPhone.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,6 +21,8 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private RolesRepository rolesRepository;
     //List USER
     @GetMapping
     public Page<Users> getUsers(
@@ -79,7 +83,6 @@ public class UserController {
                     .body(Map.of("message", "INVALID_REQUEST"));
         }
 
-        // --- validate required fields ---
         String email = req.email == null ? "" : req.email.trim();
         String password = req.password == null ? "" : req.password.trim();
         String phone = req.phone == null ? "" : req.phone.trim();
@@ -90,7 +93,6 @@ public class UserController {
                             "detail", "Email và mật khẩu là bắt buộc"));
         }
 
-        // full_name NOT NULL trong DB -> bắt buộc có
         String fullName = (req.fullName != null && !req.fullName.isBlank())
                 ? req.fullName.trim()
                 : (req.userName != null && !req.userName.isBlank() ? req.userName.trim() : "");
@@ -101,8 +103,6 @@ public class UserController {
                             "detail", "Vui lòng nhập họ tên"));
         }
 
-        // --- validate email format ---
-        // Regex đủ tốt cho demo/proj (không quá strict)
         String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
         if (!email.matches(emailRegex)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -110,7 +110,6 @@ public class UserController {
                             "detail", "Email không đúng định dạng. Ví dụ: abc@gmail.com"));
         }
 
-        // --- validate password minimal ---
         int minPasswordLen = 6;
         if (password.length() < minPasswordLen) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -118,7 +117,6 @@ public class UserController {
                             "detail", "Mật khẩu phải có ít nhất " + minPasswordLen + " ký tự"));
         }
 
-        // --- validate phone required + numeric ---
         if (phone.isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("message", "PHONE_REQUIRED",
@@ -130,28 +128,25 @@ public class UserController {
                             "detail", "Số điện thoại chỉ được chứa chữ số (10 chữ số)."));
         }
 
-        // --- email unique ---
         if (userService.getByEmail(email).isPresent()) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(Map.of("message", "EMAIL_EXISTS",
                             "detail", "Email đã tồn tại. Vui lòng dùng email khác."));
         }
 
-        // --- create user ---
+        // --- load role USER: role_id = '02' (CHAR(2)) ---
+        Roles userRole = rolesRepository.findById("02")
+                .orElseThrow(() -> new RuntimeException("ROLE_NOT_FOUND: 02"));
+
         Users user = new Users();
         user.setFullName(fullName);
         user.setEmail(email);
-        user.setPassword(password);  // plain-text theo yêu cầu
+        user.setPassword(password);
         user.setPhone(phone);
         user.setAddress(req.address);
 
-        // --- set default role_id = '02' (USER) ---
-        // Cách 1: nếu entity Users có field roleId:
-        try {
-            user.getClass().getMethod("setRoleId", String.class).invoke(user, "02");
-        } catch (Exception ignored) {
-            // Cách 2: nếu Users map ManyToOne Roles thì bạn cần set role entity (mình sẽ chỉnh đúng nếu bạn gửi Users.java/Roles.java)
-        }
+        // set role entity => DB tự lưu role_id
+        user.setRole(userRole);
 
         Users saved = userService.save(user);
 

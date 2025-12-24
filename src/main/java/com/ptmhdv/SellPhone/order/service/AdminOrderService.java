@@ -36,12 +36,9 @@ public class AdminOrderService {
         }
 
         String method = o.getPayment() != null ? o.getPayment().getPaymentMethod() : null;
-        String payStatus = o.getPayment() != null ? o.getPayment().getPaymentStatus() : null;
+        String payStatus = o.getPaymentStatus();
+        if ("BANKING".equals(method) && !"PAID".equalsIgnoreCase(payStatus)) {
 
-        // Rule của bạn:
-        // - COD: xác nhận được
-        // - BANKING: chỉ xác nhận nếu PAID
-        if ("BANKING".equals(method) && !"PAID".equals(payStatus)) {
             throw new RuntimeException("Đơn chuyển khoản chưa thanh toán, không thể xác nhận.");
         }
 
@@ -85,13 +82,14 @@ public class AdminOrderService {
         OrderAdminRowDTO dto = new OrderAdminRowDTO();
         dto.setOrderId(o.getOrderId());
         dto.setBookDate(o.getBookDate());
-        dto.setTotalPrice(o.getTotalPrice());
+        dto.setTotalPrice(o.getTotalAmount());
         dto.setShippingAddress(o.getShippingAddress());
         dto.setStatus(o.getStatus());
 
         dto.setCustomerName(o.getUser() != null ? safe(o.getUser().getFullName(), "Khách hàng") : "Khách hàng");
         dto.setPaymentMethod(o.getPayment() != null ? o.getPayment().getPaymentMethod() : null);
-        dto.setPaymentStatus(o.getPayment() != null ? o.getPayment().getPaymentStatus() : null);
+        dto.setPaymentStatus(o.getPaymentStatus());
+
 
         String preview = "";
         if (o.getOrderPhones() != null) {
@@ -109,7 +107,7 @@ public class AdminOrderService {
         OrderAdminDetailDTO dto = new OrderAdminDetailDTO();
         dto.setOrderId(o.getOrderId());
         dto.setBookDate(o.getBookDate());
-        dto.setTotalPrice(o.getTotalPrice());
+        dto.setTotalPrice(o.getTotalAmount());
         dto.setRecipientName(o.getRecipientName());
         dto.setRecipientPhone(o.getRecipientPhone());
         dto.setShippingAddress(o.getShippingAddress());
@@ -120,7 +118,8 @@ public class AdminOrderService {
         dto.setCustomerPhone(o.getUser() != null ? o.getUser().getPhone() : null);
 
         dto.setPaymentMethod(o.getPayment() != null ? o.getPayment().getPaymentMethod() : null);
-        dto.setPaymentStatus(o.getPayment() != null ? o.getPayment().getPaymentStatus() : null);
+        dto.setPaymentStatus(o.getPaymentStatus());
+
 
         List<OrderAdminDetailDTO.ItemDTO> items = (o.getOrderPhones() == null) ? List.of()
                 : o.getOrderPhones().stream().map(this::toItem).toList();

@@ -4,6 +4,7 @@ import com.ptmhdv.SellPhone.order.repository.OrdersRepository;
 import com.ptmhdv.SellPhone.payment.service.PayosService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -11,37 +12,51 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/payos")
 public class PayosWebhookController {
 
+
     private final PayosService payosService;
     private final OrdersRepository ordersRepo;
 
     @PostMapping("/webhook")
-    public ResponseEntity<String> webhook(@RequestBody Object body) {
+    @Transactional
+    public ResponseEntity<String> webhook(@RequestBody java.util.Map<String, Object> body) {
+        System.out.println("🔥 PAYOS WEBHOOK HIT 🔥");
+        System.out.println(body);
+
         try {
             var data = payosService.verifyWebhook(body);
 
+            // đọc code trực tiếp từ body (an toàn theo nhiều version)
+            Object codeObj = body.get("code");
+            String code = codeObj == null ? null : String.valueOf(codeObj);
+
+            if (code == null || !"00".equals(code)) {
+                return ResponseEntity.ok("OK");
+            }
+
             Long orderCode = data.getOrderCode();
-            Long amount = data.getAmount(); // VND
+            Long amount = data.getAmount();
 
             var opt = ordersRepo.findByPayosOrderCode(orderCode);
             if (opt.isEmpty()) return ResponseEntity.ok("OK");
 
             var order = opt.get();
 
-            // idempotent
-            if ("PAID".equalsIgnoreCase(order.getStatus())) return ResponseEntity.ok("OK");
+            // idempotent theo Orders.paymentStatus (Option 1)
+            if ("PAID".equalsIgnoreCase(order.getPaymentStatus())) return ResponseEntity.ok("OK");
 
-            // đối chiếu amount (khuyên dùng)
-            long expected = order.getTotalPrice().longValue();
+            long expected = order.getTotalAmount().longValue();
             if (amount != null && amount.longValue() != expected) {
                 return ResponseEntity.badRequest().body("Amount mismatch");
             }
 
-            // chỉ set PAID nếu đang chờ thanh toán
-            if (!"AWAITING_PAYMENT".equalsIgnoreCase(order.getStatus())) {
-                return ResponseEntity.ok("OK");
+            order.setPaymentStatus("PAID");
+
+
+            if ("AWAITING_PAYMENT".equals(order.getStatus())) {
+                order.setStatus("PROCESSING");
+                // hoặc "CONFIRMED" / "PAID" tuỳ nghiệp vụ
             }
 
-            order.setStatus("PAID");
             ordersRepo.save(order);
 
             return ResponseEntity.ok("OK");
@@ -49,4 +64,5 @@ public class PayosWebhookController {
             return ResponseEntity.badRequest().body("Invalid webhook: " + e.getMessage());
         }
     }
+
 }

@@ -987,41 +987,178 @@ body::before{
 .sp-hidden {
     display: none !important;
 }
-<style>
-  .sp-gallery { display: grid; gap: 12px; }
-  .sp-gallery__main {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    border-radius: 12px;
-    overflow: hidden;
-    background: #fff;
-    border: 1px solid rgba(148,163,184,.35);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-  }
-  .sp-gallery__main img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain; /* chuẩn TMĐT: không cắt hình */
-    background: #fff;
-    display: block;
-  }
-  .sp-gallery__thumbs {
-    display: flex;
-    gap: 10px;
-    overflow-x: auto;
-    padding-bottom: 4px;
-  }
-  .sp-thumb {
-    width: 72px;
-    height: 72px;
-    flex: 0 0 auto;
-    border-radius: 10px;
-    overflow: hidden;
-    border: 1px solid rgba(148,163,184,.35);
-    cursor: pointer;
-    background: #fff;
-    opacity: .9;
-  }
-  .sp-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .sp-thumb.is-active { outline: 2px solid rgba(30,64,175,.75); opacity: 1; }
-</style>
+/* Product gallery */
+.sp-gallery { display: grid; gap: 12px; }
+
+.sp-gallery__main{
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid rgba(148,163,184,.35);
+  box-shadow: 0 10px 28px rgba(15,23,42,.08);
+}
+
+.sp-gallery__main img{
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* không cắt hình */
+  background: #fff;
+  display: block;
+}
+
+.sp-gallery__thumbs{
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scroll-snap-type: x mandatory;
+}
+
+.sp-thumb{
+  width: 72px;
+  height: 72px;
+  flex: 0 0 auto;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(148,163,184,.35);
+  cursor: pointer;
+  background: #fff;
+  opacity: .88;
+  transition: transform .12s ease, opacity .12s ease, border-color .12s ease;
+  scroll-snap-align: start;
+}
+
+.sp-thumb:hover{ transform: translateY(-1px); opacity: 1; }
+
+.sp-thumb img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.sp-thumb.is-active{
+  outline: 3px solid rgba(37,99,235,.22);
+  border-color: rgba(37,99,235,.55);
+  opacity: 1;
+}
+
+/* Payments - card style */
+.sp-payments--cards {
+  margin-top: 10px;
+  display: grid;
+  gap: 10px;
+}
+
+.sp-paycard {
+  position: relative;
+  display: grid;
+  grid-template-columns: 18px 34px 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #fff;
+  cursor: pointer;
+  transition: transform 0.08s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+/* hover */
+.sp-paycard:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+}
+
+/* hide native radio */
+.sp-paycard > input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* custom radio */
+.sp-paycard__radio {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 2px solid #cbd5e1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sp-paycard__radio::after {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  transform: scale(0);
+  transition: transform 0.12s ease;
+}
+
+/* icon */
+.sp-paycard__icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  background: #f8fafc;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.sp-paycard__body {
+  display: grid;
+  gap: 2px;
+}
+
+.sp-paycard__title {
+  font-weight: 600;
+  font-size: 14px;
+  color: #0f172a;
+}
+
+.sp-paycard__desc {
+  font-size: 12px;
+  color: #64748b;
+}
+
+/* selected state */
+.sp-paycard > input[type="radio"]:checked ~ .sp-paycard__radio {
+  border-color: #2563eb;
+}
+
+.sp-paycard > input[type="radio"]:checked ~ .sp-paycard__radio::after {
+  background: #2563eb;
+  transform: scale(1);
+}
+
+.sp-paycard > input[type="radio"]:checked {
+  /* nothing */
+}
+
+.sp-paycard:has(input[type="radio"]:checked) {
+  border-color: rgba(37, 99, 235, 0.55);
+  box-shadow: 0 10px 26px rgba(37, 99, 235, 0.10);
+}
+
+/* keyboard focus */
+.sp-paycard > input[type="radio"]:focus-visible ~ .sp-paycard__radio {
+  outline: 3px solid rgba(37, 99, 235, 0.25);
+  outline-offset: 2px;
+}
+.sp-payments--cards{
+  margin-top: 10px;
+  display: grid;
+  gap: 12px;
+}
+
+/* card */
+.sp-paycard{
+  position: relative;
+  display: grid;
+  grid-template banning?

@@ -5,6 +5,7 @@ import com.ptmhdv.SellPhone.catalog.entity.Brands;
 import com.ptmhdv.SellPhone.catalog.entity.Phones;
 import com.ptmhdv.SellPhone.catalog.entity.ProductImage;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class PhonesMapper {
@@ -40,13 +41,17 @@ public class PhonesMapper {
             d.setBrandName(e.getBrand().getBrandName());
         }
 
-        // ✅ Detail images
+        // Detail images
         if (e.getProductImages() != null) {
             d.setDetailImages(
-                    e.getProductImages().stream()
+                    e.getProductImages() == null
+                            ? List.of()
+                            : e.getProductImages().stream()
+                            .sorted(java.util.Comparator.comparing(ProductImage::getPosition))
                             .map(ProductImage::getImageUrl)
                             .collect(Collectors.toList())
             );
+
         }
 
         return d;

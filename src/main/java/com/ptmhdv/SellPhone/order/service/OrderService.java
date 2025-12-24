@@ -118,7 +118,7 @@ public class OrderService {
             orderDetails.add(detail);
         }
 
-        order.setTotalPrice(totalOrderAmount);
+        order.setTotalAmount(totalOrderAmount);
         order.setOrderPhones(orderDetails);
 
         // Nếu BANKING thì chờ thanh toán, COD thì pending như cũ
@@ -142,7 +142,7 @@ public class OrderService {
                 // PayOS doc ví dụ orderCode dùng timestamp/1000 :contentReference[oaicite:4]{index=4}
                 long payosOrderCode = System.currentTimeMillis() / 1000;
 
-                long amountVnd = saved.getTotalPrice().longValue(); // VND, không nên có phần lẻ
+                long amountVnd = saved.getTotalAmount().longValue(); // VND, không nên có phần lẻ
                 String description = "Don " + saved.getOrderId();  // ví dụ: "Don O202512221234"
 
                 var paymentLink = payosService.createPaymentLink(payosOrderCode, amountVnd, description, saved.getOrderId());

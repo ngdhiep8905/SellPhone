@@ -14,11 +14,20 @@ public class ProductImage {
     @Column(name = "image_id")
     private Integer imageId;
 
-    @Column(name = "image_url", nullable = false, length = 255)
+    @Column(name = "image_url", nullable = false)
     private String imageUrl;
+
+    @Column(name = "position", nullable = false)
+    private Integer position;
+
+    // 🔥 SOFT DELETE
+    @Column(name = "deleted", nullable = false)
+    private Boolean deleted = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "phone_id", nullable = false)
     @JsonIgnore
     private Phones phone;
 }
+
+

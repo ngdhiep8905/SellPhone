@@ -167,12 +167,21 @@
                     <img id="d_coverPreview" class="img-preview" alt="preview" style="display:none;" />
                 </div>
                 <div class="field">
-                    <label>Upload ảnh chi tiết (nhiều ảnh)</label>
-                    <input id="d_detailImagesFile" type="file" accept="image/*" multiple>
-                    <div class="hint">Chọn nhiều ảnh. Hệ thống sẽ upload và tự thêm URL vào danh sách ảnh chi tiết.</div>
+                    <label>Ảnh chi tiết (tối đa 6 ảnh)</label>
 
-                    <div id="d_detailPreview" style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;"></div>
+                    <div id="d_dropZone" class="drop-zone">
+                        Kéo & thả ảnh vào đây hoặc click để chọn
+                        <input id="d_detailImagesFile" type="file" accept="image/*" multiple hidden>
+                    </div>
+
+                    <div id="d_detailPreview" class="detail-preview"></div>
+
+                    <div class="hint">
+                        • Kéo để sắp xếp thứ tự ảnh<br>
+                        • Click ❌ để xóa ảnh
+                    </div>
                 </div>
+
 
 
 

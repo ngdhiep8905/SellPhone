@@ -1,7 +1,8 @@
-
 const API = "/api";
 let cachedProducts = [];
+let dragIndex = null;
 
+/* ================== FORM ELEMENTS ================== */
 const phoneName = document.getElementById("phoneName");
 const price = document.getElementById("price");
 const brandId = document.getElementById("brandId");
@@ -17,51 +18,145 @@ const frontCamera = document.getElementById("frontCamera");
 const osVersion = document.getElementById("osVersion");
 const color = document.getElementById("color");
 const phoneDescription = document.getElementById("phoneDescription");
+
 const coverImageFile = document.getElementById("coverImageFile");
 const coverPreview = document.getElementById("coverPreview");
+
 const detailImagesFile = document.getElementById("detailImagesFile");
 const detailPreview = document.getElementById("detailPreview");
+const dropZone = document.getElementById("dropZone");
 
+/* ================== DETAIL IMAGES ================== */
+const MAX_DETAIL_IMAGES = 6;
+let selectedDetailFiles = [];
 
+/* ================== COVER PREVIEW ================== */
 if (coverImageFile && coverPreview) {
   coverImageFile.addEventListener("change", () => {
-    const f = coverImageFile.files?.[0];
-    if (!f) {
-      coverPreview.style.display = "none";
-      coverPreview.src = "";
-      return;
-    }
+    const f = coverImageFile.files[0];
+    if (!f) return;
     coverPreview.src = URL.createObjectURL(f);
     coverPreview.style.display = "block";
   });
 }
 
-async function uploadCoverImage(file) {
-  const formData = new FormData();
-  formData.append("file", file);
+/* ================== DETAIL IMAGE HANDLING ================== */
+dropZone.addEventListener("click", () => detailImagesFile.click());
 
-  const res = await fetch(`/api/files/upload`, { method: "POST", body: formData });
-  if (!res.ok) throw new Error(`Upload failed: HTTP ${res.status}`);
+dropZone.addEventListener("dragover", e => {
+  e.preventDefault();
+  dropZone.classList.add("dragover");
+});
+dropZone.addEventListener("dragleave", () => dropZone.classList.remove("dragover"));
+dropZone.addEventListener("drop", e => {
+  e.preventDefault();
+  dropZone.classList.remove("dragover");
+  handleDetailFiles(e.dataTransfer.files);
+});
 
-  const data = await res.json();
-  return data.url; // "/images/xxx.jpg"
+detailImagesFile.addEventListener("change", e => {
+  handleDetailFiles(e.target.files);
+});
+
+function handleDetailFiles(files) {
+  for (const f of files) {
+    if (selectedDetailFiles.length >= MAX_DETAIL_IMAGES) {
+      alert("Tối đa 6 ảnh chi tiết");
+      break;
+    }
+    selectedDetailFiles.push(f);
+  }
+  renderDetailPreview();
 }
-async function uploadManyImages(files) {
-  const arr = Array.from(files || []);
-  if (!arr.length) return [];
 
-  // Upload tuần tự (an toàn, dễ debug). Nếu muốn nhanh hơn có thể Promise.all.
+function renderDetailPreview() {
+  detailPreview.innerHTML = "";
+
+  selectedDetailFiles.forEach((file, index) => {
+    const item = document.createElement("div");
+    item.className = "detail-item";
+    item.draggable = true;
+    item.dataset.index = index;
+
+    item.innerHTML = `
+      <span class="remove">×</span>
+      <img src="${URL.createObjectURL(file)}">
+      <div class="name">${file.name}</div>
+      <div class="size">${(file.size / 1024).toFixed(1)} KB</div>
+    `;
+
+    /* ❌ xoá */
+    item.querySelector(".remove").onclick = () => {
+      selectedDetailFiles.splice(index, 1);
+      renderDetailPreview();
+    };
+
+    /* ===== DRAG START ===== */
+    item.addEventListener("dragstart", e => {
+      dragIndex = index;
+      item.style.opacity = "0.4";
+    });
+
+    /* ===== DRAG END ===== */
+    item.addEventListener("dragend", () => {
+      dragIndex = null;
+      item.style.opacity = "1";
+    });
+
+    /* ===== DRAG OVER ===== */
+    item.addEventListener("dragover", e => {
+      e.preventDefault();
+      item.style.border = "2px dashed #0ea5e9";
+    });
+
+    /* ===== DRAG LEAVE ===== */
+    item.addEventListener("dragleave", () => {
+      item.style.border = "1px solid rgba(0,0,0,0.1)";
+    });
+
+    /* ===== DROP ===== */
+    item.addEventListener("drop", e => {
+      e.preventDefault();
+      item.style.border = "1px solid rgba(0,0,0,0.1)";
+
+      const targetIndex = Number(item.dataset.index);
+      if (dragIndex === null || dragIndex === targetIndex) return;
+
+      const moved = selectedDetailFiles.splice(dragIndex, 1)[0];
+      selectedDetailFiles.splice(targetIndex, 0, moved);
+
+      renderDetailPreview();
+    });
+
+    detailPreview.appendChild(item);
+  });
+}
+
+
+function removeDetailImage(index) {
+  selectedDetailFiles.splice(index, 1);
+  renderDetailPreview();
+}
+
+/* ================== UPLOAD ================== */
+async function uploadCoverImage(file) {
+  const fd = new FormData();
+  fd.append("file", file);
+  const res = await fetch("/api/files/upload", { method: "POST", body: fd });
+  const data = await res.json();
+  return data.url;
+}
+
+async function uploadManyImages(files) {
   const urls = [];
-  for (const f of arr) {
-    const url = await uploadCoverImage(f); // dùng lại endpoint /api/files/upload
-    urls.push(url);
+  for (const f of files) {
+    urls.push(await uploadCoverImage(f));
   }
   return urls;
 }
 
-
-
-window.onload = function () {
+/* ================== LOAD DATA ================== */
+window.onload = () => {
   loadBrands();
   loadProducts();
   setupBackdropClose();
@@ -69,308 +164,102 @@ window.onload = function () {
 
 function loadProducts() {
   fetch(`${API}/phones`)
-    .then(res => {
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return res.json();
-    })
-    .then(data => {
-      cachedProducts = data || [];
+    .then(r => r.json())
+    .then(d => {
+      cachedProducts = d || [];
       renderTable(cachedProducts);
-    })
-    .catch(err => console.error("Lỗi tải sản phẩm:", err));
+    });
 }
 
 function renderTable(data) {
-  let html = "";
-
-  data.forEach(p => {
-    const img = p.coverImageURL || "/img/noimage.png";
-    const brandNameDisplay = p.brandName || "N/A";
-    const stock = (p.stockQuantity ?? 0);
-
-    html += `
-      <tr onclick="viewProduct('${p.phoneId}')" style="cursor:pointer;">
-        <td>${p.phoneId}</td>
-        <td>${p.phoneName}</td>
-        <td>${p.price ? Number(p.price).toLocaleString("vi-VN") : "0"} đ</td>
-        <td>${stock}</td>
-        <td><img src="${img}" width="60" alt="${p.phoneName}"></td>
-        <td>${brandNameDisplay}</td>
-        <td onclick="event.stopPropagation();">
-          <button class="btn" onclick="viewProduct('${p.phoneId}')">Xem</button>
-          <button class="btn" style="background:#d63031" onclick="deleteProduct('${p.phoneId}', '${escapeQuotes(p.phoneName)}')">Xóa</button>
-        </td>
-      </tr>
-    `;
-  });
-
-  document.querySelector("#productTable tbody").innerHTML = html;
-}
-
-function escapeQuotes(s) {
-  return (s || "").replace(/'/g, "\\'");
+  const tbody = document.querySelector("#productTable tbody");
+  tbody.innerHTML = data.map(p => `
+    <tr onclick="viewProduct('${p.phoneId}')">
+      <td>${p.phoneId}</td>
+      <td>${p.phoneName}</td>
+      <td>${Number(p.price).toLocaleString()} đ</td>
+      <td>${p.stockQuantity ?? 0}</td>
+      <td><img src="${p.coverImageURL || "/img/noimage.png"}" width="60"></td>
+      <td>${p.brandName || "N/A"}</td>
+      <td onclick="event.stopPropagation()">
+        <button class="btn" onclick="viewProduct('${p.phoneId}')">Xem</button>
+        <button class="btn btn-danger" onclick="deleteProduct('${p.phoneId}','${p.phoneName}')">Xóa</button>
+      </td>
+    </tr>
+  `).join("");
 }
 
 function viewProduct(id) {
-  // mở tab/cửa sổ mới để sửa chi tiết
-  window.open(`product-detail.html?id=${encodeURIComponent(id)}`, "_blank");
+  window.open(`product-detail.html?id=${id}`, "_blank");
 }
 
 function loadBrands() {
   fetch(`${API}/brands`)
-    .then(res => {
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return res.json();
-    })
-    .then(data => {
-      brandId.innerHTML = "";
-      (data || []).forEach(b => {
-        brandId.innerHTML += `<option value="${b.brandId}">${b.brandName}</option>`;
-      });
-    })
-    .catch(err => console.error("Lỗi tải Brands:", err));
+    .then(r => r.json())
+    .then(d => {
+      brandId.innerHTML = d.map(b =>
+        `<option value="${b.brandId}">${b.brandName}</option>`
+      ).join("");
+    });
 }
 
-// MODAL THÊM
+/* ================== SAVE PRODUCT ================== */
+async function saveProduct() {
+  const coverUrl = coverImageFile.files[0]
+    ? await uploadCoverImage(coverImageFile.files[0])
+    : "";
+
+  const detailUrls = await uploadManyImages(selectedDetailFiles);
+
+  const data = {
+    phoneName: phoneName.value.trim(),
+    price: Number(price.value),
+    brandId: brandId.value,
+    stockQuantity: Number(stockQuantity.value),
+    status: status.value,
+    chipset: chipset.value,
+    ramSize: ramSize.value,
+    storageSize: storageSize.value,
+    screenInfo: screenInfo.value,
+    batteryInfo: batteryInfo.value,
+    rearCamera: rearCamera.value,
+    frontCamera: frontCamera.value,
+    osVersion: osVersion.value,
+    color: color.value,
+    phoneDescription: phoneDescription.value,
+    coverImageURL: coverUrl,
+    detailImages: detailUrls
+  };
+
+  await fetch(`${API}/phones`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+
+  closeModal();
+  loadProducts();
+  alert("Đã thêm sản phẩm");
+}
+
+/* ================== MODAL ================== */
 function openAddModal() {
-  phoneName.value = "";
-  price.value = "";
-  brandId.value = "";
-
-  stockQuantity.value = 0;
-  status.value = "ACTIVE";
-
-  chipset.value = "";
-  ramSize.value = "";
-  storageSize.value = "";
-  screenInfo.value = "";
-  batteryInfo.value = "";
-  rearCamera.value = "";
-  frontCamera.value = "";
-  osVersion.value = "";
-  color.value = "";
-  phoneDescription.value = "";
-
-  // reset file + preview
-  if (coverImageFile) coverImageFile.value = "";
-  if (coverPreview) {
-    coverPreview.style.display = "none";
-    coverPreview.src = "";
-  }
-   if (detailImagesFile) detailImagesFile.value = "";
-   if (detailPreview) detailPreview.innerHTML = "";
-
-  document.getElementById("modalTitle").innerText = "Thêm sản phẩm";
+  selectedDetailFiles = [];
+  renderDetailPreview();
   document.getElementById("productModal").style.display = "flex";
 }
-
-
-
 function closeModal() {
   document.getElementById("productModal").style.display = "none";
 }
-
-// POST tạo sản phẩm (sửa thông tin sẽ làm ở product-detail)
-async function saveProduct() {
-  try {
-    const coverFile = coverImageFile.files?.[0];
-    let coverUrl = "";
-
-    if (coverFile) {
-      coverUrl = await uploadCoverImage(coverFile);
-    }
-
-    // ✅ upload nhiều ảnh chi tiết
-    const detailFiles = detailImagesFile?.files;
-    const detailUrls = await uploadManyImages(detailFiles); // array "/images/xxx.jpg"
-
-    const data = {
-      phoneName: phoneName.value.trim(),
-      price: Number(price.value),
-      coverImageURL: coverUrl,
-      brandId: brandId.value,
-
-      stockQuantity: Number(stockQuantity.value),
-      status: status.value,
-
-      chipset: chipset.value.trim(),
-      ramSize: ramSize.value.trim(),
-      storageSize: storageSize.value.trim(),
-      screenInfo: screenInfo.value.trim(),
-      batteryInfo: batteryInfo.value.trim(),
-      rearCamera: rearCamera.value.trim(),
-      frontCamera: frontCamera.value.trim(),
-      osVersion: osVersion.value.trim(),
-      color: color.value.trim(),
-      phoneDescription: phoneDescription.value.trim(),
-
-      // ✅ quan trọng: backend sẽ lưu vào product_images
-      detailImages: detailUrls
-    };
-
-    if (!data.phoneName) return alert("Tên sản phẩm không được để trống.");
-    if (!data.price || data.price <= 0) return alert("Giá phải > 0.");
-    if (!data.brandId) return alert("Vui lòng chọn thương hiệu.");
-
-    const res = await fetch(`${API}/phones`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
-
-    if (!res.ok) {
-      const msg = await res.text().catch(() => "");
-      throw new Error(msg || `HTTP ${res.status}`);
-    }
-
-    closeModal();
-    loadProducts();
-    alert("Đã thêm sản phẩm (kèm ảnh chi tiết).");
-  } catch (err) {
-    console.error(err);
-    alert("Lỗi thêm sản phẩm: " + err.message);
-  }
+function setupBackdropClose() {
+  const m = document.getElementById("productModal");
+  m.addEventListener("click", e => {
+    if (e.target === m) closeModal();
+  });
 }
-
-
-
 
 function deleteProduct(id, name) {
-  if (!confirm(`Bạn chắc chắn muốn xóa sản phẩm: ${name} (${id})?`)) return;
-
-  fetch(`${API}/phones/${encodeURIComponent(id)}`, { method: "DELETE" })
-    .then(res => {
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      loadProducts();
-    })
-    .catch(err => {
-      console.error(err);
-      alert("Lỗi xóa sản phẩm: " + err.message);
-    });
-}
-
-// MODAL TỒN KHO (áp dụng toàn bộ)
-function openStockModal() {
-  const stockModal = document.getElementById("stockModal");
-  const stockList = document.getElementById("stockList");
-
-  if (!stockModal || !stockList) {
-    alert("Thiếu HTML của stockModal/stockList trong products.html");
-    return;
-  }
-
-  if (!Array.isArray(cachedProducts) || cachedProducts.length === 0) {
-    stockList.innerHTML = `<p style="margin:0;">Chưa có sản phẩm để chỉnh tồn kho.</p>`;
-    stockModal.style.display = "flex";
-    return;
-  }
-
-  stockList.innerHTML = cachedProducts.map(p => `
-    <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 0; border-bottom:1px solid rgba(148,163,184,.35);">
-      <div style="flex:1;">
-        <div style="font-weight:700;">${p.phoneName}</div>
-        <div style="font-size:12px; opacity:0.8;">${p.phoneId} • ${p.brandName || "N/A"}</div>
-      </div>
-      <input
-        type="number"
-        min="0"
-        style="width:140px;"
-        data-phone-id="${p.phoneId}"
-        value="${p.stockQuantity ?? 0}"
-      />
-    </div>
-  `).join("");
-
-  stockModal.style.display = "flex";
-}
-
-
-function closeStockModal() {
-  document.getElementById("stockModal").style.display = "none";
-}
-
-function saveStockChanges() {
-  const inputs = document.querySelectorAll("#stockList input[data-phone-id]");
-  const updates = [];
-
-  inputs.forEach(inp => {
-    const id = inp.getAttribute("data-phone-id");
-    const newQty = Number(inp.value);
-
-    const p = cachedProducts.find(x => x.phoneId === id);
-    if (!p) return;
-
-    const oldQty = (p.stockQuantity ?? 0);
-    if (oldQty !== newQty) {
-      // gửi DTO phẳng lên PUT
-      updates.push({ ...p, stockQuantity: newQty });
-    }
-  });
-
-  if (updates.length === 0) {
-    closeStockModal();
-    return;
-  }
-
-  Promise.all(
-    updates.map(p =>
-      fetch(`${API}/phones/${encodeURIComponent(p.phoneId)}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(p)
-      }).then(res => {
-        if (!res.ok) throw new Error(`Update ${p.phoneId} failed: HTTP ${res.status}`);
-      })
-    )
-  )
-    .then(() => {
-      closeStockModal();
-      loadProducts();
-      alert("Đã cập nhật tồn kho.");
-    })
-    .catch(err => {
-      console.error(err);
-      alert("Lỗi cập nhật tồn kho: " + err.message);
-    });
-}
-function setupBackdropClose() {
-  const productModal = document.getElementById("productModal");
-  const stockModal = document.getElementById("stockModal");
-
-  if (productModal) {
-    productModal.addEventListener("click", (e) => {
-      // chỉ đóng khi click vào nền tối (overlay)
-      if (e.target === productModal) closeModal();
-    });
-  }
-
-  if (stockModal) {
-    stockModal.addEventListener("click", (e) => {
-      if (e.target === stockModal) closeStockModal();
-    });
-  }
-}
-if (detailImagesFile && detailPreview) {
-  detailImagesFile.addEventListener("change", () => {
-    detailPreview.innerHTML = "";
-    const files = Array.from(detailImagesFile.files || []);
-    if (!files.length) return;
-
-    files.forEach((f) => {
-      const img = document.createElement("img");
-      img.src = URL.createObjectURL(f);
-      img.style.width = "90px";
-      img.style.height = "90px";
-      img.style.objectFit = "cover";
-      img.style.borderRadius = "12px";
-      img.style.border = "1px solid rgba(0,0,0,0.08)";
-      detailPreview.appendChild(img);
-    });
-  });
-}
-
-
-function logout() {
-  localStorage.removeItem("isAdmin");
-  window.location.href = "admin-login.html";
+  if (!confirm(`Xóa ${name}?`)) return;
+  fetch(`${API}/phones/${id}`, { method: "DELETE" })
+    .then(() => loadProducts());
 }

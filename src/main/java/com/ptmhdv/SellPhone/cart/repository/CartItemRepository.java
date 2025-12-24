@@ -9,17 +9,16 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-public interface CartItemRepository extends JpaRepository<CartItem, String> {
+public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
 
     List<CartItem> findByCart_CartId(String cartId);
 
     void deleteByCart_CartIdAndPhone_PhoneId(String cartId, String phoneId);
 
-    Optional<CartItem> findByCartCartIdAndPhonePhoneId(String cartId, String phoneId);
+    Optional<CartItem> findByCart_CartIdAndPhone_PhoneId(String cartId, String phoneId);
 
     void deleteByCart_CartId(String cartId);
 
-    // ✅ IMPORTANT: chỉ lấy các item thuộc đúng cartId + nằm trong list ids
     @Query("""
         select ci from CartItem ci
         where ci.cart.cartId = :cartId
@@ -27,6 +26,9 @@ public interface CartItemRepository extends JpaRepository<CartItem, String> {
     """)
     List<CartItem> findByCartIdAndCartItemIdIn(
             @Param("cartId") String cartId,
-            @Param("ids") Collection<String> ids
+            @Param("ids") List<Integer> ids
     );
 }
+
+
+

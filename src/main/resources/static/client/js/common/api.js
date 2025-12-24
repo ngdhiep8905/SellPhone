@@ -34,9 +34,36 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error("Register failed");
-      return res.json();
+
+      // cố gắng parse JSON cho cả trường hợp ok và lỗi
+      let data = null;
+      const ct = res.headers.get("content-type") || "";
+
+      try {
+        if (ct.includes("application/json")) {
+          data = await res.json();
+        } else {
+          const text = await res.text();
+          data = text ? { message: text } : null;
+        }
+      } catch (_) {
+        data = null;
+      }
+
+      if (!res.ok) {
+        // backend của bạn trả { message: "EMAIL_EXISTS", detail: "..." }
+        // ném object để register.js đọc err.message và err.detail
+        throw {
+          status: res.status,
+          message: data?.message || `HTTP_${res.status}`,
+          detail: data?.detail || null,
+          raw: data,
+        };
+      }
+
+      return data;
     }
+
 
     export async function apiFetchProducts(keyword = "", brandId = "") {
       const params = new URLSearchParams();

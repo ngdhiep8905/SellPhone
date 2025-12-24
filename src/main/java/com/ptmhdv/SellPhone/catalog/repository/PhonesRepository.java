@@ -32,5 +32,8 @@ public interface PhonesRepository extends JpaRepository<Phones, String> {
         WHERE phone_id REGEXP '^P[0-9]+$'
         """, nativeQuery = true)
     Integer findMaxPhoneNumber();
+    @Query("select count(p) from Phones p where p.coverImageURL = :url")
+    long countByCoverImageURL(@Param("url") String url);
+    boolean existsByCoverImageURL(String coverImageURL);
 }
 

@@ -43,42 +43,35 @@ public class CartService {
     }
 
     @Transactional
-    public Cart addToCartByToken(String token, String phoneId, Integer quantity) {
-        if (token == null || token.isBlank()) {
-            throw new IllegalArgumentException("cartToken is required");
-        }
-        if (phoneId == null || phoneId.isBlank()) {
-            throw new IllegalArgumentException("phoneId is required");
-        }
-        if (quantity == null || quantity <= 0) {
-            throw new IllegalArgumentException("quantity must be > 0");
-        }
+    public Cart addToCartByToken(String cartToken, String phoneId, int quantity) {
+        Cart cart = cartRepo.findByCartToken(cartToken)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy giỏ hàng"));
 
         Phones phone = phonesRepo.findById(phoneId)
-                .orElseThrow(() -> new ResourceNotFoundException("Phone not found"));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm"));
 
-        Cart cart = getOrCreateCartByToken(token);
-
-        CartItem item = cartItemRepo
-                .findByCartCartIdAndPhonePhoneId(cart.getCartId(), phoneId)
+        CartItem existing = cartItemRepo
+                .findByCart_CartIdAndPhone_PhoneId(cart.getCartId(), phoneId)
                 .orElse(null);
 
-        if (item == null) {
-            item = new CartItem();
-            // ✅ KHÔNG set cartItemId thủ công (entity @PrePersist sẽ tự sinh UUID)
-            item.setCart(cart);
-            item.setPhone(phone);
-            item.setQuantity(quantity);
+        if (existing != null) {
+            existing.setQuantity(existing.getQuantity() + quantity);
+            cartItemRepo.save(existing);
         } else {
-            item.setQuantity(item.getQuantity() + quantity);
+            CartItem ci = new CartItem();
+            ci.setCart(cart);          // ✅ set relation
+            ci.setPhone(phone);
+            ci.setQuantity(quantity);
+            cartItemRepo.save(ci);     // ✅ DB tự AUTO_INCREMENT cart_item_id
         }
 
-        cartItemRepo.save(item);
-        return cart;
+        return getOrCreateCartByToken(cartToken);
+
     }
 
+
     @Transactional
-    public Cart updateQuantityByToken(String token, String cartItemId, Integer quantity) {
+    public Cart updateQuantityByToken(String token, Integer cartItemId, Integer quantity) {
         if (token == null || token.isBlank()) {
             throw new IllegalArgumentException("cartToken is required");
         }
@@ -102,7 +95,7 @@ public class CartService {
     }
 
     @Transactional
-    public Cart removeItemByToken(String token, String cartItemId) {
+    public Cart removeItemByToken(String token, Integer cartItemId) {
         if (token == null || token.isBlank()) {
             throw new IllegalArgumentException("cartToken is required");
         }
@@ -121,11 +114,12 @@ public class CartService {
 
     private Cart createGuestCart(String token) {
         Cart cart = new Cart();
-        cart.setCartId("C" + System.currentTimeMillis());
+
         cart.setCartToken(token);
         cart.setUser(null);
-        return cartRepo.save(cart);
+        return cartRepo.save(cart); // ✅ @PrePersist sinh cartId UUID(36)
     }
+
 
     @Transactional
     public Cart attachGuestCartToUser(String token, Users user) {
@@ -161,7 +155,6 @@ public class CartService {
         return cartRepo.findByUser_UserId(user.getUserId())
                 .orElseGet(() -> {
                     Cart c = new Cart();
-                    c.setCartId("C" + System.currentTimeMillis());
                     c.setUser(user);
                     c.setCartToken(UUID.randomUUID().toString());
                     return cartRepo.save(c);

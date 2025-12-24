@@ -43,6 +43,5 @@ export function updateHeaderUI() {
 
   loginBtn.onclick = () => (window.location.href = "login.html");
 
-  // ✅ chỉ dùng 1 handler logout (rotate cookie + clear session + fetch cart)
   logoutBtn.onclick = handleLogout;
 }

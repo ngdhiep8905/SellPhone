@@ -6,6 +6,7 @@ import com.ptmhdv.SellPhone.order.entity.OrdersPhones;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import org.hibernate.annotations.Where;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -74,8 +75,15 @@ public class Phones {
     private Brands brand;
 
     // --- LIÊN KẾT ẢNH CHI TIẾT ---
-    @OneToMany(mappedBy = "phone", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "phone",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @OrderBy("position ASC")
+    @Where(clause = "deleted = false")
     private List<ProductImage> productImages;
+
 
 
     @OneToMany(mappedBy = "phone", cascade = CascadeType.ALL)

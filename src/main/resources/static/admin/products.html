@@ -97,9 +97,16 @@
             <input type="file" id="coverImageFile" accept="image/*">
             <img id="coverPreview" style="margin-top:10px; max-width:160px; border-radius:12px; display:none;" />
 
-            <label>Ảnh chi tiết (nhiều ảnh)</label>
-            <input type="file" id="detailImagesFile" accept="image/*" multiple>
-            <div id="detailPreview" style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;"></div>
+            <label>Ảnh chi tiết (tối đa 6 ảnh)</label>
+
+            <div id="dropZone" class="drop-zone">
+                Kéo & thả ảnh vào đây hoặc click để chọn
+            </div>
+
+            <input type="file" id="detailImagesFile" accept="image/*" multiple hidden>
+
+            <div id="detailPreview" class="detail-preview"></div>
+
 
             <label>Thương hiệu</label>
             <select id="brandId"></select>

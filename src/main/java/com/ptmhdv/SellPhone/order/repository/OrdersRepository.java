@@ -26,7 +26,7 @@ public interface OrdersRepository extends JpaRepository<Orders, String> {
     List<Orders> filterOrders(Integer month, Integer year);//can chu y
 
     @Query("""
-        SELECT COALESCE(SUM(o.totalPrice), 0)
+        SELECT COALESCE(SUM(o.totalAmount), 0)
         FROM Orders o
         WHERE MONTH(o.bookDate) = MONTH(CURRENT_DATE)
           AND YEAR(o.bookDate) = YEAR(CURRENT_DATE)
@@ -34,7 +34,7 @@ public interface OrdersRepository extends JpaRepository<Orders, String> {
     BigDecimal getCurrentMonthRevenue();
 
     @Query("""
-        SELECT MONTH(o.bookDate), SUM(o.totalPrice)
+        SELECT MONTH(o.bookDate), SUM(o.totalAmount)
         FROM Orders o
         GROUP BY MONTH(o.bookDate)
         ORDER BY MONTH(o.bookDate)
@@ -42,7 +42,7 @@ public interface OrdersRepository extends JpaRepository<Orders, String> {
     List<Object[]> getRevenueMonthly();
 
     @Query("""
-    SELECT o.bookDate, SUM(o.totalPrice)
+    SELECT o.bookDate, SUM(o.totalAmount)
     FROM Orders o
     WHERE (:month IS NULL OR MONTH(o.bookDate) = :month)
       AND (:year IS NULL OR YEAR(o.bookDate) = :year)
@@ -59,7 +59,8 @@ public interface OrdersRepository extends JpaRepository<Orders, String> {
    FROM Orders o
    WHERE (:status IS NULL OR o.status = :status)
      AND (:paymentMethod IS NULL OR o.payment.paymentMethod = :paymentMethod)
-     AND (:paymentStatus IS NULL OR o.payment.paymentStatus = :paymentStatus)
+     AND (:paymentStatus IS NULL OR o.paymentStatus = :paymentStatus)
+            
    ORDER BY o.bookDate DESC
 """)
     List<Orders> adminFilter(String status, String paymentMethod, String paymentStatus);

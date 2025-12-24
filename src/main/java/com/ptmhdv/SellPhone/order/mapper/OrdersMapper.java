@@ -22,7 +22,7 @@ public class OrdersMapper {
         d.setRecipientName(e.getRecipientName());
         d.setRecipientPhone(e.getRecipientPhone());
         d.setShippingAddress(e.getShippingAddress());
-        d.setTotalAmount(e.getTotalPrice()); // Khớp với Entity totalPrice
+        d.setTotalAmount(e.getTotalAmount()); // Khớp với Entity totalPrice
 
         // Chuyển đổi danh sách chi tiết sản phẩm
         if (e.getOrderPhones() != null) {

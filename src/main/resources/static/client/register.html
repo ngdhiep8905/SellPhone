@@ -12,28 +12,40 @@
 
 </head>
 <body data-page="register">
-  <header class="sp-header">
+<header class="sp-header">
     <div class="sp-header__left">
-      <div class="sp-logo">
-        <span class="sp-logo__icon">📱</span>
-        <div class="sp-logo__text">
-          <span class="sp-logo__brand">SellPhone</span>
-          <span class="sp-logo__tagline">Đăng ký để săn deal</span>
+        <div class="sp-logo">
+            <span class="sp-logo__icon">📱</span>
+            <div class="sp-logo__text">
+                <span class="sp-logo__brand">SellPhone</span>
+                <span class="sp-logo__tagline">Danh sách điện thoại khuyến mãi</span>
+            </div>
         </div>
-      </div>
+        <nav class="sp-nav">
+            <a href="index.html" class="sp-nav__item">Trang chủ</a>
+            <a href="products.html" class="sp-nav__item sp-nav__item--active">Sản phẩm</a>
+        </nav>
     </div>
+
     <div class="sp-header__right">
-      <nav class="sp-nav">
-        <a href="index.html" class="sp-nav__link">Trang chủ</a>
-        <a href="products.html" class="sp-nav__link">Sản phẩm</a>
-        <a href="cart.html" class="sp-nav__link">Giỏ hàng</a>
-        <a href="account.html" class="sp-nav__link">Tài khoản</a>
-      </nav>
-      <div class="sp-header__actions">
-        <a href="login.html" class="sp-btn sp-btn--ghost sp-btn--sm">Đăng nhập</a>
-      </div>
+        <div class="sp-header__icons">
+            <a href="cart.html" class="sp-header-icon" title="Giỏ hàng">
+                <span class="sp-header-icon__badge" id="cart-header-count">0</span>🛒
+            </a>
+            <a href="account.html" class="sp-header-icon" title="Tài khoản của tôi">👤</a>
+        </div>
+
+        <div class="sp-user">
+            <div class="sp-user__info">
+                <span id="user-label" class="sp-user__label">Chưa đăng nhập</span>
+            </div>
+            <div class="sp-user__actions">
+                <button id="login-header-btn" class="sp-btn sp-btn--outline sp-btn--sm">Đăng nhập</button>
+                <button id="logout-header-btn" class="sp-btn sp-btn--outline sp-btn--sm sp-hidden">Đăng xuất</button>
+            </div>
+        </div>
     </div>
-  </header>
+</header>
 
   <main class="sp-layout" style="grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.2fr);">
     <section class="sp-panel sp-panel--main">
